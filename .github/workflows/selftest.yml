@@ -68,8 +68,12 @@ jobs:
         continue-on-error: true   # W3's last task; remove once it lands
 
       # -------------------------------------------------------------- corpus/meta
+      # `--experimental-vm-modules` is required, not a nicety: 14 of the 270
+      # fixtures are ES modules and minting a code cache for one needs
+      # `vm.SourceTextModule`, which node keeps behind that flag. The check
+      # says so itself when the flag is missing, which is how this was found.
       - name: the syntax-feature corpus is well formed
-        run: node corpus/check.mjs
+        run: node --experimental-vm-modules corpus/check.mjs
 
       - name: layering — no decompilation layer imports the oracle harness
         shell: bash

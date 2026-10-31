@@ -21,11 +21,22 @@ const SUITES = [
   ['recover', 'tools/recover/selftest.mjs', 'SSA -> expressions, statements and names'],
   ['structure', 'tools/structure/selftest.mjs', 'CFG -> a structured control tree'],
   ['emit', 'tools/emit/selftest.mjs', 'control tree + expressions -> JavaScript'],
-  ['corpus', 'corpus/check.mjs', 'the 270 syntax-feature fixtures are well formed'],
+  // `--experimental-vm-modules` is not optional for this one. 14 of the 270
+  // fixtures are ES modules, and minting a code cache for a module needs
+  // `vm.SourceTextModule`, which node hides behind that flag. Without it the
+  // check reports "will not compile to a .jsc" for all 14 and fails -- which
+  // is the right behaviour on its part, and the reason it is spelled out here
+  // rather than worked around. A local run that happens to find Electron in
+  // .v8bin-cache/ mints all 270 and passes, so the flag is also what stops the
+  // result depending on which minter is lying around.
+  ['corpus', 'corpus/check.mjs', 'the 270 syntax-feature fixtures are well formed',
+    ['--experimental-vm-modules']],
 ];
 
 if (process.argv.includes('--list')) {
-  for (const [name, file, what] of SUITES) console.log(`${name.padEnd(12)} ${file.padEnd(34)} ${what}`);
+  for (const [name, file, what, flags] of SUITES) {
+    console.log(`${name.padEnd(12)} ${file.padEnd(34)} ${what}${flags ? `   [${flags.join(' ')}]` : ''}`);
+  }
   process.exit(0);
 }
 
@@ -33,14 +44,14 @@ const only = process.argv.slice(2).filter((a) => !a.startsWith('-'));
 const results = [];
 let failed = 0;
 
-for (const [name, file, what] of SUITES) {
+for (const [name, file, what, flags = []] of SUITES) {
   if (only.length && !only.includes(name)) continue;
   if (!fs.existsSync(file)) {
     results.push({ name, state: 'absent', what });
     continue;
   }
   const t0 = Date.now();
-  const r = spawnSync(process.execPath, [file], { stdio: 'inherit' });
+  const r = spawnSync(process.execPath, [...flags, file], { stdio: 'inherit' });
   const ms = Date.now() - t0;
   const ok = r.status === 0;
   if (!ok) failed++;

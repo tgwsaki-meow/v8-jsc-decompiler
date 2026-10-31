@@ -11,7 +11,7 @@
     "test:ir": "node tools/ir/selftest.mjs",
     "test:recover": "node tools/recover/selftest.mjs",
     "test:structure": "node tools/structure/selftest.mjs",
-    "test:corpus": "node corpus/check.mjs",
+    "test:corpus": "node --experimental-vm-modules corpus/check.mjs",
     "oracle": "node tools/oracle/selftest.mjs",
     "oracle:frontend": "node tests/t4/acceptance.mjs",
     "oracle:disasm": "node tools/disasm/oracle_agreement.mjs",
