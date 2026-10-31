@@ -28,20 +28,66 @@ import path from 'node:path';
 import vm from 'node:vm';
 import { spawnSync } from 'node:child_process';
 
-export const ELECTRON_CANDIDATES = [
-  '.v8bin-cache/electron-v40.0.0-win32-x64/electron.exe',
-  '.v8bin-cache/electron-v40.0.0-win32-x64/electron',
-];
+export const BIN_CACHE = '.v8bin-cache';
 export const D8_CANDIDATES = [
   '.v8bin-cache/v8-win64-rel-14.4.258.17/d8.exe',
   '.v8bin-cache/v8-linux64-rel-14.4.258.16/d8',
 ];
 
+// The only name this host can hand to `spawn`. A cache can hold both builds --
+// a Windows dev machine's `electron.exe` and a Linux runner's `electron` live
+// in sibling directories -- and looking for either one is how a linux ELF gets
+// handed to a Windows spawn.
+const ELECTRON_EXE = process.platform === 'win32' ? 'electron.exe' : 'electron';
+
+// Electron major -> the V8 it ships. Only what has been read off a binary
+// (`fetch_electron.mjs --binary` prints `process.versions.v8` before anything
+// depends on the download) is listed; an unlisted major reports null rather
+// than inheriting 40's string. Nothing here enforces the match: O1 refuses two
+// caches whose header versionHash disagrees (o1_corpus.mjs, the `hx` gate), so
+// a mislabelled minter fails on the artefact instead of on a string written
+// down beside it.
+const ELECTRON_V8 = Object.freeze({ 40: '14.4.258.16' });
+
 const CHILD = path.resolve('src/verify/mint_child.cjs');
 
+/**
+ * Every unpacked Electron in the binary cache, most preferred first.
+ *
+ * This was a hard-coded `electron-v40.0.0-win32-x64/electron.exe`, and the
+ * platform in that directory name is the DOWNLOADER's: a Linux CI job fetched
+ * its own archive, unpacked it, and the O1 runner still exited 2 saying there
+ * was no minter. So scan instead, prefer a directory built for this platform,
+ * and sort the rest so the choice does not depend on readdir order.
+ */
+export function electronCandidates() {
+  let ents;
+  try { ents = fs.readdirSync(BIN_CACHE, { withFileTypes: true }); } catch { return []; }
+  const dirs = ents.filter((e) => e.isDirectory() && /^electron-v[0-9]/.test(e.name))
+    .map((e) => e.name).sort();
+  const mine = `-${process.platform}-`;
+  return [...dirs.filter((n) => n.includes(mine)), ...dirs.filter((n) => !n.includes(mine))]
+    .map((n) => path.join(BIN_CACHE, n, ELECTRON_EXE));
+}
+
 export function findElectron() {
-  for (const c of ELECTRON_CANDIDATES) if (fs.existsSync(c)) return path.resolve(c);
+  for (const c of electronCandidates()) {
+    if (!fs.existsSync(c)) continue;
+    // A zip extractor that drops the POSIX mode leaves a file that exists and
+    // cannot be run; it then fails as an EACCES that reads like ENOENT, inside
+    // the minter, once per corpus file. One syscall here instead.
+    if (process.platform !== 'win32') {
+      try { fs.accessSync(c, fs.constants.X_OK); } catch { continue; }
+    }
+    return path.resolve(c);
+  }
   return null;
+}
+
+/** The V8 of a cached Electron, by the major in its directory name. */
+export function electronV8(exePath) {
+  const m = /^electron-v(\d+)\./.exec(path.basename(path.dirname(exePath)));
+  return (m && ELECTRON_V8[m[1]]) ?? null;
 }
 export function findD8() {
   for (const c of D8_CANDIDATES) if (fs.existsSync(c)) return path.resolve(c);
@@ -79,8 +125,11 @@ export function resolveMinter(spec = 'auto') {
   }
   if (spec === 'auto' || spec === 'electron') {
     const e = findElectron();
-    if (e) return { kind: 'electron', exe: e, label: path.basename(e), v8: '14.4.258.16', inProcess: false };
-    if (spec === 'electron') throw new Error(`electron not found; looked in ${ELECTRON_CANDIDATES.join(', ')}`);
+    if (e) return { kind: 'electron', exe: e, label: path.basename(e), v8: electronV8(e), inProcess: false };
+    if (spec === 'electron') {
+      const cands = electronCandidates();
+      throw new Error(`electron not found; looked in ${cands.length ? cands.join(', ') : `${BIN_CACHE}/ (no electron-v* directory)`}`);
+    }
     return resolveMinter('node');
   }
   const exe = path.resolve(spec);
