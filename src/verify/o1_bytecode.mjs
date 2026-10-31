@@ -22,8 +22,15 @@
 //  3. A V8 run EXECUTES the script after printing its bytecode. There is no
 //     compile-only mode for --print-bytecode. O1 is therefore restricted to
 //     code we wrote (corpus/features/**) and the pipeline's output for it, and
-//     assertExecutable() enforces that rather than trusting the caller. O1 for
-//     `extracted_jsc/` needs our own decoder for stream A -- that is T4/T5.
+//     assertExecutable() enforces that rather than trusting the caller.
+//
+//     O1 for `extracted_jsc/` is NOW MEASURED, by `o1_corpus.mjs`: it decodes
+//     stream A with src/disasm instead of asking an engine to print it, and
+//     gets stream B by COMPILING our output (`--no-lazy` +
+//     `produceCachedData`, which runs nothing) and decoding that the same way.
+//     Both streams through one decoder, nothing executed. See docs/O1.md.
+//     This file stays as the engine-truth oracle for the fixtures, where
+//     running the program is allowed and is worth the stronger guarantee.
 //
 // Every failure mode is a row, never a throw: mint-failed, pipeline-threw,
 // pipeline-timeout, output-unparseable, engine-failed, no-functions.
@@ -270,7 +277,7 @@ export function o1Identity(entry, opts = {}) {
  * is O1's blind spot, measured: V8 prints an array or object literal as
  * `<ArrayBoilerplateDescription PACKED_SMI_ELEMENTS, <FixedArray[3]>>` and
  * never prints the element values, on either engine (verified in
- * scratch/t3/probe_pool.mjs), so a change confined to literal element values
+ * tools/probes/probe_pool.mjs), so a change confined to literal element values
  * does not appear in any listing. O3 sees those; O1 cannot.
  */
 export function o1SelfCheck(entries, opts = {}) {
@@ -303,7 +310,7 @@ export function o1SelfCheck(entries, opts = {}) {
     blindSpot: {
       what: 'values inside boilerplate constants (array / object literals)',
       why: 'V8 prints the boilerplate descriptor, never the element values -- on node (pool dumped) as well as d8 (pool partial)',
-      evidence: 'scratch/t3/probe_pool.mjs',
+      evidence: 'tools/probes/probe_pool.mjs',
       invisibleMutations: disc.flatMap((d) => d.invisibleMutations.map((m) => `${d.id}: ${m}`)),
     },
   };

@@ -3,6 +3,19 @@
 The only instrument in this project that can answer *"is the decompiled JS the
 same program as the `.jsc`?"* with a number.
 
+There are **two** O1s, and they differ only in where stream A comes from:
+
+| | stream A | stream B | runs on |
+|---|---|---|---|
+| `o1_bytecode.mjs` | a real V8's `--print-bytecode` of the original source | the same, of our output | `corpus/features/**` only — V8 *executes* the script after printing it |
+| `o1_corpus.mjs` | `src/disasm` decoding the `.jsc` | `src/disasm` decoding a `.jsc` COMPILED from our output (`--no-lazy` + `produceCachedData`) | anything, including `extracted_jsc/`, because nothing is executed |
+
+The first buys engine truth with the right to run the program; the second
+keeps the program unrun and trusts the decoder, which
+`tools/disasm/oracle_agreement.mjs` measured instruction-exact on 1680/1680
+functions. Numbers, erasure contract and ranked causes: **`docs/O1.md`**.
+Self-test: `node tools/verify/o1_corpus_selftest.mjs`.
+
 ```
 original .jsc ──our decoder──────────────────────────────→ bytecode stream A
               └─our decompiler─→ JS' ──real V8 --print-bytecode──→ stream B
