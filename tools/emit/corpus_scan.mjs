@@ -39,8 +39,24 @@ const WORK = val('--work', 'scratch/t9/corpus');
 const OUT = val('--out', 'scratch/t9/EMIT_CORPUS.md');
 const PROFILE = val('--profile', path.join('profiles', '14.4.258.16'));
 const JOBS = Math.max(1, Number(val('--jobs', '2')));
-const TIMEOUT = Number(val('--timeout', '300000'));
-const HEAP = Number(val('--heap', '1200'));
+
+// `--timeout` is in SECONDS, and the heap flag is `--child-heap`, both to match
+// tools/structure and tools/recover. They used to differ here -- milliseconds,
+// and `--heap` -- and the first sharded cloud run over all 1039 files was
+// invoked with the other two scanners' spelling:
+//
+//     --jobs 1 --child-heap 6000 --timeout 2700
+//
+// so this scanner read a 2700 MILLISECOND timeout and ignored the heap
+// setting entirely, keeping its 1200 MB default. 46 files, every one of the
+// largest, died with `killed by SIGKILL after ~2.74 s` -- which was read as
+// the kernel's OOM killer and is nothing of the kind. A flag that means
+// seconds in two tools and milliseconds in a third will keep doing this, so
+// the units are now the same everywhere and the old spellings are accepted as
+// aliases rather than silently ignored.
+const TIMEOUT = Number(val('--timeout', '300')) * 1000;
+const HEAP_MB = val('--child-heap', null) ?? val('--heap', '1200');
+const HEAP = Number(HEAP_MB);
 const STRIDE = Number(val('--stride', '1'));
 const MAX = Number(val('--max-files', '0'));
 /**
