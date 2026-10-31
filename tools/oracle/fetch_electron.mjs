@@ -15,6 +15,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
+import { extractZip } from './unzip.mjs';
 
 const version = process.argv[2] ?? '40.0.0';
 const platform = process.argv[3] ?? 'win32-x64';
@@ -49,14 +50,13 @@ const buf = fs.readFileSync(zipPath);
 console.log(`cached ${zipPath}`);
 console.log(`  bytes=${buf.length} sha256=${crypto.createHash('sha256').update(buf).digest('hex')}`);
 
-// Extract only the two snapshot blobs (bsdtar can select members).
-// `tar.exe` is the Windows spelling; on Linux and macOS it is plain `tar`.
-const TAR = process.platform === 'win32' ? 'tar.exe' : 'tar';
+// Extract only the two snapshot blobs; both extractors take member names as
+// trailing operands. See tools/oracle/unzip.mjs for why this is not just `tar`.
 const dir = zipPath.replace(/\.zip$/, '');
 fs.mkdirSync(dir, { recursive: true });
 for (const member of ['v8_context_snapshot.bin', 'snapshot_blob.bin']) {
   try {
-    execFileSync(TAR, ['-xf', zipPath, '-C', dir, member], { stdio: 'inherit' });
+    extractZip(zipPath, dir, [member]);
     const p = path.join(dir, member);
     const b = fs.readFileSync(p);
     console.log(`  ${member}: ${b.length} bytes sha256=${crypto.createHash('sha256').update(b).digest('hex')}`);
