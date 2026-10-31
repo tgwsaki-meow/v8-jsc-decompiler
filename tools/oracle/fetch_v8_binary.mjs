@@ -31,6 +31,9 @@ import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 
 const BUCKET = 'https://storage.googleapis.com/chromium-v8';
+
+/** bsdtar, which reads zip. `tar.exe` on Windows, `tar` everywhere else. */
+export const TAR = process.platform === 'win32' ? 'tar.exe' : 'tar';
 const CACHE = path.resolve('.v8bin-cache');
 
 function keyFor(platform, version) {
@@ -90,8 +93,12 @@ async function get(platform, version, { unzip = false } = {}) {
     dir = zipPath.replace(/\.zip$/, '');
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
-      // Windows 10+ ships bsdtar as C:\Windows\system32\tar.exe; it reads zip.
-      execFileSync('tar.exe', ['-xf', zipPath, '-C', dir], { stdio: 'inherit' });
+      // Windows 10+ ships bsdtar as C:\Windows\system32\tar.exe and it reads
+      // zip; on Linux and macOS the same program is plain `tar`. Spelling it
+      // `tar.exe` unconditionally made this script fail on every non-Windows
+      // host with an ENOENT that named a Windows executable -- found by CI on
+      // ubuntu-latest, not by review.
+      execFileSync(TAR, ['-xf', zipPath, '-C', dir], { stdio: 'inherit' });
     }
     console.log(`  unpacked -> ${dir}`);
     for (const f of walk(dir)) {

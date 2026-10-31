@@ -75,7 +75,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '24'
+          node-version: '26'
       - run: npm ci --no-audit --fund=false
 
       - name: stage the corpus
@@ -140,7 +140,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '24'
+          node-version: '26'
       - run: npm ci --no-audit --fund=false
 
       - name: collect every shard's results into one work directory

@@ -50,11 +50,13 @@ console.log(`cached ${zipPath}`);
 console.log(`  bytes=${buf.length} sha256=${crypto.createHash('sha256').update(buf).digest('hex')}`);
 
 // Extract only the two snapshot blobs (bsdtar can select members).
+// `tar.exe` is the Windows spelling; on Linux and macOS it is plain `tar`.
+const TAR = process.platform === 'win32' ? 'tar.exe' : 'tar';
 const dir = zipPath.replace(/\.zip$/, '');
 fs.mkdirSync(dir, { recursive: true });
 for (const member of ['v8_context_snapshot.bin', 'snapshot_blob.bin']) {
   try {
-    execFileSync('tar.exe', ['-xf', zipPath, '-C', dir, member], { stdio: 'inherit' });
+    execFileSync(TAR, ['-xf', zipPath, '-C', dir, member], { stdio: 'inherit' });
     const p = path.join(dir, member);
     const b = fs.readFileSync(p);
     console.log(`  ${member}: ${b.length} bytes sha256=${crypto.createHash('sha256').update(b).digest('hex')}`);
