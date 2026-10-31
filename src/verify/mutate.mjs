@@ -14,7 +14,7 @@
 //   * a mutation need not be VISIBLE IN BYTECODE: V8 prints an array literal
 //     as `<ArrayBoilerplateDescription PACKED_SMI_ELEMENTS, <FixedArray[3]>>`
 //     and never prints the element values, so changing `[1,2,3]` to `[2,2,3]`
-//     is invisible to O1 on either engine (scratch/t3/probe_pool.mjs).
+//     is invisible to O1 on either engine (tools/probes/probe_pool.mjs).
 //
 // The last candidate -- appending one extra observable call -- is guaranteed
 // visible to both, so "no candidate was detected" always means a real oracle

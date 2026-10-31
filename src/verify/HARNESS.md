@@ -82,7 +82,7 @@ and median of the per-function opcode similarity over all paired functions.
    literal as `<ArrayBoilerplateDescription PACKED_SMI_ELEMENTS,
    <FixedArray[3]>>` and never prints the element values — on `node` with a
    fully dumped pool as well as on a release `d8`
-   (`scratch/t3/probe_pool.mjs`). Changing `f([1,2,3])` to `f([2,2,3])` is
+   (`tools/probes/probe_pool.mjs`). Changing `f([1,2,3])` to `f([2,2,3])` is
    therefore an exact O1 match. O3 catches it. This is the concrete reason
    three oracles exist instead of one.
 

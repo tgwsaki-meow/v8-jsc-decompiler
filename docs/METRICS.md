@@ -62,7 +62,7 @@ Each oracle has to be shown both that it accepts an identical program and that i
 
 Self-check entries: accessor-defineproperty, async-function, class-methods, decl-var.
 
-**O1 blind spot, measured.** values inside boilerplate constants (array / object literals): V8 prints the boilerplate descriptor, never the element values -- on node (pool dumped) as well as d8 (pool partial). Evidence: `scratch/t3/probe_pool.mjs`. Mutations that O1 could not see in this run: none. O3 sees these, which is part of why three oracles are needed rather than one.
+**O1 blind spot, measured.** values inside boilerplate constants (array / object literals): V8 prints the boilerplate descriptor, never the element values -- on node (pool dumped) as well as d8 (pool partial). Evidence: `tools/probes/probe_pool.mjs`. Mutations that O1 could not see in this run: none. O3 sees these, which is part of why three oracles are needed rather than one.
 
 ## 1-3, 10: control flow, bytecode side vs emitted side
 
