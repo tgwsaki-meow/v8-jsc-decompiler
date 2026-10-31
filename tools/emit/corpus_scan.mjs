@@ -58,10 +58,26 @@ const WORKER = path.resolve('tools/emit/corpus_worker.mjs');
 
 fs.mkdirSync(WORK, { recursive: true });
 
-let files = fs.readdirSync(CORPUS).filter((f) => f.endsWith('.jsc')).sort();
+// `--merge-only` reports over results that already exist and runs nothing.
+// Its file list therefore comes from the RESULTS, not from the corpus: a
+// sharded cloud run merges in a job that never staged the corpus, and
+// requiring the inputs there would mean downloading 104 MiB to read a
+// directory listing. tools/{recover,structure}/corpus_scan.mjs do the same;
+// this scanner was written after that change and did not inherit it, so the
+// first sharded run of 1039 files scanned all 12 shards successfully and then
+// died in the merge job on `scandir '/nonexistent'`.
+const MERGE_ONLY = has('--merge-only');
+// resultPath() maps `x.jsc` -> `<work>/x.emit.json`, so the inverse is
+// `x.emit.json` -> `x.jsc`.
+let files = MERGE_ONLY
+  ? (fs.existsSync(WORK)
+    ? fs.readdirSync(WORK).filter((f) => f.endsWith('.emit.json'))
+      .map((f) => `${f.replace(/\.emit\.json$/, '')}.jsc`).sort()
+    : [])
+  : fs.readdirSync(CORPUS).filter((f) => f.endsWith('.jsc')).sort();
 const corpusFiles = files.length;
 let excludedBySize = 0;
-if (MAX_BYTES > 0) {
+if (!MERGE_ONLY && MAX_BYTES > 0) {
   const before = files.length;
   files = files.filter((f) => fs.statSync(path.join(CORPUS, f)).size <= MAX_BYTES);
   excludedBySize = before - files.length;
