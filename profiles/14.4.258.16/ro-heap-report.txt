@@ -1,0 +1,98 @@
+# ro-heap generation report
+tag                 : 14.4.258.16
+static-roots variant: intl-wasm
+blob                : .v8bin-cache/qq-14.4.258.16-electron/v8_context_snapshot.bin
+blob sha256         : 8bd0f1a03a521f8c011000bf411b233c0aafdb735cdc5464fd554597f8e00083
+blob versionString  : 14.4.258.16-electron.0
+static-roots sha256 : e46f0b4706b6a9d8c5214769d1247ab2bee3bc54f5293702d5e4621d4f365a3c
+generated           : 2026-10-30T12:58:47.953Z
+
+## snapshot header (src/snapshot/snapshot.cc SnapshotImpl)
+numberOfContexts          = 3
+rehashability             = 1
+blob checksum             = 0xacdaf763
+readOnlySnapshotChecksum  = 0x4be885e (stored)
+  recomputed from section = 0x4be885e  match=true
+readOnly section          = [120368, 454234) = 333866 bytes
+RO SnapshotData magic     = 0xc0de0674  => ExternalReferenceTable::kSize = 1652
+RO payload length         = 333858
+
+## read-only image (src/snapshot/read-only-serializer-deserializer.h)
+static roots build        = true (first opcode was kAllocatePageAt)
+payload bytes consumed    = 333858 / 333858
+opcode histogram          = {"kAllocatePageAt":9,"kSegment":30,"kReadOnlyRootsTable":1,"kFinalizeReadOnlySpace":1}
+
+## pages: compressed_page_address vs (page_index << kPageSizeBits)
+  page  0 areaSize= 262128 compressedAddr=0x000000 expected=0x000000 OK segments=4
+  page  1 areaSize= 262128 compressedAddr=0x040000 expected=0x040000 OK segments=4
+  page  2 areaSize= 262128 compressedAddr=0x080000 expected=0x080000 OK segments=4
+  page  3 areaSize= 262128 compressedAddr=0x0c0000 expected=0x0c0000 OK segments=4
+  page  4 areaSize= 262128 compressedAddr=0x100000 expected=0x100000 OK segments=4
+  page  5 areaSize= 262128 compressedAddr=0x140000 expected=0x140000 OK segments=4
+  page  6 areaSize= 262124 compressedAddr=0x180000 expected=0x180000 OK segments=4
+  page  7 areaSize= 102464 compressedAddr=0x1c0000 expected=0x1c0000 OK segments=1
+  page  8 areaSize=  73188 compressedAddr=0x200000 expected=0x200000 OK segments=1
+=> Tagged_t = (chunk_index << 18) + chunk_offset + 1 holds for all pages: true
+
+## object walk
+  page 0: objects= 1131 segmentBytes=  26724 bytesCovered= 262128 area=[16,262144) issues=0
+  page 1: objects=    4 segmentBytes=     32 bytesCovered= 262128 area=[16,262144) issues=0
+  page 2: objects=    4 segmentBytes=     32 bytesCovered= 262128 area=[16,262144) issues=0
+  page 3: objects=    4 segmentBytes=     32 bytesCovered= 262128 area=[16,262144) issues=0
+  page 4: objects=    4 segmentBytes=     32 bytesCovered= 262128 area=[16,262144) issues=0
+  page 5: objects=    4 segmentBytes=     32 bytesCovered= 262128 area=[16,262144) issues=0
+  page 6: objects= 4777 segmentBytes= 131068 bytesCovered= 262124 area=[16,262140) issues=0
+  page 7: objects= 1601 segmentBytes= 102464 bytesCovered= 102464 area=[16,102480) issues=0
+  page 8: objects= 2770 segmentBytes=  73188 bytesCovered=  73188 area=[16,73204) issues=0
+total objects              = 10299
+sized by map/shape formula = 10298
+sized from next static root= 1   (fallback; see ro_heap.mjs rootOffsets())
+
+## cross-validation against static-roots-intl-wasm.h
+static roots in header     = 1047 (ordered table lists 1045)
+landing on an object start = 1047
+not landing on an object   = 0
+agreement                  = 1047/1047 = 100.00%
+
+## root-name vs decoded-kind consistency
+consistent = 1046, inconsistent = 1
+      EmptyOrderedHashMap: decoded kind=orderedHashMap map=OrderedHashMapMap
+
+## kind histogram
+    3182  string
+    2403  codeWrapper
+    2403  code
+    1235  accessorInfo
+     731  sharedFunctionInfo
+     204  map
+      56  symbol
+      14  freeSpace
+      12  hole
+      11  interceptorInfo
+      10  heapNumber
+       5  scopeInfo
+       4  oddball
+       3  byteArray
+       2  fixedArray
+       2  descriptorArray
+       2  functionTemplateInfo
+       1  weakFixedArray
+       1  weakArrayList
+       1  enumCache
+       1  cell
+       1  nameDictionary
+       1  orderedNameDictionary
+       1  propertyArray
+       1  arrayList
+       1  objectBoilerplateDescription
+       1  arrayBoilerplateDescription
+       1  closureFeedbackCellArray
+       1  swissNameDictionary
+       1  numberDictionary
+       1  registeredSymbolTable
+       1  contextCell
+       1  orderedHashMap
+       1  orderedHashSet
+       1  feedbackMetadataArray
+       1  manyClosuresCell
+       1  wasmNull

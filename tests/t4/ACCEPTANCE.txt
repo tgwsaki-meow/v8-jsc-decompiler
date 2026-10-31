@@ -1,0 +1,54 @@
+acceptance against V8 14.6.202.34-node.40 (profile profiles-local\14.6.202.34)
+overlay layouts-overlay-local\14.6.202.34.json
+
+source                     units  c/u      matched  unm  checks  fail  ctxSlots  named  roUnres 
+-------------------------- ------ -------- -------- ---- ------- ----- --------- ------ --------
+plain-functions            4      4/0      4        0    40      0     0         0      0         pass
+nested-closures            4      4/0      4        0    40      0     3         3      0         pass
+generators                 3      3/0      3        0    30      0     0         0      0         pass
+async                      3      3/0      3        0    30      0     0         0      0         pass
+class-full                 11     11/0     11       0    110     0     8         8      0         pass
+try-catch-finally          5      5/0      5        0    50      0     0         0      0         pass
+switch                     3      3/0      3        0    30      0     0         0      0         pass
+for-in-for-of              4      4/0      4        0    40      0     0         0      3         pass
+destructuring              2      2/0      2        0    20      0     0         0      0         pass
+template-literals          4      4/0      4        0    40      0     0         0      1         pass
+regexps                    2      2/0      2        0    20      0     0         0      4         pass
+literals                   4      4/0      4        0    40      0     0         0      1         pass
+with-statement             2      2/0      2        0    20      0     1         1      0         pass
+direct-eval                4      4/0      4        0    40      0     13        13     0         pass
+strict-mode                5      5/0      5        0    50      0     1         1      0         pass
+sloppy-mode                4      4/0      4        0    40      0     0         0      0         pass
+arrow-and-method-kinds     9      9/0      9        0    90      0     0         0      0         pass
+spread-rest                6      6/0      6        0    60      0     0         0      0         pass
+optional-chaining          3      3/0      3        0    30      0     0         0      0         pass
+labels-and-loops           2      2/0      2        0    20      0     0         0      0         pass
+numbers-and-bigint         3      3/0      3        0    30      0     0         0      0         pass
+symbols                    3      3/0      3        0    30      0     0         0      3         pass
+typeof-and-globals         3      3/0      3        0    30      0     0         0      6         pass
+uncompiled-inner           4      1/3      1        0    10      0     0         0      0         pass
+many-context-locals        3      3/0      3        0    30      0     90        90     0         pass
+few-context-locals         3      3/0      3        0    30      0     70        70     0         pass
+wide-registers             2      2/0      2        0    20      0     0         0      0         pass
+extra-wide-jump            2      2/0      2        0    20      0     0         0      0         pass
+getters-setters-define     5      5/0      5        0    50      0     1         1      1         pass
+catch-param-patterns       7      7/0      7        0    70      0     0         0      0         pass
+block-scopes               4      4/0      4        0    40      0     1         1      0         pass
+
+totals: 31 sources, 120 units matched to V8 listings, 0 unmatched, 1200 assertions, 0 failures
+
+notes
+  nested-closures: 3/3 context slots named
+  generators: 2 generator unit(s)
+  async: 2 async unit(s)
+  async: handler predictions: ASYNC_AWAIT
+  class-full: kinds: classCtor,getter,method,normal,setter
+  try-catch-finally: 5 handler row(s)
+  switch: 1 smi run(s), longest 8
+  template-literals: 1 TemplateObjectDescription
+  regexps: 3/3 regexp patterns found as string constants; 0 RegExpBoilerplateDescription in the pool (V8 does not put one there for a fresh compile)
+  numbers-and-bigint: 3 bigint constant(s): 1,123456789012345678901234567890,2
+  uncompiled-inner: 3 uncompiled unit(s) with UncompiledData
+  many-context-locals: 1 scope(s) used the name hash table
+  few-context-locals: 70/70 context slots named
+  catch-param-patterns: 4 handler row(s)

@@ -1,0 +1,85 @@
+{
+  "v8Version": "14.6.202.34",
+  "count": 35,
+  "tags": {
+    "kNewObject": 0,
+    "kBackref": 4,
+    "kReadOnlyHeapRef": 5,
+    "kStartupObjectCache": 6,
+    "kRootArray": 7,
+    "kAttachedReference": 8,
+    "kSharedHeapObjectCache": 9,
+    "kNop": 10,
+    "kSynchronize": 11,
+    "kVariableRepeatRoot": 12,
+    "kOffHeapBackingStore": 13,
+    "kOffHeapResizableBackingStore": 14,
+    "kEmbedderFieldsData": 15,
+    "kApiWrapperFieldsData": 16,
+    "kVariableRawData": 17,
+    "kApiReference": 18,
+    "kExternalReference": 19,
+    "kSandboxedApiReference": 20,
+    "kSandboxedExternalReference": 21,
+    "kSandboxedRawExternalReference": 22,
+    "kClearedWeakReference": 23,
+    "kWeakPrefix": 24,
+    "kRegisterPendingForwardRef": 25,
+    "kResolvePendingForwardRef": 26,
+    "kNewContextlessMetaMap": 27,
+    "kNewContextfulMetaMap": 28,
+    "kIndirectPointerPrefix": 29,
+    "kInitializeSelfIndirectPointer": 30,
+    "kAllocateJSDispatchEntry": 31,
+    "kJSDispatchEntry": 32,
+    "kProtectedPointerPrefix": 33,
+    "kRootArrayConstants": 64,
+    "kFixedRawData": 96,
+    "kFixedRepeatRoot": 128,
+    "kHotObject": 144
+  },
+  "constants": {
+    "kRootArrayConstantsCount": 32,
+    "kFixedRawDataCount": 32,
+    "kFixedRepeatRootCount": 16,
+    "kHotObjectCount": 8,
+    "kFirstEncodableFixedRawDataSize": 1,
+    "kFirstEncodableRepeatRootCount": 2,
+    "kDoubleAlignmentSentinel": 0,
+    "kEmptyBackingStoreRefSentinel": 0
+  },
+  "kNumberOfSnapshotSpaces": 4,
+  "rangedTags": {
+    "kNewObject": {
+      "base": 0,
+      "count": 4,
+      "minValue": 0,
+      "end": 3
+    },
+    "kRootArrayConstants": {
+      "base": 64,
+      "count": 32,
+      "minValue": 0,
+      "end": 95
+    },
+    "kFixedRawData": {
+      "base": 96,
+      "count": 32,
+      "minValue": 1,
+      "end": 127
+    },
+    "kFixedRepeatRoot": {
+      "base": 128,
+      "count": 16,
+      "minValue": 2,
+      "end": 143
+    },
+    "kHotObject": {
+      "base": 144,
+      "count": 8,
+      "minValue": 0,
+      "end": 151
+    }
+  },
+  "decodeRule": "for a ranged tag: value = byte - base + minValue"
+}

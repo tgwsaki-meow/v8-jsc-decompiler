@@ -1,0 +1,173 @@
+name: corpus scan
+
+# The measurement runs: ARCHITECTURE.md §11.5's acceptance lines, over all 1039
+# corpus files. Manual only.
+#
+# WHY THIS IS NOT AN ORDINARY CI JOB
+# ----------------------------------
+# The corpus is 104 MiB of Tencent's compiled JavaScript. It is not in this
+# repository and must not be (see .gitignore), so it is fetched at run time from
+# a URL only the repository owner has: set the `CORPUS_URL` secret to a
+# short-lived signed URL for a zip of the .jsc files. Nothing is cached and the
+# staging directory dies with the runner.
+#
+# If `CORPUS_URL` is unset the workflow does not fail -- it runs the scan over
+# `corpus/features/`, the 270 syntax fixtures we wrote ourselves, which
+# exercises every code path with none of the scale. That keeps the workflow
+# testable by anyone who clones this repo.
+#
+# WHY SHARDING IS THE POINT
+# -------------------------
+# On the development host -- 2 cores, 4 GB, ~250 MB free -- two concurrent scans
+# measured 4.2 and 3.4 KiB/s and needed 4.5 and 7.3 hours. A public-repository
+# Linux runner is 4 vCPU / 16 GB and the minutes are free and unlimited, and
+# `tools/ci/shard_corpus.mjs` splits the corpus by BYTES (the largest five files
+# are 27.4% of it). The floor is the single largest file: `r_8878.jsc` is
+# 10.2 MiB and gets a shard to itself, so more than ~12 shards buys nothing.
+
+on:
+  workflow_dispatch:
+    inputs:
+      layer:
+        description: 'which layer to scan'
+        required: true
+        default: 'recover,structure'
+        type: string
+      shards:
+        description: 'parallel shards (>12 does not help; r_8878.jsc is the floor)'
+        required: true
+        default: '12'
+        type: string
+      jobs_per_shard:
+        description: 'worker processes inside one shard (runner has 4 vCPU)'
+        required: true
+        default: '3'
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set.outputs.matrix }}
+      layers: ${{ steps.set.outputs.layers }}
+    steps:
+      - id: set
+        run: |
+          set -euo pipefail
+          n='${{ inputs.shards }}'
+          echo "matrix=$(seq 0 $((n-1)) | jq -Rsc 'split("\n")[:-1]')" >> "$GITHUB_OUTPUT"
+          echo "layers=$(echo '${{ inputs.layer }}' | jq -Rc 'split(",")')" >> "$GITHUB_OUTPUT"
+
+  scan:
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      matrix:
+        layer: ${{ fromJSON(needs.plan.outputs.layers) }}
+        shard: ${{ fromJSON(needs.plan.outputs.matrix) }}
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm ci --no-audit --fund=false
+
+      - name: stage the corpus
+        env:
+          CORPUS_URL: ${{ secrets.CORPUS_URL }}
+        run: |
+          set -euo pipefail
+          if [ -n "${CORPUS_URL:-}" ]; then
+            echo "fetching the corpus"
+            curl -fsSL --retry 3 -o /tmp/corpus.zip "$CORPUS_URL"
+            mkdir -p /tmp/corpus
+            unzip -q -j /tmp/corpus.zip -d /tmp/corpus
+            rm -f /tmp/corpus.zip
+            echo "CORPUS_DIR=/tmp/corpus" >> "$GITHUB_ENV"
+          else
+            echo "::notice::CORPUS_URL is not set; scanning the committed fixtures instead"
+            mkdir -p /tmp/corpus
+            cp tests/t8/fixtures/*.jsc /tmp/corpus/
+            echo "CORPUS_DIR=/tmp/corpus" >> "$GITHUB_ENV"
+          fi
+          echo "staged $(ls -1 "$CORPUS_DIR" 2>/dev/null | wc -l) files" || true
+
+      - name: take this shard
+        run: |
+          set -euo pipefail
+          node tools/ci/shard_corpus.mjs \
+            --corpus "$CORPUS_DIR" --shards '${{ inputs.shards }}' \
+            --index '${{ matrix.shard }}' --out /tmp/shard
+
+      # 4 vCPU and 16 GB, so a bigger child heap and more workers than the
+      # development host can afford. Still one child per file: a pathological
+      # input gets killed on its own timeout instead of taking the shard down.
+      - name: scan
+        run: |
+          set -euo pipefail
+          node tools/${{ matrix.layer }}/corpus_scan.mjs \
+            --corpus /tmp/shard \
+            --profile profiles/14.4.258.16 \
+            --work /tmp/work \
+            --out /tmp/report-${{ matrix.layer }}-${{ matrix.shard }}.md \
+            --jobs '${{ inputs.jobs_per_shard }}' \
+            --child-heap 3500 \
+            --timeout 2700
+
+      - name: upload this shard's per-file results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scan-${{ matrix.layer }}-shard${{ matrix.shard }}
+          path: /tmp/work
+          retention-days: 7
+          if-no-files-found: warn
+
+  merge:
+    needs: [plan, scan]
+    if: always()
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        layer: ${{ fromJSON(needs.plan.outputs.layers) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm ci --no-audit --fund=false
+
+      - name: collect every shard's results into one work directory
+        uses: actions/download-artifact@v4
+        with:
+          pattern: scan-${{ matrix.layer }}-shard*
+          path: /tmp/shards
+          merge-multiple: true
+
+      # The scanners already know how to report over an existing work directory
+      # without re-running anything, which is what makes a sharded run mergeable
+      # at all: one JSON per file, no shared state.
+      - name: report
+        run: |
+          set -euo pipefail
+          ls -1 /tmp/shards | wc -l
+          node tools/${{ matrix.layer }}/corpus_scan.mjs \
+            --merge-only --work /tmp/shards \
+            --out /tmp/CORPUS-${{ matrix.layer }}.md
+
+      - name: summary
+        run: cat /tmp/CORPUS-${{ matrix.layer }}.md >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: corpus-report-${{ matrix.layer }}
+          path: |
+            /tmp/CORPUS-${{ matrix.layer }}.md
+            /tmp/CORPUS-${{ matrix.layer }}.json
+          if-no-files-found: error

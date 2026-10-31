@@ -1,0 +1,121 @@
+{
+  "v8Version": "14.6.202.34",
+  "count": 16,
+  "byId": {
+    "0": {
+      "id": 0,
+      "name": "AsyncFunctionAwait",
+      "runtimeFunction": "async_function_await_caught",
+      "argCount": 2
+    },
+    "1": {
+      "id": 1,
+      "name": "AsyncFunctionEnter",
+      "runtimeFunction": "async_function_enter",
+      "argCount": 2
+    },
+    "2": {
+      "id": 2,
+      "name": "AsyncFunctionReject",
+      "runtimeFunction": "async_function_reject",
+      "argCount": 2
+    },
+    "3": {
+      "id": 3,
+      "name": "AsyncFunctionResolve",
+      "runtimeFunction": "async_function_resolve",
+      "argCount": 2
+    },
+    "4": {
+      "id": 4,
+      "name": "AsyncGeneratorAwait",
+      "runtimeFunction": "async_generator_await_caught",
+      "argCount": 2
+    },
+    "5": {
+      "id": 5,
+      "name": "AsyncGeneratorReject",
+      "runtimeFunction": "async_generator_reject",
+      "argCount": 2
+    },
+    "6": {
+      "id": 6,
+      "name": "AsyncGeneratorResolve",
+      "runtimeFunction": "async_generator_resolve",
+      "argCount": 3
+    },
+    "7": {
+      "id": 7,
+      "name": "AsyncGeneratorYieldWithAwait",
+      "runtimeFunction": "async_generator_yield_with_await",
+      "argCount": 2
+    },
+    "8": {
+      "id": 8,
+      "name": "CreateJSGeneratorObject",
+      "runtimeFunction": "create_js_generator_object",
+      "argCount": 2
+    },
+    "9": {
+      "id": 9,
+      "name": "GeneratorGetResumeMode",
+      "runtimeFunction": "generator_get_resume_mode",
+      "argCount": 1
+    },
+    "10": {
+      "id": 10,
+      "name": "GeneratorClose",
+      "runtimeFunction": "generator_close",
+      "argCount": 1
+    },
+    "11": {
+      "id": 11,
+      "name": "GetImportMetaObject",
+      "runtimeFunction": "get_import_meta_object",
+      "argCount": 0
+    },
+    "12": {
+      "id": 12,
+      "name": "CopyDataProperties",
+      "runtimeFunction": "copy_data_properties",
+      "argCount": 2
+    },
+    "13": {
+      "id": 13,
+      "name": "CopyDataPropertiesWithExcludedPropertiesOnStack",
+      "runtimeFunction": "copy_data_properties_with_excluded_properties_on_stack",
+      "argCount": -1
+    },
+    "14": {
+      "id": 14,
+      "name": "CreateIterResultObject",
+      "runtimeFunction": "create_iter_result_object",
+      "argCount": 2
+    },
+    "15": {
+      "id": 15,
+      "name": "CreateAsyncFromSyncIterator",
+      "runtimeFunction": "create_async_from_sync_iterator",
+      "argCount": 1
+    }
+  },
+  "byName": {
+    "AsyncFunctionAwait": 0,
+    "AsyncFunctionEnter": 1,
+    "AsyncFunctionReject": 2,
+    "AsyncFunctionResolve": 3,
+    "AsyncGeneratorAwait": 4,
+    "AsyncGeneratorReject": 5,
+    "AsyncGeneratorResolve": 6,
+    "AsyncGeneratorYieldWithAwait": 7,
+    "CreateJSGeneratorObject": 8,
+    "GeneratorGetResumeMode": 9,
+    "GeneratorClose": 10,
+    "GetImportMetaObject": 11,
+    "CopyDataProperties": 12,
+    "CopyDataPropertiesWithExcludedPropertiesOnStack": 13,
+    "CreateIterResultObject": 14,
+    "CreateAsyncFromSyncIterator": 15
+  },
+  "note": "InvokeIntrinsic's kIntrinsicId operand is an index into this table"
+}

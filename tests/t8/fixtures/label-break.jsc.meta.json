@@ -1,0 +1,12 @@
+{
+ "v8": "14.4.258.16-electron.0",
+ "node": "24.11.1",
+ "electron": "40.0.0",
+ "sourceLength": 235,
+ "cacheLength": 776,
+ "argv": [
+  "--no-lazy",
+  "--no-enable-lazy-source-positions",
+  "--max-old-space-size=1024"
+ ]
+}

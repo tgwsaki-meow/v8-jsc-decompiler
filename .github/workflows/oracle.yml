@@ -1,0 +1,112 @@
+name: V8 oracle
+
+# The suites that need a real V8 to compare against: O1 (our decode vs
+# `--print-bytecode`) and the T4 acceptance run (1200 assertions against V8's
+# own listing of freshly minted .jsc files).
+#
+# The binaries are fetched, not committed:
+#   d8 14.4.258.16  linux64  storage.googleapis.com/chromium-v8  (the corpus's V8)
+#   Electron 40.0.0                 github.com/electron/releases  (ships V8 14.4.258.16,
+#                                   and is what can produce a .jsc the corpus's
+#                                   reader accepts -- node's V8 is built without
+#                                   the sandbox, so its .jsc is not comparable)
+#
+# Still no Tencent input: every .jsc here is minted from our own sources.
+#
+# Linux is the right host for this one. ARCHITECTURE.md 9.7: electron.exe on
+# Windows is a GUI-subsystem binary with no stdout, so `--print-bytecode`
+# cannot be captured from it at all. On Linux it can.
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+  schedule:
+    - cron: '0 3 * * 1'    # weekly: catches an upstream bucket or release moving
+
+concurrency:
+  group: oracle-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  oracle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: install
+        run: npm ci --no-audit --fund=false
+
+      # The two downloads are ~200 MB and immutable for a pinned version, so
+      # they are worth a cache. A miss just re-downloads.
+      - name: cache the fetched V8 binaries
+        uses: actions/cache@v4
+        with:
+          path: .v8bin-cache
+          key: v8bin-linux-14.4.258.16-electron40-v1
+
+      - name: fetch d8 14.4.258.16 (linux64)
+        run: node tools/oracle/fetch_v8_binary.mjs --platform linux64 --version 14.4.258.16
+
+      - name: fetch Electron 40.0.0 (linux-x64)
+        run: node tools/oracle/fetch_electron.mjs --version 40.0.0 --platform linux-x64
+
+      # profiles/14.4.258.16/ro-heap.json is committed, but regenerating it here
+      # proves the claim docs/ARCHITECTURE.md 3.6 rests on: the table is a
+      # function of the snapshot, not of the machine that ran the tool. Electron's
+      # own v8_context_snapshot.bin is used because it is downloadable; it was
+      # measured identical to the corpus producer's own snapshot on all 883
+      # addresses the corpus dereferences (0 disagreements), while differing in
+      # sha256 -- so this is a real reproduction, not a tautology.
+      - name: the read-only heap table reproduces from a downloaded snapshot
+        run: |
+          set -euo pipefail
+          node tools/profilegen/index.mjs --tag 14.4.258.16 --variant intl+wasm \
+            --tagged-size 4 --out /tmp/profiles-ci
+          node tools/oracle/gen_ro_heap.mjs \
+            --blob .v8bin-cache/electron-v40.0.0-linux-x64/v8_context_snapshot.bin \
+            --static-roots .v8src-cache/14.4.258.16/src/roots/static-roots-intl-wasm.h \
+            --tag 14.4.258.16 --variant intl-wasm \
+            --out /tmp/ro-heap-ci.json --report /tmp/ro-heap-ci.txt
+          node -e '
+            const a = require("./profiles/14.4.258.16/ro-heap.json");
+            const b = require("/tmp/ro-heap-ci.json");
+            const ka = Object.keys(a.objects), kb = Object.keys(b.objects);
+            let diff = 0;
+            for (const k of ka) {
+              const x = a.objects[k], y = b.objects[k];
+              if (!y) { diff++; continue; }
+              if (x.kind !== y.kind || x.size !== y.size || x.mapName !== y.mapName) diff++;
+            }
+            console.log(`committed ${ka.length} objects, regenerated ${kb.length}, differing ${diff}`);
+            if (diff) { console.error("::error::the committed read-only table does not reproduce"); process.exit(1); }
+          '
+
+      - name: O1 — our decode vs --print-bytecode, both engines
+        run: node tools/oracle/selftest.mjs
+
+      - name: the disassembler agrees with V8's listing instruction for instruction
+        run: node tools/disasm/oracle_agreement.mjs
+
+      - name: T4 acceptance — 1200 assertions against V8's own listing
+        run: node tests/t4/acceptance.mjs
+
+      - name: the three oracles self-check
+        run: node src/verify/run_oracles.mjs --selfcheck
+
+      - name: upload reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oracle-reports
+          path: |
+            tests/t4/ACCEPTANCE.txt
+            /tmp/ro-heap-ci.txt
+            scratch/**/*.md
+          if-no-files-found: ignore

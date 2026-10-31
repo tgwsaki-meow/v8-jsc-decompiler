@@ -1,0 +1,2703 @@
+{
+  "generator": {
+    "name": "tools/profilegen",
+    "version": "1.1.0"
+  },
+  "generatedAt": "2026-10-30T03:49:47.035Z",
+  "v8Version": "14.6.202.34",
+  "variant": "intl+wasm",
+  "taggedSize": 4,
+  "targetOs": "win",
+  "build": {
+    "sandbox": true,
+    "pointerCompression": true,
+    "externalCodeSpace": true,
+    "staticRoots": true,
+    "taggedSize": 4,
+    "variant": "intl+wasm",
+    "targetOs": "win",
+    "targetCpu": "x64",
+    "intl": true,
+    "wasm": true,
+    "debug": false,
+    "trustedPointerSize": 4,
+    "note": "the switches a .jsc producer must share with this profile. A cache produced by a build that differs in `sandbox` or `pointerCompression` cannot be read with this profile: the trusted-pointer slot widths differ, so every object after the first trusted field is misread rather than refused. The header carries no field that states them, so a reader can only check them against what it knows about the producer."
+  },
+  "gnFlags": {
+    "v8_enable_i18n_support": true,
+    "v8_enable_webassembly": true,
+    "v8_enable_pointer_compression": true,
+    "v8_enable_pointer_compression_shared_cage": true,
+    "v8_enable_external_code_space": true,
+    "v8_enable_sandbox": true,
+    "v8_enable_static_roots": true,
+    "v8_enable_short_builtin_calls": true,
+    "v8_enable_swiss_name_dictionary": false,
+    "v8_enable_javascript_promise_hooks": false,
+    "v8_enable_continuation_preserved_embedder_data": true,
+    "v8_enable_undefined_double": false,
+    "v8_enable_experimental_tsa_builtins": false,
+    "v8_enable_drumbrake": false,
+    "v8_enable_temporal_support": true,
+    "v8_scriptormodule_legacy_lifetime": false,
+    "v8_enable_leaptiering": true,
+    "debug": false,
+    "targetCpu": "x64",
+    "targetOs": "win"
+  },
+  "cppDefines": {
+    "__cplusplus": "201703L",
+    "V8_TARGET_ARCH_X64": 1,
+    "V8_HOST_ARCH_X64": 1,
+    "V8_TARGET_ARCH_64_BIT": 1,
+    "V8_HOST_ARCH_64_BIT": 1,
+    "V8_TARGET_LITTLE_ENDIAN": 1,
+    "V8_INTL_SUPPORT": 1,
+    "V8_ENABLE_WEBASSEMBLY": 1,
+    "V8_COMPRESS_POINTERS": 1,
+    "V8_COMPRESS_POINTERS_IN_SHARED_CAGE": 1,
+    "V8_31BIT_SMIS_ON_64BIT_ARCH": 1,
+    "V8_EXTERNAL_CODE_SPACE": 1,
+    "V8_ENABLE_SANDBOX": 1,
+    "V8_STATIC_ROOTS": 1,
+    "V8_SHORT_BUILTIN_CALLS": 1,
+    "V8_SHARED_RO_HEAP": 1,
+    "V8_ENABLE_LEAPTIERING": 1,
+    "V8_ENABLE_CONTINUATION_PRESERVED_EMBEDDER_DATA": 1,
+    "V8_ENABLE_TEMPORAL_SUPPORT": 1,
+    "V8_TARGET_OS_WIN": 1,
+    "V8_OS_WIN": 1,
+    "V8_OS_WIN64": 1,
+    "V8_CC_MSVC": 1
+  },
+  "cppNotDefined": [
+    "CPPGC_YOUNG_GENERATION",
+    "DEBUG",
+    "OBJECT_PRINT",
+    "V8_ENABLE_ALLOCATION_TIMEOUT",
+    "V8_ENABLE_CHECKS",
+    "V8_ENABLE_CONSERVATIVE_STACK_SCANNING",
+    "V8_ENABLE_DRUMBRAKE",
+    "V8_ENABLE_ETW_STACK_WALKING",
+    "V8_ENABLE_EXPERIMENTAL_TSA_BUILTINS",
+    "V8_ENABLE_JAVASCRIPT_PROMISE_HOOKS",
+    "V8_ENABLE_SWISS_NAME_DICTIONARY",
+    "V8_ENABLE_UNDEFINED_DOUBLE",
+    "V8_ENABLE_WASM_SIMD256_REVEC",
+    "V8_RUNTIME_CALL_STATS",
+    "V8_SCRIPTORMODULE_LEGACY_LIFETIME",
+    "VERIFY_HEAP"
+  ],
+  "torqueBuildFlags": {
+    "V8_EXTERNAL_CODE_SPACE": true,
+    "TAGGED_SIZE_8_BYTES": false,
+    "V8_ENABLE_UNDEFINED_DOUBLE": false,
+    "V8_ENABLE_EXPERIMENTAL_TSA_BUILTINS": false,
+    "V8_ENABLE_EXPERIMENTAL_TSA_BUILTINS_WITHOUT_TQ_TO_TSA": false,
+    "V8_INTL_SUPPORT": true,
+    "V8_ENABLE_SWISS_NAME_DICTIONARY": false,
+    "V8_ENABLE_JAVASCRIPT_PROMISE_HOOKS": false,
+    "V8_ENABLE_CONTINUATION_PRESERVED_EMBEDDER_DATA": true,
+    "TRUE_FOR_TESTING": true,
+    "FALSE_FOR_TESTING": false,
+    "V8_SCRIPTORMODULE_LEGACY_LIFETIME": false,
+    "V8_ENABLE_WEBASSEMBLY": true,
+    "WASM_CODE_POINTER_NEEDS_PADDING": false,
+    "V8_ENABLE_SANDBOX": true,
+    "DEBUG": false,
+    "V8_ENABLE_DRUMBRAKE": false
+  },
+  "torqueFileCount": 246,
+  "counts": {
+    "opcodes": 212,
+    "operandTypes": 23,
+    "serializerTags": 35,
+    "roots": 1156,
+    "readOnlyRoots": 1049,
+    "staticRoots": 1049,
+    "torqueMapRoots": 32,
+    "layoutClasses": 43,
+    "bitfieldStructs": 53,
+    "runtimeFunctions": 599,
+    "intrinsics": 16,
+    "enums": 54,
+    "cppValuedEnums": 12,
+    "functionKindGroups": 19,
+    "cppLayouts": 3,
+    "torqueConstants": 214
+  },
+  "acceptance": {
+    "roots": {
+      "agreement": "1049/1049",
+      "agreementCount": 1049,
+      "total": 1049,
+      "firstDivergentIndex": null
+    },
+    "layoutCrossChecks": {
+      "BytecodeArray": {
+        "ok": true,
+        "compared": 12,
+        "mismatches": []
+      },
+      "BytecodeWrapper": {
+        "ok": true,
+        "compared": 2,
+        "mismatches": []
+      },
+      "ExposedTrustedObject": {
+        "ok": true,
+        "compared": 2,
+        "mismatches": []
+      }
+    },
+    "expectations": {
+      "checked": 36,
+      "satisfied": 36,
+      "missing": []
+    }
+  },
+  "unresolved": {
+    "unresolvedGlobalConstants": {
+      "note": "globals.h constexprs whose right-hand side we do not evaluate (sizeof/offsetof of C++ types, or arch reservation sizes). None of them feeds an emitted table; they are listed so the gap is visible.",
+      "names": [
+        "kCodePointerTableReservationSize",
+        "kContiguousReadOnlyReservationSize",
+        "kCppHeapPointerTableReservationSize",
+        "kDebugZapValue",
+        "kDeoptimizeKindCount",
+        "kDisallowGarbageCollectionAlign",
+        "kExternalPointerTableReservationSize",
+        "kFromSpaceZapValue",
+        "kGlobalHandleZapValue",
+        "kHandleZapValue",
+        "kIndexSpaceSize",
+        "kIntptrAllBitsSet",
+        "kIntptrSignBit",
+        "kInvalidWasmSignatureHash",
+        "kJSDispatchTableReservationSize",
+        "kMaxCodePointers",
+        "kMaxCppHeapPointers",
+        "kMaxExternalPointers",
+        "kMaxJSDispatchEntries",
+        "kMaxSafeBufferSizeForSandbox",
+        "kMaxTrustedPointers",
+        "kMaximalCodeRangeSize",
+        "kMaximalTrustedRangeSize",
+        "kMinExpectedOSPageSize",
+        "kMinimumCodeRangeSize",
+        "kMinimumTrustedRangeSize",
+        "kPersistentHandleZapValue",
+        "kPtrComprCageBaseAlignment",
+        "kPtrComprCageReservationSize",
+        "kSandboxAlignment",
+        "kSandboxGuardRegionSize",
+        "kSandboxMinimumReservationSize",
+        "kShortBuiltinCallsOldSpaceSizeThreshold",
+        "kSlotsZapValue",
+        "kSmiMaxValue",
+        "kSmiMinValue",
+        "kSmiSignMask",
+        "kTracedHandleEagerResetZapValue",
+        "kTracedHandleFullGCResetZapValue",
+        "kTracedHandleMinorGCResetZapValue",
+        "kTracedHandleMinorGCWeakResetZapValue",
+        "kTrustedPointerTableReservationSize",
+        "kUintptrAllBitsSet",
+        "kZapValue"
+      ]
+    },
+    "unknownConditionIdentifiers": {
+      "note": "identifiers that appeared in a #if while expanding the root headers and are not in the defines map, so they evaluated to 0 (the C rule). All of these guard compiler-attribute macros in src/base/macros.h, not list content; the root-order acceptance check confirms the lists are unaffected.",
+      "names": [
+        "USING_V8_SHARED_PRIVATE",
+        "V8_OS_DARWIN",
+        "__GNUC_MINOR__",
+        "__GNUC__"
+      ]
+    },
+    "enumValueDisagreements": {
+      "note": "members whose Torque declaration position is not their C++ value. The C++ value is authoritative and is what layouts.json -> enums.<X>.members carries; the Torque order is kept as enums.<X>.torqueDeclarationOrder. These are not errors: for an `extern enum` Torque declares names only. They are listed because reading one of them as a value is a wrong-but-plausible answer.",
+      "count": 113,
+      "byEnum": {
+        "LanguageMode": 2,
+        "ElementsKind": 33,
+        "ContextSlot": 78
+      },
+      "entries": [
+        {
+          "enum": "LanguageMode",
+          "member": "kSloppy",
+          "torqueDeclarationOrder": 1,
+          "cppValue": 0
+        },
+        {
+          "enum": "LanguageMode",
+          "member": "kStrict",
+          "torqueDeclarationOrder": 0,
+          "cppValue": 1
+        },
+        {
+          "enum": "ElementsKind",
+          "member": "PACKED_SMI_ELEMENTS",
+          "torqueDeclarationOrder": 1,
+          "cppValue": 0
+        },
+        {
+          "enum": "ElementsKind",
+          "member": "HOLEY_SMI_ELEMENTS",
+          "torqueDeclarationOrder": 2,
+          "cppValue": 1
+        },
+        {
+          "enum": "ElementsKind",
+          "member": "PACKED_ELEMENTS",
+          "torqueDeclarationOrder": 3,
+          "cppValue": 2
+        },
+        {
+          "enum": "ElementsKind",
+          "member": "HOLEY_ELEMENTS",
+          "torqueDeclarationOrder": 4,
+          "cppValue": 3
+        },
+        {
+          "enum": "ElementsKind",
+          "member": "PACKED_DOUBLE_ELEMENTS",
+          "torqueDeclarationOrder": 5,
+          "cppValue": 4
+        },
+        {
+          "enum": "ElementsKind",
+          "member": "HOLEY_DOUBLE_ELEMENTS",
+          "torqueDeclarationOrder": 6,
+          "cppValue": 5
+        },
+        {
+          "enum": "ElementsKind",
+          "member": "DICTIONARY_ELEMENTS",
+          "torqueDeclarationOrder": 8,
+          "cppValue": 13
+        },
+        {
+          "enum": "ElementsKind",
+          "member": "UINT8_ELEMENTS",
+          "torqueDeclarationOrder": 9,
+          "cppValue": 18
+        },
+        {
+          "enum": "ElementsKind",
+          "member": "INT8_ELEMENTS",
+          "torqueDeclarationOrder": 10,
+          "cppValue": 19
+        },
+        {
+          "enum": "ElementsKind",
+          "member": "UINT16_ELEMENTS",
+          "torqueDeclarationOrder": 11,
+          "cppValue": 20
+        },
+        {
+          "enum": "ElementsKind",
+          "member": "INT16_ELEMENTS",
+          "torqueDeclarationOrder": 12,
+          "cppValue": 21
+        },
+        {
+          "enum": "ElementsKind",
+          "member": "UINT32_ELEMENTS",
+          "torqueDeclarationOrder": 13,
+          "cppValue": 22
+        },
+        {
+          "enum": "ElementsKind",
+          "member": "INT32_ELEMENTS",
+          "torqueDeclarationOrder": 14,
+          "cppValue": 23
+        },
+        {
+          "enum": "ElementsKind",
+          "member": "BIGUINT64_ELEMENTS",
+          "torqueDeclarationOrder": 19,
+          "cppValue": 24
+        },
+        {
+          "enum": "ElementsKind",
+          "member": "BIGINT64_ELEMENTS",
+          "torqueDeclarationOrder": 20,
+          "cppValue": 25
+        },
+        {
+          "enum": "ElementsKind",
+          "member": "UINT8_CLAMPED_ELEMENTS",
+          "torqueDeclarationOrder": 18,
+          "cppValue": 26
+        },
+        {
+          "enum": "ElementsKind",
+          "member": "FLOAT32_ELEMENTS",
+          "torqueDeclarationOrder": 16,
+          "cppValue": 27
+        },
+        {
+          "enum": "ElementsKind",
+          "member": "FLOAT64_ELEMENTS",
+          "torqueDeclarationOrder": 17,
+          "cppValue": 28
+        },
+        {
+          "enum": "ElementsKind",
+          "member": "FLOAT16_ELEMENTS",
+          "torqueDeclarationOrder": 15,
+          "cppValue": 29
+        },
+        {
+          "enum": "ElementsKind",
+          "member": "RAB_GSAB_UINT8_ELEMENTS",
+          "torqueDeclarationOrder": 21,
+          "cppValue": 30
+        },
+        {
+          "enum": "ElementsKind",
+          "member": "RAB_GSAB_INT8_ELEMENTS",
+          "torqueDeclarationOrder": 22,
+          "cppValue": 31
+        },
+        {
+          "enum": "ElementsKind",
+          "member": "RAB_GSAB_UINT16_ELEMENTS",
+          "torqueDeclarationOrder": 23,
+          "cppValue": 32
+        },
+        {
+          "enum": "ElementsKind",
+          "member": "RAB_GSAB_INT16_ELEMENTS",
+          "torqueDeclarationOrder": 24,
+          "cppValue": 33
+        },
+        {
+          "enum": "ElementsKind",
+          "member": "RAB_GSAB_UINT32_ELEMENTS",
+          "torqueDeclarationOrder": 25,
+          "cppValue": 34
+        },
+        {
+          "enum": "ElementsKind",
+          "member": "RAB_GSAB_INT32_ELEMENTS",
+          "torqueDeclarationOrder": 26,
+          "cppValue": 35
+        },
+        {
+          "enum": "ElementsKind",
+          "member": "RAB_GSAB_BIGUINT64_ELEMENTS",
+          "torqueDeclarationOrder": 31,
+          "cppValue": 36
+        },
+        {
+          "enum": "ElementsKind",
+          "member": "RAB_GSAB_BIGINT64_ELEMENTS",
+          "torqueDeclarationOrder": 32,
+          "cppValue": 37
+        },
+        {
+          "enum": "ElementsKind",
+          "member": "RAB_GSAB_UINT8_CLAMPED_ELEMENTS",
+          "torqueDeclarationOrder": 30,
+          "cppValue": 38
+        },
+        {
+          "enum": "ElementsKind",
+          "member": "RAB_GSAB_FLOAT32_ELEMENTS",
+          "torqueDeclarationOrder": 28,
+          "cppValue": 39
+        },
+        {
+          "enum": "ElementsKind",
+          "member": "RAB_GSAB_FLOAT64_ELEMENTS",
+          "torqueDeclarationOrder": 29,
+          "cppValue": 40
+        },
+        {
+          "enum": "ElementsKind",
+          "member": "RAB_GSAB_FLOAT16_ELEMENTS",
+          "torqueDeclarationOrder": 27,
+          "cppValue": 41
+        },
+        {
+          "enum": "ElementsKind",
+          "member": "NO_ELEMENTS",
+          "torqueDeclarationOrder": 0,
+          "cppValue": 43
+        },
+        {
+          "enum": "ElementsKind",
+          "member": "LAST_ANY_NONEXTENSIBLE_ELEMENTS_KIND",
+          "torqueDeclarationOrder": 7,
+          "cppValue": 12
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "CONTINUATION_PRESERVED_EMBEDDER_DATA_INDEX",
+          "torqueDeclarationOrder": 75,
+          "cppValue": 5
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "REFLECT_APPLY_INDEX",
+          "torqueDeclarationOrder": 28,
+          "cppValue": 8
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "PROMISE_THEN_INDEX",
+          "torqueDeclarationOrder": 68,
+          "cppValue": 11
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "FUNCTION_PROTOTYPE_APPLY_INDEX",
+          "torqueDeclarationOrder": 39,
+          "cppValue": 13
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "UINT8_ARRAY_FUN_INDEX",
+          "torqueDeclarationOrder": 41,
+          "cppValue": 14
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "INT8_ARRAY_FUN_INDEX",
+          "torqueDeclarationOrder": 42,
+          "cppValue": 15
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "UINT16_ARRAY_FUN_INDEX",
+          "torqueDeclarationOrder": 43,
+          "cppValue": 16
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "INT16_ARRAY_FUN_INDEX",
+          "torqueDeclarationOrder": 44,
+          "cppValue": 17
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "UINT32_ARRAY_FUN_INDEX",
+          "torqueDeclarationOrder": 45,
+          "cppValue": 18
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "INT32_ARRAY_FUN_INDEX",
+          "torqueDeclarationOrder": 46,
+          "cppValue": 19
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "BIGUINT64_ARRAY_FUN_INDEX",
+          "torqueDeclarationOrder": 51,
+          "cppValue": 20
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "BIGINT64_ARRAY_FUN_INDEX",
+          "torqueDeclarationOrder": 52,
+          "cppValue": 21
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "UINT8_CLAMPED_ARRAY_FUN_INDEX",
+          "torqueDeclarationOrder": 50,
+          "cppValue": 22
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "FLOAT32_ARRAY_FUN_INDEX",
+          "torqueDeclarationOrder": 48,
+          "cppValue": 23
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "FLOAT64_ARRAY_FUN_INDEX",
+          "torqueDeclarationOrder": 49,
+          "cppValue": 24
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "FLOAT16_ARRAY_FUN_INDEX",
+          "torqueDeclarationOrder": 47,
+          "cppValue": 25
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "RAB_GSAB_UINT8_ARRAY_MAP_INDEX",
+          "torqueDeclarationOrder": 53,
+          "cppValue": 26
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "RAB_GSAB_INT8_ARRAY_MAP_INDEX",
+          "torqueDeclarationOrder": 54,
+          "cppValue": 27
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "RAB_GSAB_UINT16_ARRAY_MAP_INDEX",
+          "torqueDeclarationOrder": 55,
+          "cppValue": 28
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "RAB_GSAB_INT16_ARRAY_MAP_INDEX",
+          "torqueDeclarationOrder": 56,
+          "cppValue": 29
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "RAB_GSAB_UINT32_ARRAY_MAP_INDEX",
+          "torqueDeclarationOrder": 57,
+          "cppValue": 30
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "RAB_GSAB_INT32_ARRAY_MAP_INDEX",
+          "torqueDeclarationOrder": 58,
+          "cppValue": 31
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "RAB_GSAB_BIGUINT64_ARRAY_MAP_INDEX",
+          "torqueDeclarationOrder": 63,
+          "cppValue": 32
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "RAB_GSAB_BIGINT64_ARRAY_MAP_INDEX",
+          "torqueDeclarationOrder": 64,
+          "cppValue": 33
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "RAB_GSAB_UINT8_CLAMPED_ARRAY_MAP_INDEX",
+          "torqueDeclarationOrder": 62,
+          "cppValue": 34
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "RAB_GSAB_FLOAT32_ARRAY_MAP_INDEX",
+          "torqueDeclarationOrder": 60,
+          "cppValue": 35
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "RAB_GSAB_FLOAT64_ARRAY_MAP_INDEX",
+          "torqueDeclarationOrder": 61,
+          "cppValue": 36
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "RAB_GSAB_FLOAT16_ARRAY_MAP_INDEX",
+          "torqueDeclarationOrder": 59,
+          "cppValue": 37
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "ACCESSOR_PROPERTY_DESCRIPTOR_MAP_INDEX",
+          "torqueDeclarationOrder": 65,
+          "cppValue": 40
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "ARRAY_BUFFER_FUN_INDEX",
+          "torqueDeclarationOrder": 3,
+          "cppValue": 42
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "ARRAY_BUFFER_MAP_INDEX",
+          "torqueDeclarationOrder": 5,
+          "cppValue": 43
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "ARRAY_BUFFER_NOINIT_FUN_INDEX",
+          "torqueDeclarationOrder": 4,
+          "cppValue": 44
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "ARRAY_FUNCTION_INDEX",
+          "torqueDeclarationOrder": 6,
+          "cppValue": 45
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "ARRAY_JOIN_STACK_INDEX",
+          "torqueDeclarationOrder": 7,
+          "cppValue": 46
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "BOUND_FUNCTION_WITH_CONSTRUCTOR_MAP_INDEX",
+          "torqueDeclarationOrder": 76,
+          "cppValue": 54
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "BOUND_FUNCTION_WITHOUT_CONSTRUCTOR_MAP_INDEX",
+          "torqueDeclarationOrder": 77,
+          "cppValue": 55
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "DATA_PROPERTY_DESCRIPTOR_MAP_INDEX",
+          "torqueDeclarationOrder": 66,
+          "cppValue": 60
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "FAST_ALIASED_ARGUMENTS_MAP_INDEX",
+          "torqueDeclarationOrder": 37,
+          "cppValue": 69
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "INITIAL_ARRAY_ITERATOR_MAP_INDEX",
+          "torqueDeclarationOrder": 32,
+          "cppValue": 76
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "INITIAL_ARRAY_PROTOTYPE_INDEX",
+          "torqueDeclarationOrder": 20,
+          "cppValue": 78
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "INITIAL_ITERATOR_PROTOTYPE_INDEX",
+          "torqueDeclarationOrder": 33,
+          "cppValue": 85
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "INITIAL_STRING_ITERATOR_MAP_INDEX",
+          "torqueDeclarationOrder": 31,
+          "cppValue": 94
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "ITERATOR_FILTER_HELPER_MAP_INDEX",
+          "torqueDeclarationOrder": 11,
+          "cppValue": 114
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "ITERATOR_MAP_HELPER_MAP_INDEX",
+          "torqueDeclarationOrder": 10,
+          "cppValue": 115
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "ITERATOR_TAKE_HELPER_MAP_INDEX",
+          "torqueDeclarationOrder": 12,
+          "cppValue": 116
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "ITERATOR_DROP_HELPER_MAP_INDEX",
+          "torqueDeclarationOrder": 13,
+          "cppValue": 117
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "ITERATOR_FLAT_MAP_HELPER_MAP_INDEX",
+          "torqueDeclarationOrder": 14,
+          "cppValue": 118
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "ITERATOR_CONCAT_HELPER_MAP_INDEX",
+          "torqueDeclarationOrder": 15,
+          "cppValue": 119
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "ITERATOR_FUNCTION_INDEX",
+          "torqueDeclarationOrder": 16,
+          "cppValue": 120
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "VALID_ITERATOR_WRAPPER_MAP_INDEX",
+          "torqueDeclarationOrder": 17,
+          "cppValue": 121
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "ITERATOR_RESULT_MAP_INDEX",
+          "torqueDeclarationOrder": 9,
+          "cppValue": 122
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "JS_ARRAY_PACKED_SMI_ELEMENTS_MAP_INDEX",
+          "torqueDeclarationOrder": 19,
+          "cppValue": 123
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "JS_ARRAY_PACKED_ELEMENTS_MAP_INDEX",
+          "torqueDeclarationOrder": 18,
+          "cppValue": 125
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "JS_MAP_MAP_INDEX",
+          "torqueDeclarationOrder": 22,
+          "cppValue": 134
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "JS_SET_MAP_INDEX",
+          "torqueDeclarationOrder": 23,
+          "cppValue": 139
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "FUNCTION_CONTEXT_MAP_INDEX",
+          "torqueDeclarationOrder": 38,
+          "cppValue": 157
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "MATH_RANDOM_INDEX_INDEX",
+          "torqueDeclarationOrder": 25,
+          "cppValue": 171
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "MATH_RANDOM_CACHE_INDEX",
+          "torqueDeclarationOrder": 24,
+          "cppValue": 173
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "NUMBER_FUNCTION_INDEX",
+          "torqueDeclarationOrder": 26,
+          "cppValue": 175
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "OBJECT_FUNCTION_INDEX",
+          "torqueDeclarationOrder": 8,
+          "cppValue": 176
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "PROMISE_HOOK_INIT_FUNCTION_INDEX",
+          "torqueDeclarationOrder": 71,
+          "cppValue": 179
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "PROMISE_HOOK_BEFORE_FUNCTION_INDEX",
+          "torqueDeclarationOrder": 72,
+          "cppValue": 180
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "PROMISE_HOOK_AFTER_FUNCTION_INDEX",
+          "torqueDeclarationOrder": 73,
+          "cppValue": 181
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "PROMISE_HOOK_RESOLVE_FUNCTION_INDEX",
+          "torqueDeclarationOrder": 74,
+          "cppValue": 182
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "PROXY_REVOCABLE_RESULT_MAP_INDEX",
+          "torqueDeclarationOrder": 27,
+          "cppValue": 187
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "PROMISE_PROTOTYPE_INDEX",
+          "torqueDeclarationOrder": 69,
+          "cppValue": 188
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "REGEXP_FUNCTION_INDEX",
+          "torqueDeclarationOrder": 29,
+          "cppValue": 191
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "REGEXP_LAST_MATCH_INFO_INDEX",
+          "torqueDeclarationOrder": 30,
+          "cppValue": 192
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "SLOPPY_ARGUMENTS_MAP_INDEX",
+          "torqueDeclarationOrder": 36,
+          "cppValue": 211
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "STRICT_ARGUMENTS_MAP_INDEX",
+          "torqueDeclarationOrder": 35,
+          "cppValue": 213
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "SLOW_OBJECT_WITH_NULL_PROTOTYPE_MAP",
+          "torqueDeclarationOrder": 34,
+          "cppValue": 214
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "INITIAL_ARRAY_PROTOTYPE_VALIDITY_CELL_INDEX",
+          "torqueDeclarationOrder": 21,
+          "cppValue": 220
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "STRICT_FUNCTION_WITHOUT_PROTOTYPE_MAP_INDEX",
+          "torqueDeclarationOrder": 70,
+          "cppValue": 228
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "STRING_FUNCTION_INDEX",
+          "torqueDeclarationOrder": 40,
+          "cppValue": 237
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "AGGREGATE_ERROR_FUNCTION_INDEX",
+          "torqueDeclarationOrder": 2,
+          "cppValue": 267
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "PROMISE_FUNCTION_INDEX",
+          "torqueDeclarationOrder": 67,
+          "cppValue": 283
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "WRAPPED_FUNCTION_MAP_INDEX",
+          "torqueDeclarationOrder": 78,
+          "cppValue": 302
+        },
+        {
+          "enum": "ContextSlot",
+          "member": "MIN_CONTEXT_SLOTS",
+          "torqueDeclarationOrder": 79,
+          "cppValue": 2
+        }
+      ]
+    },
+    "functionKindPredicates": {
+      "note": "predicates in src/objects/function-kind.h whose body is not a disjunction of base::IsInRange / equality tests, so no ordinal range is emitted for them. They are left out rather than approximated.",
+      "entries": [
+        {
+          "predicate": "IsResumableFunction",
+          "source": "src/objects/function-kind.h",
+          "line": null,
+          "reason": "body is not a disjunction of base::IsInRange / equality tests",
+          "body": " return IsGeneratorFunction(kind) || IsAsyncFunction(kind) || IsModule(kind); "
+        },
+        {
+          "predicate": "IsStatic",
+          "source": "src/objects/function-kind.h",
+          "line": null,
+          "reason": "body is not a disjunction of base::IsInRange / equality tests",
+          "body": " switch (kind) { case FunctionKind::kStaticGetterFunction: case FunctionKind::kStaticSetterFunction: case FunctionKind::kStaticConciseMethod: case FunctionKind::kStaticConciseGeneratorMethod: case FunctionKind::kStaticAsyncConciseMethod: case FunctionKind::kStaticAsyncConciseGeneratorMethod: case FunctionKind::kClassStaticInitializerFunction: case FunctionKind::kClassStaticInitializerFunctionPrecededByMember: return true; default: return false; } "
+        },
+        {
+          "predicate": "BindsSuper",
+          "source": "src/objects/function-kind.h",
+          "line": null,
+          "reason": "body is not a disjunction of base::IsInRange / equality tests",
+          "body": " return IsConciseMethod(kind) || IsAccessorFunction(kind) || IsClassConstructor(kind); "
+        }
+      ]
+    },
+    "buildConfigUncertain": [
+      {
+        "what": "Script.script_or_modules",
+        "gatedOn": "V8_SCRIPTORMODULE_LEGACY_LIFETIME",
+        "chosen": false,
+        "why": "BUILD.gn defaults v8_scriptormodule_legacy_lifetime to false, but an embedder (notably Node) can set it to true; V8 source cannot tell us which the target binary used. Pass --scriptormodule-legacy-lifetime to flip it.",
+        "effect": "if wrong, every Script field after script_or_modules shifts by one tagged slot"
+      }
+    ]
+  },
+  "sources": [
+    {
+      "path": "BUILD.gn",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/BUILD.gn?format=TEXT",
+      "sha256": "5beb1f06a26cd1049f8b6c333f9187cba9bcad5e9f6f4f1cb035a3ef39710df0",
+      "bytes": 293237
+    },
+    {
+      "path": "include/v8-internal.h",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/include/v8-internal.h?format=TEXT",
+      "sha256": "e4926e23f24fc529bd14b53ee8b1c50e21f5fbd3fb26bf9048477fbef854123a",
+      "bytes": 75608
+    },
+    {
+      "path": "src/base/build_config.h",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/base/build_config.h?format=TEXT",
+      "sha256": "5b809f262ea64aa231e87f2fe218b0720f8b7927ad23b8472ef4da9b813cd6d5",
+      "bytes": 3932
+    },
+    {
+      "path": "src/base/macros.h",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/base/macros.h?format=TEXT",
+      "sha256": "e9ab320b4260aa90c535160ce48634fd241131d533ce68c753fd750902e49124",
+      "bytes": 23577
+    },
+    {
+      "path": "src/builtins/accessors.h",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/accessors.h?format=TEXT",
+      "sha256": "ef0fabc04bc55c53f7118d25cfd6eb0d12e7309a190197c0bc8536a71646304a",
+      "bytes": 8250
+    },
+    {
+      "path": "src/builtins/aggregate-error.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/aggregate-error.tq?format=TEXT",
+      "sha256": "814c02944e0a50e1b7035ad3cdc1a41bf467fe860725b6510af6bc0a4ac0c014",
+      "bytes": 1907
+    },
+    {
+      "path": "src/builtins/array-at.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/array-at.tq?format=TEXT",
+      "sha256": "24777a71f3d6a18d29cd77af9b84b5192ed555ca17b210bd8990a093829e55f9",
+      "bytes": 1377
+    },
+    {
+      "path": "src/builtins/array-concat.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/array-concat.tq?format=TEXT",
+      "sha256": "16c9ace40986b7d0d1aa88255f696e1116c95f196619352dbad9548ebbbc0aaf",
+      "bytes": 1608
+    },
+    {
+      "path": "src/builtins/array-copywithin.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/array-copywithin.tq?format=TEXT",
+      "sha256": "1b22d27f31b8fc1bc903f46dc1fd47c90c17e91b78941fa409474ea6369f0d97",
+      "bytes": 3215
+    },
+    {
+      "path": "src/builtins/array-every.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/array-every.tq?format=TEXT",
+      "sha256": "93c13efd6d52c1c8acb3c656eaf0975c1a0ad98935466672dffe200d0a723010",
+      "bytes": 5340
+    },
+    {
+      "path": "src/builtins/array-filter.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/array-filter.tq?format=TEXT",
+      "sha256": "fc215b2ab9ac27b20e1f43652f941f8a19bed113d15426f66998d2edf57e6268",
+      "bytes": 7688
+    },
+    {
+      "path": "src/builtins/array-find.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/array-find.tq?format=TEXT",
+      "sha256": "68a767cd62b7b7b179eb0030806fba0f520f34a00a6ab6b5cdb0e75250848099",
+      "bytes": 5714
+    },
+    {
+      "path": "src/builtins/array-findindex.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/array-findindex.tq?format=TEXT",
+      "sha256": "073841351072997ca80008fc2ab5c2238c1ef53f10faac00d8ec478f22c8a899",
+      "bytes": 5773
+    },
+    {
+      "path": "src/builtins/array-findlast.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/array-findlast.tq?format=TEXT",
+      "sha256": "cf98953ddb593a95ffdca3927167f0afad43472a47f1f6e8a31dd3f88add8061",
+      "bytes": 3935
+    },
+    {
+      "path": "src/builtins/array-findlastindex.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/array-findlastindex.tq?format=TEXT",
+      "sha256": "dd2ed216487798881fb228cbd2cf486bd8ccfc8613d551294380edb0b9ec42b3",
+      "bytes": 3918
+    },
+    {
+      "path": "src/builtins/array-flat.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/array-flat.tq?format=TEXT",
+      "sha256": "692a55e7ace2ac40918b25068db69149e88d9a471987f7190e0736ccbe03e194",
+      "bytes": 10147
+    },
+    {
+      "path": "src/builtins/array-foreach.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/array-foreach.tq?format=TEXT",
+      "sha256": "8449ca55249fb9534a88a42e9f565458bde2ebbd2400fbcdb2e4f526ba78f2f1",
+      "bytes": 4768
+    },
+    {
+      "path": "src/builtins/array-from-async.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/array-from-async.tq?format=TEXT",
+      "sha256": "efc7ca9a7007971b84cf272814acf89c17a140988e3e4bc6021111b5ee53211a",
+      "bytes": 37985
+    },
+    {
+      "path": "src/builtins/array-from.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/array-from.tq?format=TEXT",
+      "sha256": "d30c941700d7477b0efdf1ec4c6efd8eba9705a381960859e8fb48af1b18bb73",
+      "bytes": 6825
+    },
+    {
+      "path": "src/builtins/array-isarray.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/array-isarray.tq?format=TEXT",
+      "sha256": "1c9a786b0bcac7d54e6aa30c2790a7e9875f7bbb9f1f28bdfe97f1efd6e24a16",
+      "bytes": 711
+    },
+    {
+      "path": "src/builtins/array-join.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/array-join.tq?format=TEXT",
+      "sha256": "031731fe040bb732df93d87c5f7b4ce82dd704c01080e5a3fc94c1b0c9ca3f4a",
+      "bytes": 35069
+    },
+    {
+      "path": "src/builtins/array-lastindexof.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/array-lastindexof.tq?format=TEXT",
+      "sha256": "1c5e1bd872813a50d61276ecefd25943164b2912f142e1e3708a864290703e65",
+      "bytes": 5020
+    },
+    {
+      "path": "src/builtins/array-map.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/array-map.tq?format=TEXT",
+      "sha256": "e7aba10004c7dc0444d2fcaff8624462fd301351982c80c01399e8348c517b38",
+      "bytes": 10739
+    },
+    {
+      "path": "src/builtins/array-of.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/array-of.tq?format=TEXT",
+      "sha256": "a050279c167451ef8fedff2897fc7936fc9520e3de4f42cc2ed618f1785a75ea",
+      "bytes": 1831
+    },
+    {
+      "path": "src/builtins/array-reduce-right.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/array-reduce-right.tq?format=TEXT",
+      "sha256": "de077f24ac18e6f66242dd02f38fefdc04017c57903592be7bd8fefa02fe70ff",
+      "bytes": 7478
+    },
+    {
+      "path": "src/builtins/array-reduce.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/array-reduce.tq?format=TEXT",
+      "sha256": "6ee8e37b1eccf7583f4bd60596e773ad9c8a38c9874f87f6a21009ebdb97fed5",
+      "bytes": 7303
+    },
+    {
+      "path": "src/builtins/array-reverse.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/array-reverse.tq?format=TEXT",
+      "sha256": "b36422aa7e29d40f02f417966e8014387915bfb7a9085c17cadfb80cfa9637a9",
+      "bytes": 6148
+    },
+    {
+      "path": "src/builtins/array-shift.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/array-shift.tq?format=TEXT",
+      "sha256": "05aa5c85747faefcc6215e069239d99f880e5d02e9d341800a172681e57ac890",
+      "bytes": 3594
+    },
+    {
+      "path": "src/builtins/array-slice.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/array-slice.tq?format=TEXT",
+      "sha256": "c3421e47bcc18a639464971d14329d93c6f8caf231f3f780a58f26073adefd4d",
+      "bytes": 8702
+    },
+    {
+      "path": "src/builtins/array-some.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/array-some.tq?format=TEXT",
+      "sha256": "0a406fde8ac0d47614e2d2f43fd1afbdb83709f7fdac008be39c9e8890a5e1f0",
+      "bytes": 5312
+    },
+    {
+      "path": "src/builtins/array-splice.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/array-splice.tq?format=TEXT",
+      "sha256": "1d781f8cc5dee55bb5a9e7cbe9039b59a11c54e0d30fa48b4b16e10bfb8459da",
+      "bytes": 16028
+    },
+    {
+      "path": "src/builtins/array-to-reversed.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/array-to-reversed.tq?format=TEXT",
+      "sha256": "b4fa4b2926e6dcb60291a1ddc873c18f4f3e2841e89ac8c0ff911f77ab14b7c7",
+      "bytes": 5351
+    },
+    {
+      "path": "src/builtins/array-to-sorted.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/array-to-sorted.tq?format=TEXT",
+      "sha256": "e550c4881ec9643e521c851448e46987450cb3a2790dcacc45d1120134aae9c5",
+      "bytes": 4873
+    },
+    {
+      "path": "src/builtins/array-to-spliced.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/array-to-spliced.tq?format=TEXT",
+      "sha256": "743de5face016bf2c0d165f18608e5b753d78c4d88b4230c7d8564fd02fbd615",
+      "bytes": 8768
+    },
+    {
+      "path": "src/builtins/array-unshift.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/array-unshift.tq?format=TEXT",
+      "sha256": "171f63732b69975bbb1557464db5aa1e45a730d7d815d56a2065e3857c6c7477",
+      "bytes": 3305
+    },
+    {
+      "path": "src/builtins/array-with.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/array-with.tq?format=TEXT",
+      "sha256": "5591b94ec36868eb5bfaa1d3d754dc5b24da9ac2a5139b3c50b5a5af2c11b68a",
+      "bytes": 3087
+    },
+    {
+      "path": "src/builtins/array.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/array.tq?format=TEXT",
+      "sha256": "26c0e2d6798ec8b6e3bd9a8af279bd9a0c45ba31622f166550cc00e8ccb667ae",
+      "bytes": 3541
+    },
+    {
+      "path": "src/builtins/arraybuffer.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/arraybuffer.tq?format=TEXT",
+      "sha256": "a239be20815ad36002e6c56f88fe48fdfa1cdb8f4073073a4f901de6a806cb51",
+      "bytes": 8191
+    },
+    {
+      "path": "src/builtins/base.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/base.tq?format=TEXT",
+      "sha256": "509128b6bf2e0d6430078c50574e27df95a7e21a202965fe1425f145f2a975d5",
+      "bytes": 87876
+    },
+    {
+      "path": "src/builtins/boolean.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/boolean.tq?format=TEXT",
+      "sha256": "31c46c789bb362a4fae0a9272ebb11ee23de646d1e11a0ea85cfac14fb6102e0",
+      "bytes": 1542
+    },
+    {
+      "path": "src/builtins/builtins-bigint.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/builtins-bigint.tq?format=TEXT",
+      "sha256": "60f513ad984d368998665b0023a4c314f1bf25e2ee4a9050ef6d319ed5a88f36",
+      "bytes": 27757
+    },
+    {
+      "path": "src/builtins/builtins-string.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/builtins-string.tq?format=TEXT",
+      "sha256": "9f94589b94198321c0d281803896a45f0db307d27fea683a3ed462562d71a623",
+      "bytes": 11130
+    },
+    {
+      "path": "src/builtins/cast.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/cast.tq?format=TEXT",
+      "sha256": "4ccc277d64e08c12dbb51cb7ae7f85ce06d9836d310f8a0b9754f90a551c5ef5",
+      "bytes": 25712
+    },
+    {
+      "path": "src/builtins/collections.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/collections.tq?format=TEXT",
+      "sha256": "0bcb557a3e26a76ac6e022fa326efa6cbdd5c911e63db53772b8c3d5aa4ea849",
+      "bytes": 14608
+    },
+    {
+      "path": "src/builtins/console.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/console.tq?format=TEXT",
+      "sha256": "e957736a6e7d78398429674180b094ed879e556d2d250253d639a458b4f6f171",
+      "bytes": 825
+    },
+    {
+      "path": "src/builtins/constructor.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/constructor.tq?format=TEXT",
+      "sha256": "1ffa0763a5535af27fc739aa5c757a3608d702d9a8ee7e0f88d332852036c513",
+      "bytes": 6542
+    },
+    {
+      "path": "src/builtins/conversion.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/conversion.tq?format=TEXT",
+      "sha256": "f686f4258b5109e9b5151725213fc4bbe0afabe857752623eed0945b559ffa66",
+      "bytes": 10846
+    },
+    {
+      "path": "src/builtins/convert.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/convert.tq?format=TEXT",
+      "sha256": "8935d57635b16424298655a5d691faa2de8d854726352c1e3f3a1f9fc96bbab1",
+      "bytes": 14053
+    },
+    {
+      "path": "src/builtins/data-view.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/data-view.tq?format=TEXT",
+      "sha256": "b94c0c94273101ed4392af10fca9ef1b4f15d61bd7b259657eb6dd3dea889a9f",
+      "bytes": 36574
+    },
+    {
+      "path": "src/builtins/finalization-registry.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/finalization-registry.tq?format=TEXT",
+      "sha256": "dd6ec9e3630ba4d494be2181ab92700627a6668f9db58c8a11e4b33b00990621",
+      "bytes": 5380
+    },
+    {
+      "path": "src/builtins/frame-arguments.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/frame-arguments.tq?format=TEXT",
+      "sha256": "0ded4e28015994f47ca2b1e274b9b47ebafdd3fc7f33661ace9ac8cdbc2d7160",
+      "bytes": 2395
+    },
+    {
+      "path": "src/builtins/frames.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/frames.tq?format=TEXT",
+      "sha256": "39775a78f1698fb473bb0e9ee63c45e768a81a0bbc4c49de5374ee01db112c96",
+      "bytes": 5294
+    },
+    {
+      "path": "src/builtins/function.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/function.tq?format=TEXT",
+      "sha256": "93bc3964b274906f424a851254a1e11f38fa8b261872dd79e18d9164cdadfa31",
+      "bytes": 4409
+    },
+    {
+      "path": "src/builtins/growable-fixed-array.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/growable-fixed-array.tq?format=TEXT",
+      "sha256": "52f51d4f528c223a2729652f86a171160d5c8627eb6f8a0693648fd30a25ed19",
+      "bytes": 1711
+    },
+    {
+      "path": "src/builtins/ic-callable.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/ic-callable.tq?format=TEXT",
+      "sha256": "a5bb4ad937f9973f727b8e28d2ca2a4cd46342e25d4429c3a43bf9ec781900b1",
+      "bytes": 11713
+    },
+    {
+      "path": "src/builtins/ic.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/ic.tq?format=TEXT",
+      "sha256": "d11071ec4f4cf83a3da0fa3fb6eb6f5a4028f6446173c5acec0418d3a13aeeac",
+      "bytes": 2543
+    },
+    {
+      "path": "src/builtins/internal-coverage.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/internal-coverage.tq?format=TEXT",
+      "sha256": "093c7ba63d34ca5c167e791406d1ed2d540c6ce6ed613a77293cf2b2bc4c0cdd",
+      "bytes": 1487
+    },
+    {
+      "path": "src/builtins/internal.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/internal.tq?format=TEXT",
+      "sha256": "c214c30a5ad4bdd463397fcb820cfd5c8187fbabe98e770ebbe4a6befcf12beb",
+      "bytes": 3322
+    },
+    {
+      "path": "src/builtins/iterator-from.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/iterator-from.tq?format=TEXT",
+      "sha256": "0777ca4ed5729cb8bb662be0160248d8a86290da703e7949124108ba0ac33cf2",
+      "bytes": 4816
+    },
+    {
+      "path": "src/builtins/iterator-helpers.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/iterator-helpers.tq?format=TEXT",
+      "sha256": "da3cb26e2a35359cd180c03758214391e89bdf5f2b4d9aefc595dd20c3b6dcb6",
+      "bytes": 48380
+    },
+    {
+      "path": "src/builtins/iterator.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/iterator.tq?format=TEXT",
+      "sha256": "69a3263692397e464f70ed10ae952872d29fe197aa3fd7d85cf683ade48643e4",
+      "bytes": 16198
+    },
+    {
+      "path": "src/builtins/js-to-js.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/js-to-js.tq?format=TEXT",
+      "sha256": "c9e27a42f8920b67030c550902739b2726a5238b51227268c47f32dae49ebc61",
+      "bytes": 5468
+    },
+    {
+      "path": "src/builtins/js-to-wasm.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/js-to-wasm.tq?format=TEXT",
+      "sha256": "886e1893a7ecd1ca037463624ad349472120a95c116812324ca42bfa260bc825",
+      "bytes": 43421
+    },
+    {
+      "path": "src/builtins/map-groupby.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/map-groupby.tq?format=TEXT",
+      "sha256": "4ce29d0d15f475049bd15d27e74ecbfb22f08c119c93137e5ffba8d748d4a9b8",
+      "bytes": 1506
+    },
+    {
+      "path": "src/builtins/math.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/math.tq?format=TEXT",
+      "sha256": "95f1ae417b60c7ac1a815a7316889e861db1bccd2754106e2f38f315ae937de6",
+      "bytes": 15882
+    },
+    {
+      "path": "src/builtins/number.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/number.tq?format=TEXT",
+      "sha256": "81b905485c09e7be060523d1e501e3faafe8c885183649104ca216e110297cbc",
+      "bytes": 27986
+    },
+    {
+      "path": "src/builtins/object-fromentries.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/object-fromentries.tq?format=TEXT",
+      "sha256": "4e7c73b72ff101300eed2dadcba213b35789a810a433bdc34c7e6ea135a748b2",
+      "bytes": 2859
+    },
+    {
+      "path": "src/builtins/object-groupby.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/object-groupby.tq?format=TEXT",
+      "sha256": "0e13f49bc1118d175b74a0d3afbd0a3a9b7239cfdf5e4afc695ed6ea52e0fe6d",
+      "bytes": 7674
+    },
+    {
+      "path": "src/builtins/object.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/object.tq?format=TEXT",
+      "sha256": "c8091c2c0a0a2180fc2abf6e46d0dc7db726ae78ce166dd16291d6ccc3362635",
+      "bytes": 13303
+    },
+    {
+      "path": "src/builtins/promise-abstract-operations.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/promise-abstract-operations.tq?format=TEXT",
+      "sha256": "0d83e3a67559ac31f9c99c632671534dd67cead48d876003f818f01ee7eef8ef",
+      "bytes": 24440
+    },
+    {
+      "path": "src/builtins/promise-all-element-closure.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/promise-all-element-closure.tq?format=TEXT",
+      "sha256": "f63fdabfdcc0c774cf7ec483fb018900bf8765e0a64331930f190e89f917c75f",
+      "bytes": 7380
+    },
+    {
+      "path": "src/builtins/promise-all.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/promise-all.tq?format=TEXT",
+      "sha256": "a0a3bc74b2d631cf4607f9960598f7a609395fa5352fe53ba866485c658c20b8",
+      "bytes": 16164
+    },
+    {
+      "path": "src/builtins/promise-any.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/promise-any.tq?format=TEXT",
+      "sha256": "d0d87a0b6707a788fb6874446434d3c4860c0347cfcb2c19babaef1ca1356908",
+      "bytes": 15854
+    },
+    {
+      "path": "src/builtins/promise-constructor.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/promise-constructor.tq?format=TEXT",
+      "sha256": "d4e90471b97d8b84185ba0025aff869794420d0e38cd35e6d5e394527f3bbd03",
+      "bytes": 3565
+    },
+    {
+      "path": "src/builtins/promise-finally.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/promise-finally.tq?format=TEXT",
+      "sha256": "276a20c1b6d68028112b8a7af171a27b32058628931ca853f4b4861814858a6e",
+      "bytes": 9051
+    },
+    {
+      "path": "src/builtins/promise-jobs.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/promise-jobs.tq?format=TEXT",
+      "sha256": "741bf36a545dd5b118ea44f31c64c173e3991b12a6c4a8d7beb3d891cba5d299",
+      "bytes": 3335
+    },
+    {
+      "path": "src/builtins/promise-misc.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/promise-misc.tq?format=TEXT",
+      "sha256": "20c029fbb37389deb3d8e2fa7dc610fb2c5eab3e116e660e95556449eede8eb9",
+      "bytes": 17296
+    },
+    {
+      "path": "src/builtins/promise-race.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/promise-race.tq?format=TEXT",
+      "sha256": "d768c0e4a76fdbc957893b8d69ec62891de49e96cf718369b351d3f4e17db739",
+      "bytes": 4033
+    },
+    {
+      "path": "src/builtins/promise-reaction-job.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/promise-reaction-job.tq?format=TEXT",
+      "sha256": "22716ba550311d71208764b5bbc215b8870202f1b6b4c090e0bd2cf5cecbcd2e",
+      "bytes": 4646
+    },
+    {
+      "path": "src/builtins/promise-resolve.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/promise-resolve.tq?format=TEXT",
+      "sha256": "520707a9f905cc5a6ef6e4d199c82ee2f86f3618d59234bfc6cbc793da1215dc",
+      "bytes": 7327
+    },
+    {
+      "path": "src/builtins/promise-then.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/promise-then.tq?format=TEXT",
+      "sha256": "58b10431f0ebeb1935bc771c303b9742674aadfcde4b7dd1faaba2c212c92a9c",
+      "bytes": 3216
+    },
+    {
+      "path": "src/builtins/promise-try.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/promise-try.tq?format=TEXT",
+      "sha256": "c9925328e8fc2c2ddbb0a4d841355803f6faaff67f6a38891b7c70a79dcada54",
+      "bytes": 1798
+    },
+    {
+      "path": "src/builtins/promise-withresolvers.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/promise-withresolvers.tq?format=TEXT",
+      "sha256": "781d9e8c8b942a6c79f373ba5ad1e26438a7919efc4a0c09075160be237320ec",
+      "bytes": 1375
+    },
+    {
+      "path": "src/builtins/proxy-constructor.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/proxy-constructor.tq?format=TEXT",
+      "sha256": "ca302042b20e069965afd4e619bf756a961dee9e08e047c935fe00fb6bc40bb1",
+      "bytes": 1818
+    },
+    {
+      "path": "src/builtins/proxy-delete-property.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/proxy-delete-property.tq?format=TEXT",
+      "sha256": "b3dff78efa6d90d10baf5dac7f4ade355dddfe0b9ea99fcb7218601f4b97c1f4",
+      "bytes": 2602
+    },
+    {
+      "path": "src/builtins/proxy-get-property.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/proxy-get-property.tq?format=TEXT",
+      "sha256": "5e553826307eb459a6e349a3334bb0ad4064cb470c3def68d9764b5ef56a7f90",
+      "bytes": 2449
+    },
+    {
+      "path": "src/builtins/proxy-get-prototype-of.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/proxy-get-prototype-of.tq?format=TEXT",
+      "sha256": "3291d041d78ac63642c7dad6652af39f28df2ee2630ff2c8f8b3ca39b8c305ec",
+      "bytes": 2667
+    },
+    {
+      "path": "src/builtins/proxy-has-property.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/proxy-has-property.tq?format=TEXT",
+      "sha256": "8fe07b6e1e25e73b89d880d761a5cb39a6104a44b849672e8153ae40193b0a90",
+      "bytes": 1963
+    },
+    {
+      "path": "src/builtins/proxy-is-extensible.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/proxy-is-extensible.tq?format=TEXT",
+      "sha256": "33672906662d083e7fd5f66f61af65930ccb24cb3c8ab30ef2d03dec5e0f29aa",
+      "bytes": 2113
+    },
+    {
+      "path": "src/builtins/proxy-prevent-extensions.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/proxy-prevent-extensions.tq?format=TEXT",
+      "sha256": "0a658ced96ac20253b9372f834737f61f5c60ae1b9c71dedd8511bcd0e430362",
+      "bytes": 2458
+    },
+    {
+      "path": "src/builtins/proxy-revocable.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/proxy-revocable.tq?format=TEXT",
+      "sha256": "d2f4a0f14a2797927c54e5f69f03c60f9edf8ab12c818432b61ec230a9bcdf46",
+      "bytes": 1685
+    },
+    {
+      "path": "src/builtins/proxy-revoke.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/proxy-revoke.tq?format=TEXT",
+      "sha256": "49da453b46930475d32a0390f3576eb2c9bc18bf97ab375c76801d28483edc5c",
+      "bytes": 1152
+    },
+    {
+      "path": "src/builtins/proxy-set-property.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/proxy-set-property.tq?format=TEXT",
+      "sha256": "10d6ae188f0e2e86dcb60f44951c968468597c2c77b91dedab893dabb41d26d1",
+      "bytes": 3264
+    },
+    {
+      "path": "src/builtins/proxy-set-prototype-of.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/proxy-set-prototype-of.tq?format=TEXT",
+      "sha256": "d9655cb0f40653ec69e1b45f0efa5110c5bd16298934a32508bd330b6522bb1d",
+      "bytes": 2869
+    },
+    {
+      "path": "src/builtins/proxy.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/proxy.tq?format=TEXT",
+      "sha256": "2a36ca2fa56a2dd2c56eb6f200de088274aab99d3e760ab114222cd35645b70b",
+      "bytes": 1243
+    },
+    {
+      "path": "src/builtins/reflect.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/reflect.tq?format=TEXT",
+      "sha256": "365744239ee06f43852b8d4d8dffce35c89ea32eccde40f64ab6d0f3c38be86f",
+      "bytes": 4398
+    },
+    {
+      "path": "src/builtins/regexp-exec.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/regexp-exec.tq?format=TEXT",
+      "sha256": "0b8cbc748f30afbf034b004b38b5b0b34589ccce6a7a4f77497d12a5b102de19",
+      "bytes": 1578
+    },
+    {
+      "path": "src/builtins/regexp-match-all.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/regexp-match-all.tq?format=TEXT",
+      "sha256": "ac9fe7d1a240effd7c1a094e545042d4981ef7f4ceec5109dca33b93f971f613",
+      "bytes": 9181
+    },
+    {
+      "path": "src/builtins/regexp-match.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/regexp-match.tq?format=TEXT",
+      "sha256": "007858b458c1258cb27893202a046cfc931a068f1f45ea8906a087c6e49784f2",
+      "bytes": 5814
+    },
+    {
+      "path": "src/builtins/regexp-replace.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/regexp-replace.tq?format=TEXT",
+      "sha256": "d5283c163530e2446d863a81fa0fa9b395a28755630dc38319648b36f0a98319",
+      "bytes": 9964
+    },
+    {
+      "path": "src/builtins/regexp-search.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/regexp-search.tq?format=TEXT",
+      "sha256": "43614a32c83a781e3341fb77e5d1d49d8ac80a8b4177fd7cc909e8ff555148cb",
+      "bytes": 3426
+    },
+    {
+      "path": "src/builtins/regexp-source.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/regexp-source.tq?format=TEXT",
+      "sha256": "4826e9e46cbb0d032e6cf15abea94fd8909c5a90c645a97cb29b2f5bc3984583",
+      "bytes": 761
+    },
+    {
+      "path": "src/builtins/regexp-split.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/regexp-split.tq?format=TEXT",
+      "sha256": "eca9dc30b998d09158f086c0f6001222911fe306507172688d933674c62b5a80",
+      "bytes": 2719
+    },
+    {
+      "path": "src/builtins/regexp-test.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/regexp-test.tq?format=TEXT",
+      "sha256": "bb9ce7ed6e3992dee6a04a042545585528852babfb0eb72ed6a42cd38cbf08f5",
+      "bytes": 1229
+    },
+    {
+      "path": "src/builtins/regexp.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/regexp.tq?format=TEXT",
+      "sha256": "a4f1e2254309971c7fba2f293dbf6c5cf37a365c3c27892916f20f48aa98e474",
+      "bytes": 15851
+    },
+    {
+      "path": "src/builtins/set-difference.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/set-difference.tq?format=TEXT",
+      "sha256": "d216c47ada0e7b7356e9e2bcafb20f84a309d6a68c7ec3ad933ec37249bbe711",
+      "bytes": 6655
+    },
+    {
+      "path": "src/builtins/set-intersection.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/set-intersection.tq?format=TEXT",
+      "sha256": "956e0b0ec6fe66314f196f9eee8eea5a8c34fc3e9b2320700a70a05bee720cdd",
+      "bytes": 6855
+    },
+    {
+      "path": "src/builtins/set-is-disjoint-from.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/set-is-disjoint-from.tq?format=TEXT",
+      "sha256": "8d8b276c98043dfc093a7c688bac641f6202db3775e028b093b442f446317102",
+      "bytes": 5356
+    },
+    {
+      "path": "src/builtins/set-is-subset-of.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/set-is-subset-of.tq?format=TEXT",
+      "sha256": "d93cbc34e59c5e617d13fc2e58ce85d43fea61d1b0ee74d6f6db268870188041",
+      "bytes": 3152
+    },
+    {
+      "path": "src/builtins/set-is-superset-of.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/set-is-superset-of.tq?format=TEXT",
+      "sha256": "b7b78bc587479db44b97bb007a766dd477b2b0079f1fd16c17cc5c76708662e5",
+      "bytes": 3315
+    },
+    {
+      "path": "src/builtins/set-symmetric-difference.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/set-symmetric-difference.tq?format=TEXT",
+      "sha256": "eaa9272d6f5c53f1391d8a650c2a5430e95380db5030449ca2aa68b20cbf7879",
+      "bytes": 6175
+    },
+    {
+      "path": "src/builtins/set-union.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/set-union.tq?format=TEXT",
+      "sha256": "ebfd0738770a57c4e5ef133547c010edb5be4ed6dbe4b2cf3c7298e578480cde",
+      "bytes": 4065
+    },
+    {
+      "path": "src/builtins/string-at.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/string-at.tq?format=TEXT",
+      "sha256": "6ba8be5de0011362b5fa9097765bc3d6ce6d9ede7b8cf236e7166af8df9cc889",
+      "bytes": 1165
+    },
+    {
+      "path": "src/builtins/string-endswith.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/string-endswith.tq?format=TEXT",
+      "sha256": "1860c6e5862e6741b4af2ae44ee506da05a43b702501c6f51befb74db2be957e",
+      "bytes": 3052
+    },
+    {
+      "path": "src/builtins/string-html.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/string-html.tq?format=TEXT",
+      "sha256": "928dd086d2889975a039ed2e22a280ed6d2228119352849982930386a61561db",
+      "bytes": 5524
+    },
+    {
+      "path": "src/builtins/string-includes.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/string-includes.tq?format=TEXT",
+      "sha256": "69b8aca78d9c0498005080bfafd3f26addf04e58e3f42495067e49cee8269937",
+      "bytes": 1692
+    },
+    {
+      "path": "src/builtins/string-indexof.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/string-indexof.tq?format=TEXT",
+      "sha256": "98c0719c24c956d2d191a0b174f0c3c03b88f73b6dfa8050d4d29cf0a33ed717",
+      "bytes": 1342
+    },
+    {
+      "path": "src/builtins/string-iswellformed.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/string-iswellformed.tq?format=TEXT",
+      "sha256": "b14d78fd7c3d07bb42adb84638c31fcc0920e10ba2a00e11cdc1f42a5f81f814",
+      "bytes": 1586
+    },
+    {
+      "path": "src/builtins/string-iterator.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/string-iterator.tq?format=TEXT",
+      "sha256": "cc116f759f46cd07c10034258e6a9ec8d46ab23abab6c861a6766d7d57f0a4c4",
+      "bytes": 1747
+    },
+    {
+      "path": "src/builtins/string-match-search.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/string-match-search.tq?format=TEXT",
+      "sha256": "128afb5a1a16573a24477513d99472aaeca8707acedc0e01a62ddc4843aa1d1b",
+      "bytes": 3086
+    },
+    {
+      "path": "src/builtins/string-pad.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/string-pad.tq?format=TEXT",
+      "sha256": "3345bc6268949a4436afc6e2f2740961ce6cc40219c0a455e844b126155deeec",
+      "bytes": 3503
+    },
+    {
+      "path": "src/builtins/string-repeat.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/string-repeat.tq?format=TEXT",
+      "sha256": "6730ee37dc3d8b4c74ed646223e80417171eea08bddeb531f2b9e7d039d7e403",
+      "bytes": 2317
+    },
+    {
+      "path": "src/builtins/string-replaceall.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/string-replaceall.tq?format=TEXT",
+      "sha256": "09c56f03423ab6380373faff6c3732ef31205db22f81572382c7e264ea3b268c",
+      "bytes": 6352
+    },
+    {
+      "path": "src/builtins/string-slice.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/string-slice.tq?format=TEXT",
+      "sha256": "1f192eeee8fd7ba24008670493edcd418e8e672e84a2886a48c0db19b5c48323",
+      "bytes": 1193
+    },
+    {
+      "path": "src/builtins/string-startswith.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/string-startswith.tq?format=TEXT",
+      "sha256": "6f7ac8ae3ff6221fd25df046ea2907cc17b0e8ae9465033ba6e24c326182c16a",
+      "bytes": 2012
+    },
+    {
+      "path": "src/builtins/string-substr.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/string-substr.tq?format=TEXT",
+      "sha256": "37b215439f7603af4a94a9ad7ee5379ac60fee2b40d26688363d8d80fdd8b463",
+      "bytes": 1676
+    },
+    {
+      "path": "src/builtins/string-substring.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/string-substring.tq?format=TEXT",
+      "sha256": "39b5c25f5a06bb1e7bb036e254370b8cd2742b1b0aa6c6ed7ebe38f7f3e6e4fe",
+      "bytes": 1032
+    },
+    {
+      "path": "src/builtins/string-towellformed.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/string-towellformed.tq?format=TEXT",
+      "sha256": "432741912a70be117822b94b0ba225bf37a9543ba7f3af75b558ffeb58730905",
+      "bytes": 2013
+    },
+    {
+      "path": "src/builtins/string-trim.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/string-trim.tq?format=TEXT",
+      "sha256": "8a7a306323b377eec092bfd0c9b966173b043860fe90602a1bd853eff28588fe",
+      "bytes": 4758
+    },
+    {
+      "path": "src/builtins/suppressed-error.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/suppressed-error.tq?format=TEXT",
+      "sha256": "3a9c7f096c280fe87670c7a0b445155b68d10aca7444abdce64a7171a2621d23",
+      "bytes": 1643
+    },
+    {
+      "path": "src/builtins/symbol.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/symbol.tq?format=TEXT",
+      "sha256": "f778f93e7b7b2a769a13c5cf5466b23bd59f81e12d9efc60613347e7dc61d2f7",
+      "bytes": 1898
+    },
+    {
+      "path": "src/builtins/torque-internal.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/torque-internal.tq?format=TEXT",
+      "sha256": "e2fef26b49fc4c70912ea4bebc71364d782378d865c494c0d426ab92b23c10ec",
+      "bytes": 15598
+    },
+    {
+      "path": "src/builtins/typed-array-at.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/typed-array-at.tq?format=TEXT",
+      "sha256": "49929a72edea539d962dc84f79dd1aefe8fc78e66f295d09c5fa15d8b86c2604",
+      "bytes": 1156
+    },
+    {
+      "path": "src/builtins/typed-array-createtypedarray.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/typed-array-createtypedarray.tq?format=TEXT",
+      "sha256": "efbe027ddfc60610472c4705763b734f844ff970e0f6e5f11cd6361bcc268649",
+      "bytes": 23217
+    },
+    {
+      "path": "src/builtins/typed-array-entries.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/typed-array-entries.tq?format=TEXT",
+      "sha256": "62611bfdeb49d263817f6e5061aa7ce989c2aaf6b07e805d77e27fe37cfe4d0e",
+      "bytes": 1068
+    },
+    {
+      "path": "src/builtins/typed-array-every.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/typed-array-every.tq?format=TEXT",
+      "sha256": "80a7912463f45d2261b9f03835c1487fe5c7682e1e599c2ebbaf85caac7c8d1d",
+      "bytes": 2967
+    },
+    {
+      "path": "src/builtins/typed-array-filter.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/typed-array-filter.tq?format=TEXT",
+      "sha256": "af4df1a00c598aef41c052f811db52ab1726f86b7324fa07ea62622563e40a2e",
+      "bytes": 3544
+    },
+    {
+      "path": "src/builtins/typed-array-find.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/typed-array-find.tq?format=TEXT",
+      "sha256": "3ec2958887b2628d41b6bf97474f0f896c9fea77a2c91517d8199e8670e74733",
+      "bytes": 2961
+    },
+    {
+      "path": "src/builtins/typed-array-findindex.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/typed-array-findindex.tq?format=TEXT",
+      "sha256": "ec7b768db0d5c397a4dec436846b939a4f4d88f4479eeffd135f8adfec25a570",
+      "bytes": 2860
+    },
+    {
+      "path": "src/builtins/typed-array-findlast.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/typed-array-findlast.tq?format=TEXT",
+      "sha256": "7f609bb974596608a4b8be6b29f66c2a53735c42c255c7ee60aaf46ec452a911",
+      "bytes": 3063
+    },
+    {
+      "path": "src/builtins/typed-array-findlastindex.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/typed-array-findlastindex.tq?format=TEXT",
+      "sha256": "85a9adb9468de64da8a1f4fe65bc5783f09a419d9d25552dd6ccc5ada9b968e5",
+      "bytes": 3143
+    },
+    {
+      "path": "src/builtins/typed-array-foreach.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/typed-array-foreach.tq?format=TEXT",
+      "sha256": "ce2eec3d56c1bcaac92a54ea296d9366d3298188e656edea66128094deaf8c4d",
+      "bytes": 2796
+    },
+    {
+      "path": "src/builtins/typed-array-from.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/typed-array-from.tq?format=TEXT",
+      "sha256": "68535cd456c85b1c4721ef21a7f8946b6c6182ea60621601e0d1b98cfb68b9d9",
+      "bytes": 9926
+    },
+    {
+      "path": "src/builtins/typed-array-keys.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/typed-array-keys.tq?format=TEXT",
+      "sha256": "865f373074747addd591fde3709ccd6378ee1351f274edf64ef391525f488cd9",
+      "bytes": 1036
+    },
+    {
+      "path": "src/builtins/typed-array-of.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/typed-array-of.tq?format=TEXT",
+      "sha256": "1a2a8aae772067c7f79af37d5970de2199daf359b90899566923262c17cdf6f0",
+      "bytes": 1827
+    },
+    {
+      "path": "src/builtins/typed-array-reduce.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/typed-array-reduce.tq?format=TEXT",
+      "sha256": "e326a95f7d261675912990b25d91b4e137e88ee597fb93db4dae1e3362c51f7b",
+      "bytes": 2848
+    },
+    {
+      "path": "src/builtins/typed-array-reduceright.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/typed-array-reduceright.tq?format=TEXT",
+      "sha256": "aaea2b7c42de3508c835eb2792f1eb52b67230a78d9065a8b544f3680a8286f4",
+      "bytes": 2997
+    },
+    {
+      "path": "src/builtins/typed-array-set.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/typed-array-set.tq?format=TEXT",
+      "sha256": "2fdd751803f9b3944aac39314b1fda922e98f9bf9aa134312ef41bc477493810",
+      "bytes": 13137
+    },
+    {
+      "path": "src/builtins/typed-array-slice.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/typed-array-slice.tq?format=TEXT",
+      "sha256": "d50fa2fd4225296ab1d05da05aec0b7834fdd18ad82fd88d8d4a0763ac68d811",
+      "bytes": 5106
+    },
+    {
+      "path": "src/builtins/typed-array-some.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/typed-array-some.tq?format=TEXT",
+      "sha256": "0038f2fc1bb3a96351508cad48a2c5185b0f3976450c26df763bff514107154b",
+      "bytes": 2951
+    },
+    {
+      "path": "src/builtins/typed-array-sort.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/typed-array-sort.tq?format=TEXT",
+      "sha256": "b55beb385d91b212f9aca5bfac375612ed84d33afde54b22f8f20c641dfde66b",
+      "bytes": 6392
+    },
+    {
+      "path": "src/builtins/typed-array-subarray.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/typed-array-subarray.tq?format=TEXT",
+      "sha256": "9dfcb14884f84e809eb9782f60f403b609ee3c06988629894c9c563916f3db5b",
+      "bytes": 3765
+    },
+    {
+      "path": "src/builtins/typed-array-to-reversed.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/typed-array-to-reversed.tq?format=TEXT",
+      "sha256": "5d77e8bca79d0ac6375bdd27a37071831cf762ef770cee6d64913074d730b978",
+      "bytes": 1532
+    },
+    {
+      "path": "src/builtins/typed-array-to-sorted.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/typed-array-to-sorted.tq?format=TEXT",
+      "sha256": "d2a68ab571627683da9750675400d858b404fae3c73d60bd791d8635fd3a4379",
+      "bytes": 2604
+    },
+    {
+      "path": "src/builtins/typed-array-values.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/typed-array-values.tq?format=TEXT",
+      "sha256": "e9de7b8b612270ec4c256dc3215af57661a291e068490eb25b2e700140540d2f",
+      "bytes": 1052
+    },
+    {
+      "path": "src/builtins/typed-array-with.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/typed-array-with.tq?format=TEXT",
+      "sha256": "d908fd9e22b309706bccac2ebd90c316a05ee3fecd248f6147d6f62d23d432d8",
+      "bytes": 4006
+    },
+    {
+      "path": "src/builtins/typed-array.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/typed-array.tq?format=TEXT",
+      "sha256": "17031d9c84be8df088fb5aba9b5699dd43e55d7676ee64441fe56f4b306db8de",
+      "bytes": 12831
+    },
+    {
+      "path": "src/builtins/wasm-strings.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/wasm-strings.tq?format=TEXT",
+      "sha256": "4f9f835ff7da7b4c07d67ca82077ea0acc89faeba56f1c1240c0646f69818647",
+      "bytes": 9075
+    },
+    {
+      "path": "src/builtins/wasm-to-js.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/wasm-to-js.tq?format=TEXT",
+      "sha256": "b26decdab271aa61ff099554b0acdf50a8a51dec05693e6227e54de0a1a2d922",
+      "bytes": 11678
+    },
+    {
+      "path": "src/builtins/wasm.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/wasm.tq?format=TEXT",
+      "sha256": "16a40749e866ff30265aff1163276cdd25a423b4996685d2352650f2f4f93b08",
+      "bytes": 68920
+    },
+    {
+      "path": "src/builtins/weak-ref.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/builtins/weak-ref.tq?format=TEXT",
+      "sha256": "0eda5e91c1637bdeaee11653c192034f0c2fe9109f6498740a327dcf577aaa80",
+      "bytes": 3044
+    },
+    {
+      "path": "src/codegen/handler-table.h",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/codegen/handler-table.h?format=TEXT",
+      "sha256": "5e3b555fde9b94bb51051f68e0d026d226abccd3e1fc34b3397fe5d2de868798",
+      "bytes": 6230
+    },
+    {
+      "path": "src/codegen/source-position-table.cc",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/codegen/source-position-table.cc?format=TEXT",
+      "sha256": "d537b4008196d86767e7f00c8ba440369a2ee98097c005d77dce8f46a7c89bd5",
+      "bytes": 10776
+    },
+    {
+      "path": "src/codegen/source-position.h",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/codegen/source-position.h?format=TEXT",
+      "sha256": "44140aeb7bf3894a5c8a5167dbcacd6f9709456f4d784d6e0b810fa50ed8dace",
+      "bytes": 6450
+    },
+    {
+      "path": "src/common/globals.h",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/common/globals.h?format=TEXT",
+      "sha256": "9277cadd097e6cc2b99628f4de2f2bbcd4ca2db98aebaae7d78a1b99c0bde664",
+      "bytes": 108173
+    },
+    {
+      "path": "src/debug/debug-wasm-objects.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/debug/debug-wasm-objects.tq?format=TEXT",
+      "sha256": "b146c9217de32b0bddfeb91d0ebde28d2e2d3c79ddf21e8bac46ce519917056a",
+      "bytes": 258
+    },
+    {
+      "path": "src/heap/memory-chunk.h",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/heap/memory-chunk.h?format=TEXT",
+      "sha256": "355e7007b109a163331cc4c9fd4d1c51dcfff0551880a735871e10a2f0a628dc",
+      "bytes": 13954
+    },
+    {
+      "path": "src/ic/handler-configuration.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/ic/handler-configuration.tq?format=TEXT",
+      "sha256": "332a0ffccba18eede6b70706426c68525204ca41d6ad692bd50996941ded4b26",
+      "bytes": 308
+    },
+    {
+      "path": "src/init/heap-symbols.h",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/init/heap-symbols.h?format=TEXT",
+      "sha256": "520a3a19641ca08d5de7ab9f98651ed35f492b57657031505e969b8e088cf442",
+      "bytes": 74357
+    },
+    {
+      "path": "src/interpreter/bytecode-operands.h",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/interpreter/bytecode-operands.h?format=TEXT",
+      "sha256": "6ca7cab13a6643f4957ec53c1e1b292f6d08995ff59efd9c5fe4981c1f0114db",
+      "bytes": 9274
+    },
+    {
+      "path": "src/interpreter/bytecodes.h",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/interpreter/bytecodes.h?format=TEXT",
+      "sha256": "a974ab6f2c8add9f6529596d7c262c0c65db35278728448d4f9fcdb8300eb62d",
+      "bytes": 66132
+    },
+    {
+      "path": "src/interpreter/interpreter-intrinsics.h",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/interpreter/interpreter-intrinsics.h?format=TEXT",
+      "sha256": "645d1c91360dfac393e700303eef56e33df08aa5557f70fe2091ffa9ef356f21",
+      "bytes": 2521
+    },
+    {
+      "path": "src/objects/allocation-site.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/allocation-site.tq?format=TEXT",
+      "sha256": "b2dcb44eb3028df47593f6f1f5e1015d7eb083a538e9b0e0b358765e72520e2b",
+      "bytes": 329
+    },
+    {
+      "path": "src/objects/api-callbacks.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/api-callbacks.tq?format=TEXT",
+      "sha256": "1bcfa965b1a04d3ba7f4b4059cb5741565000fce4270ba7720bf985a54a70e44",
+      "bytes": 2339
+    },
+    {
+      "path": "src/objects/arguments.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/arguments.tq?format=TEXT",
+      "sha256": "ae45524500ef1c77a848e8cb3a9fda1c6540cd59a94d91cd4230e6f795ff682d",
+      "bytes": 11568
+    },
+    {
+      "path": "src/objects/bigint.h",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/bigint.h?format=TEXT",
+      "sha256": "3686c34e9c0004096ca5861a02f5403729c30492af43096d1567954a7641ee6d",
+      "bytes": 14221
+    },
+    {
+      "path": "src/objects/bigint.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/bigint.tq?format=TEXT",
+      "sha256": "2bb14f640e8cd5c132026ed876adba38fa746f52e952a25b09138af9414f0ca4",
+      "bytes": 719
+    },
+    {
+      "path": "src/objects/bytecode-array.h",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/bytecode-array.h?format=TEXT",
+      "sha256": "6d74b6b3a35d024cc97f6e1ac4ec2c7e1932f45d8d11d3219bf52a50b450756a",
+      "bytes": 7738
+    },
+    {
+      "path": "src/objects/bytecode-array.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/bytecode-array.tq?format=TEXT",
+      "sha256": "639a83f36c1be917e1ec98414c65a15606c60d5e02d1a5d6bdcc0f62cd56e1a4",
+      "bytes": 1195
+    },
+    {
+      "path": "src/objects/call-site-info.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/call-site-info.tq?format=TEXT",
+      "sha256": "5e939d72148e5fbd7fe2dd3e4cf45717e3e43400b0db1e42d899e4057b406c9f",
+      "bytes": 1093
+    },
+    {
+      "path": "src/objects/cell.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/cell.tq?format=TEXT",
+      "sha256": "c250ca73eb4a3734a059b6461819bfe915e3415a65f0991a1124682c17615ed4",
+      "bytes": 604
+    },
+    {
+      "path": "src/objects/contexts.h",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/contexts.h?format=TEXT",
+      "sha256": "21188b470b30f3597befca8dfa5e85f2205f9d42f20e3ac1c936ab20cb7ac270",
+      "bytes": 52880
+    },
+    {
+      "path": "src/objects/contexts.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/contexts.tq?format=TEXT",
+      "sha256": "d5bac7395b63b0f7c5f39850b994117952ee26a607638f6103a65078d62c8783",
+      "bytes": 18334
+    },
+    {
+      "path": "src/objects/cpp-heap-external-object.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/cpp-heap-external-object.tq?format=TEXT",
+      "sha256": "ad238f7be3323f6da27b7839218c23c6960b7d34f5d007d7ca336e1b51c0f40b",
+      "bytes": 264
+    },
+    {
+      "path": "src/objects/data-handler.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/data-handler.tq?format=TEXT",
+      "sha256": "057bcef40cd95952b0a01cbf42f172b456164ac2b8ef550c59c2f52479f37d55",
+      "bytes": 363
+    },
+    {
+      "path": "src/objects/debug-objects.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/debug-objects.tq?format=TEXT",
+      "sha256": "36f080f6230692a720000d1f9752a2b33c8318774004baa89691f8f2912f1325",
+      "bytes": 3991
+    },
+    {
+      "path": "src/objects/descriptor-array.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/descriptor-array.tq?format=TEXT",
+      "sha256": "8d74ba93c90fc656f9d91fc9f969da9411659a484073a74cdf6743655bb7f3d8",
+      "bytes": 1273
+    },
+    {
+      "path": "src/objects/elements-kind.h",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/elements-kind.h?format=TEXT",
+      "sha256": "0b9973dc0426dce0155435dd1ff6e121bb8196ec8ed1ba1ad319cd04cd913815",
+      "bytes": 21771
+    },
+    {
+      "path": "src/objects/embedder-data-array.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/embedder-data-array.tq?format=TEXT",
+      "sha256": "20da93d40fb18c05d633a48c438c0f56fa3e037eed86ed46648030f4b53fc28a",
+      "bytes": 289
+    },
+    {
+      "path": "src/objects/feedback-cell.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/feedback-cell.tq?format=TEXT",
+      "sha256": "3c90e6cd1d9a49cbfc173e2bf9b460e5c25440e5f028190acd17f8fab0ffc4ad",
+      "bytes": 326
+    },
+    {
+      "path": "src/objects/feedback-vector.h",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/feedback-vector.h?format=TEXT",
+      "sha256": "b08ce4014baf47a1d6bd3817d218d6ce89b2ad433a162ce800f3971419132790",
+      "bytes": 39598
+    },
+    {
+      "path": "src/objects/feedback-vector.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/feedback-vector.tq?format=TEXT",
+      "sha256": "f881f5a916f00b28c456fc7aa5b0e966a6f59c057a3a8bb080876dba0bc3ea94",
+      "bytes": 1689
+    },
+    {
+      "path": "src/objects/fixed-array.h",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/fixed-array.h?format=TEXT",
+      "sha256": "7d954000c509e803491f26d0428b97c9953c4681112a574c8ce0e1b0073d460b",
+      "bytes": 37214
+    },
+    {
+      "path": "src/objects/fixed-array.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/fixed-array.tq?format=TEXT",
+      "sha256": "9e5572b0540a7031549ee52d1784a9bd103de2cfd7d5450d986126c28498c4e4",
+      "bytes": 7502
+    },
+    {
+      "path": "src/objects/foreign.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/foreign.tq?format=TEXT",
+      "sha256": "5318661d62f7b328c3a618e92e369a448d297ace00e091b38d5726180353ac82",
+      "bytes": 365
+    },
+    {
+      "path": "src/objects/free-space.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/free-space.tq?format=TEXT",
+      "sha256": "3f491b5a4a94abae6f62a325fb6a6b99069c0be3bb5250ab09b9f39e6eddcb17",
+      "bytes": 211
+    },
+    {
+      "path": "src/objects/function-kind.h",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/function-kind.h?format=TEXT",
+      "sha256": "30937fb67470aa45ed953bb2fb31f601d36a4b48893dd4a25b0be1c8cdc4d242",
+      "bytes": 9599
+    },
+    {
+      "path": "src/objects/function-syntax-kind.h",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/function-syntax-kind.h?format=TEXT",
+      "sha256": "033b1bd69b96c28304f886de229c89b92310353737af06c427f7a72cfe02aa14",
+      "bytes": 1214
+    },
+    {
+      "path": "src/objects/hash-table.h",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/hash-table.h?format=TEXT",
+      "sha256": "d6788102301cb7b6c96f58506a8c4b47a486ca0aef7e9316ebd507f113240d4b",
+      "bytes": 27042
+    },
+    {
+      "path": "src/objects/heap-number.h",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/heap-number.h?format=TEXT",
+      "sha256": "598e4edc2959d92dabb473341e6d86fdde48c9df688bee8602e228fb3ea23c4f",
+      "bytes": 2403
+    },
+    {
+      "path": "src/objects/heap-number.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/heap-number.tq?format=TEXT",
+      "sha256": "295338f5d234a13f1742303fe3abc93bcc39d88d8d44e42ffbf5e0f3cc650db9",
+      "bytes": 477
+    },
+    {
+      "path": "src/objects/heap-object.h",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/heap-object.h?format=TEXT",
+      "sha256": "593ac54112048833c9c7adf0153c8a462485e1079eb5b5e5efdd0f5006b4453b",
+      "bytes": 28455
+    },
+    {
+      "path": "src/objects/heap-object.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/heap-object.tq?format=TEXT",
+      "sha256": "c3bc61ca8cec176be50ff00fde2c2217776df9825fc0ccd1ba46cff05f8f87a2",
+      "bytes": 314
+    },
+    {
+      "path": "src/objects/hole.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/hole.tq?format=TEXT",
+      "sha256": "a6d6309d1b23227d5a5ac1988835dee5c7fcb86fd42af4707006bd9588c88dd8",
+      "bytes": 485
+    },
+    {
+      "path": "src/objects/intl-objects.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/intl-objects.tq?format=TEXT",
+      "sha256": "46c109d0fb0566bbe8cc11cd29d78a20faa6b604f3e47329d23d05c4dd4a635a",
+      "bytes": 5734
+    },
+    {
+      "path": "src/objects/js-array-buffer.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/js-array-buffer.tq?format=TEXT",
+      "sha256": "a1dbf7ffdaa5707129e001e603dc0d3aba29deeaa0afb42dbb9bec44f7e6e225",
+      "bytes": 6563
+    },
+    {
+      "path": "src/objects/js-array.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/js-array.tq?format=TEXT",
+      "sha256": "ea30b9cf6c98b0e3ab7c3407e5d9e719553489d4e9681fd468836248cc0c71c3",
+      "bytes": 13744
+    },
+    {
+      "path": "src/objects/js-atomics-synchronization.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/js-atomics-synchronization.tq?format=TEXT",
+      "sha256": "790c868cf6d1dbb218060e545eaad217ffe7e40bb5b94ab3207b7e4ec1bf85d2",
+      "bytes": 584
+    },
+    {
+      "path": "src/objects/js-break-iterator.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/js-break-iterator.tq?format=TEXT",
+      "sha256": "7755f9cc7d88a5efb21808dc6877fcf0389c54d1810aa7812bb5fe973b5fd19e",
+      "bytes": 598
+    },
+    {
+      "path": "src/objects/js-collator.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/js-collator.tq?format=TEXT",
+      "sha256": "c05d7542611091d2028e65abf7af64d3aaf48a47074e1ff2ef90b589c2ec778f",
+      "bytes": 360
+    },
+    {
+      "path": "src/objects/js-collection-iterator.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/js-collection-iterator.tq?format=TEXT",
+      "sha256": "8e9a727a8ec5686cd355f3b3c39ded124cb3137d6f3164e5fe46f7a94ee57825",
+      "bytes": 355
+    },
+    {
+      "path": "src/objects/js-collection.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/js-collection.tq?format=TEXT",
+      "sha256": "a6db8df9f845cda92174f20b2025e2dfcaddd0c1e9f9ada0b9c3757c722e84c4",
+      "bytes": 1580
+    },
+    {
+      "path": "src/objects/js-date-time-format.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/js-date-time-format.tq?format=TEXT",
+      "sha256": "e17a5380a8ad848fa9c036b22bbf6a5e6fb1723ac0bd1e68505bfa171150ac74",
+      "bytes": 983
+    },
+    {
+      "path": "src/objects/js-display-names.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/js-display-names.tq?format=TEXT",
+      "sha256": "76e83b5eb0009d133636f6864a5ce8f0e6a13bbe6dc0429cad1d02ba62b21202",
+      "bytes": 806
+    },
+    {
+      "path": "src/objects/js-disposable-stack.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/js-disposable-stack.tq?format=TEXT",
+      "sha256": "6e2b8d128e28bc59c325da52c18f7fc60484a88e5c1c78f8b7c9d0a2bf421ea4",
+      "bytes": 1365
+    },
+    {
+      "path": "src/objects/js-duration-format.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/js-duration-format.tq?format=TEXT",
+      "sha256": "7d10ef2fa22997b9baf4db41cbf794c515caa78f007e93e37b21e9f15a0649a3",
+      "bytes": 2150
+    },
+    {
+      "path": "src/objects/js-function.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/js-function.tq?format=TEXT",
+      "sha256": "31d345efd3d65336fd136fcb58cf8ac8863f6a422fef23bfa0b069094c1accdb",
+      "bytes": 1821
+    },
+    {
+      "path": "src/objects/js-generator.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/js-generator.tq?format=TEXT",
+      "sha256": "f03c8419fa2d3c3564d5b26aa3b4f3224bf6629b213c7dadc6c116a692dc4cc2",
+      "bytes": 1609
+    },
+    {
+      "path": "src/objects/js-iterator-helpers.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/js-iterator-helpers.tq?format=TEXT",
+      "sha256": "d7c85a6f5d3645cb845d9411b59cedaf0d893096c3086e516217139a8f6ffdaf",
+      "bytes": 1330
+    },
+    {
+      "path": "src/objects/js-list-format.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/js-list-format.tq?format=TEXT",
+      "sha256": "50dc99b86db66ae86db9ef95d8ccb87dd3c89defc7c5f116b410879277b44fad",
+      "bytes": 662
+    },
+    {
+      "path": "src/objects/js-locale.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/js-locale.tq?format=TEXT",
+      "sha256": "4d4da00876dabf1d70d8a610f5744f8cef82f1fe565d78d626ced0d598de80a0",
+      "bytes": 295
+    },
+    {
+      "path": "src/objects/js-number-format.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/js-number-format.tq?format=TEXT",
+      "sha256": "dce915b374d87e3c946b41592a188d3f846b2ea58986ea8df7592db4ad48e9a3",
+      "bytes": 406
+    },
+    {
+      "path": "src/objects/js-objects.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/js-objects.tq?format=TEXT",
+      "sha256": "028d97068f633696fb78b4ea4ab13735da3a32ad706da1dde4f405ca158dd87d",
+      "bytes": 7564
+    },
+    {
+      "path": "src/objects/js-plural-rules.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/js-plural-rules.tq?format=TEXT",
+      "sha256": "904303a32ea76cf3560321d5ecc9c2c0963b693639c339e8011b50c66ca183c3",
+      "bytes": 655
+    },
+    {
+      "path": "src/objects/js-promise.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/js-promise.tq?format=TEXT",
+      "sha256": "621fc20437687c2d3ac5bab2b7296e5248643db95e12e6ee5c4a9c7ee0e7095b",
+      "bytes": 1121
+    },
+    {
+      "path": "src/objects/js-proxy.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/js-proxy.tq?format=TEXT",
+      "sha256": "ec70cf4fcdab50a4ce5e8d5c05e5c62e2458b334d91aaf4f9d78e99d1d02729c",
+      "bytes": 752
+    },
+    {
+      "path": "src/objects/js-raw-json.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/js-raw-json.tq?format=TEXT",
+      "sha256": "a1a23f0825ddfb29fcbb9acecd38640fde7be50db4139c99744c6345c06d9eb1",
+      "bytes": 249
+    },
+    {
+      "path": "src/objects/js-regexp-string-iterator.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/js-regexp-string-iterator.tq?format=TEXT",
+      "sha256": "fa544965a6ea8b27ed68bed21183eb5b6aea815edd2d160cda14ad6fbc28b9e6",
+      "bytes": 561
+    },
+    {
+      "path": "src/objects/js-regexp.h",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/js-regexp.h?format=TEXT",
+      "sha256": "54307d68bf03c12f317df69e301049da67491bd785b1ea3874f6bb4acf58b2bf",
+      "bytes": 12812
+    },
+    {
+      "path": "src/objects/js-regexp.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/js-regexp.tq?format=TEXT",
+      "sha256": "5d0c4cd96166575736c6ffe0900c6e2d01943458655f7ef56f4707b5d307c8da",
+      "bytes": 3156
+    },
+    {
+      "path": "src/objects/js-relative-time-format.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/js-relative-time-format.tq?format=TEXT",
+      "sha256": "6476ee603af4793372ad90b0448ad8a1a51203ac545202b3b273ad2706d51c51",
+      "bytes": 638
+    },
+    {
+      "path": "src/objects/js-segment-iterator.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/js-segment-iterator.tq?format=TEXT",
+      "sha256": "b159eef6726aeb4b8f774a93cc750b68fb066a47a07f8d6c8bd9945e9ccfec9f",
+      "bytes": 872
+    },
+    {
+      "path": "src/objects/js-segmenter.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/js-segmenter.tq?format=TEXT",
+      "sha256": "fd13a79f3a8486b114c304dcb8086ca0260dd179f953f99f71d4cdba0fcb77a6",
+      "bytes": 555
+    },
+    {
+      "path": "src/objects/js-segments.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/js-segments.tq?format=TEXT",
+      "sha256": "8ae83dd074edb03f3b7fe592f5233420a38d5ad4baadcb82c8191dc0c0139856",
+      "bytes": 530
+    },
+    {
+      "path": "src/objects/js-shadow-realm.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/js-shadow-realm.tq?format=TEXT",
+      "sha256": "b167c3236b758c9673108e20332f32a4a065a86b045603cffb1ff25f4e69f711",
+      "bytes": 249
+    },
+    {
+      "path": "src/objects/js-shared-array.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/js-shared-array.tq?format=TEXT",
+      "sha256": "1f1f0f9dc9212762fe8d677fd6a84a07d5db4d5ce7826f0ad2c3890d3a42a38d",
+      "bytes": 232
+    },
+    {
+      "path": "src/objects/js-struct.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/js-struct.tq?format=TEXT",
+      "sha256": "d488e69ac15d9283ffa5a0397d78cf1e973e2f8baf68731d7d309041987d0dc3",
+      "bytes": 474
+    },
+    {
+      "path": "src/objects/js-temporal-objects.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/js-temporal-objects.tq?format=TEXT",
+      "sha256": "bb2bcd91ef4efd4bf5f3a21b6d54017fe9ca88d22aed0cc43eb9d08123dd7b5b",
+      "bytes": 1134
+    },
+    {
+      "path": "src/objects/js-weak-refs.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/js-weak-refs.tq?format=TEXT",
+      "sha256": "d3425993f2ca3b136a0129b0325ca499149219fbb85d620d97d35bc78816c8e0",
+      "bytes": 1667
+    },
+    {
+      "path": "src/objects/literal-objects.h",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/literal-objects.h?format=TEXT",
+      "sha256": "e15c89c8311202779ebdc8883c1386989c515056ca5f2f10272ba1f47f20233c",
+      "bytes": 9410
+    },
+    {
+      "path": "src/objects/literal-objects.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/literal-objects.tq?format=TEXT",
+      "sha256": "723a731851d734956fe4beb0bb332d037b4ca899acc88287d2247b8d067297de",
+      "bytes": 1203
+    },
+    {
+      "path": "src/objects/map.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/map.tq?format=TEXT",
+      "sha256": "9dca249a1a69dca5d756646bc43ff7dfd3fca2e29894a221990e2e7921785c84",
+      "bytes": 3985
+    },
+    {
+      "path": "src/objects/megadom-handler.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/megadom-handler.tq?format=TEXT",
+      "sha256": "1d22a1ef3db16b9e8a2a061dee6d77bcf9beb8df956626abef367c31d0c4ebc4",
+      "bytes": 292
+    },
+    {
+      "path": "src/objects/microtask.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/microtask.tq?format=TEXT",
+      "sha256": "8c48ac5facc1c1b5d69481a251dc656491f5a91bad0cf9322a4f82f79df4c879",
+      "bytes": 593
+    },
+    {
+      "path": "src/objects/module.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/module.tq?format=TEXT",
+      "sha256": "1e5e8111e370652c74e6cc8d902e29260c844cb060fc12d5ca900280f2e366e9",
+      "bytes": 976
+    },
+    {
+      "path": "src/objects/name.h",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/name.h?format=TEXT",
+      "sha256": "44912bd6c957ee157fe2095e625a031f5bec60c76509cbdfa3b56c3243c904ad",
+      "bytes": 14848
+    },
+    {
+      "path": "src/objects/name.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/name.tq?format=TEXT",
+      "sha256": "bc63a0d0a2a0442710a0a0299a8dc8d58fa218ad80f6f25a4a568445870a3bc4",
+      "bytes": 2911
+    },
+    {
+      "path": "src/objects/objects-definitions.h",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/objects-definitions.h?format=TEXT",
+      "sha256": "5908abe861a195d2b90169d2eeae75a5a02a90f1bd1c61bd8b60c86073ba32f2",
+      "bytes": 15242
+    },
+    {
+      "path": "src/objects/objects.h",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/objects.h?format=TEXT",
+      "sha256": "97b701b8b5f98d03c555376183e93305ac934646056b5ac3c617349e8b2ce3be",
+      "bytes": 43663
+    },
+    {
+      "path": "src/objects/oddball.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/oddball.tq?format=TEXT",
+      "sha256": "957fd5517808fad258010f637a7f65bb82dd04500928bc0ea5b6db2b07d70582",
+      "bytes": 1000
+    },
+    {
+      "path": "src/objects/ordered-hash-table.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/ordered-hash-table.tq?format=TEXT",
+      "sha256": "2dcacb813d77c19fa5ceb4030e3af11102f7e0c3d646e08cf082fc4ff795256f",
+      "bytes": 4364
+    },
+    {
+      "path": "src/objects/primitive-heap-object.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/primitive-heap-object.tq?format=TEXT",
+      "sha256": "3a68a3c41dcdb3ce4a16eb281088f0f6d620e4cb31480cf6ffdbc66e9fe620a0",
+      "bytes": 260
+    },
+    {
+      "path": "src/objects/promise.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/promise.tq?format=TEXT",
+      "sha256": "64bd4eae82b1a5bc5e4fb871f7400d3573555587f788b071f4d4e9b7fd5d89d7",
+      "bytes": 3526
+    },
+    {
+      "path": "src/objects/property-array.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/property-array.tq?format=TEXT",
+      "sha256": "056015a0774dd9152c55b1684f91820e7abe99a17ec9f548e656b7af367c1819",
+      "bytes": 242
+    },
+    {
+      "path": "src/objects/property-cell.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/property-cell.tq?format=TEXT",
+      "sha256": "1967e321c06c47161ca7a577706a798291390d4c12719544568f3953c8764ead",
+      "bytes": 361
+    },
+    {
+      "path": "src/objects/property-descriptor-object.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/property-descriptor-object.tq?format=TEXT",
+      "sha256": "9441f37d97e3e3cb1485761883b2efce6c009a496af5025538479b9010c42e38",
+      "bytes": 5969
+    },
+    {
+      "path": "src/objects/prototype-info.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/prototype-info.tq?format=TEXT",
+      "sha256": "f14222ce7cff6f087a0a31a675f6f729b544f3e45923431adf02c31d609c6893",
+      "bytes": 1759
+    },
+    {
+      "path": "src/objects/regexp-match-info.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/regexp-match-info.tq?format=TEXT",
+      "sha256": "38a473e21bbdf802c64bfa0b84d0b67f5698a0beb3ba26f03b95ca2f476e0146",
+      "bytes": 629
+    },
+    {
+      "path": "src/objects/scope-info.h",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/scope-info.h?format=TEXT",
+      "sha256": "e594dfcc79b9ecaa251c52eb7b794cec9695e29968d9dbb91a8d3e8b7c88a311",
+      "bytes": 15111
+    },
+    {
+      "path": "src/objects/scope-info.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/scope-info.tq?format=TEXT",
+      "sha256": "d3589e8b72fb58ae9d6c7722029e8610fc0c89140423d597916bcc54bda708d9",
+      "bytes": 7940
+    },
+    {
+      "path": "src/objects/script.h",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/script.h?format=TEXT",
+      "sha256": "be09a51410411e4e998e50406ba20c2d7a2b88e6e7be31dc7dbd78326ad011c2",
+      "bytes": 11389
+    },
+    {
+      "path": "src/objects/script.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/script.tq?format=TEXT",
+      "sha256": "68ce0f5ddcf98e7eb726a329065a05ff0f0921f57d57b26934f7806c73b3f584",
+      "bytes": 2752
+    },
+    {
+      "path": "src/objects/shared-function-info.h",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/shared-function-info.h?format=TEXT",
+      "sha256": "01e67a8e27e35b7696d6859a0532a7557b85dab7d6f9499d978acf1bd2d6bb36",
+      "bytes": 39927
+    },
+    {
+      "path": "src/objects/shared-function-info.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/shared-function-info.tq?format=TEXT",
+      "sha256": "58e3388e9522229e3c1e9108aa6b32dfab47aeee212470a8918a07e3d6884686",
+      "bytes": 8274
+    },
+    {
+      "path": "src/objects/source-text-module.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/source-text-module.tq?format=TEXT",
+      "sha256": "a4d3301c9a6d4170e046f19dac54c8f621c05bb0865089ab3f47075ecf3711ee",
+      "bytes": 2532
+    },
+    {
+      "path": "src/objects/string.h",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/string.h?format=TEXT",
+      "sha256": "bedb48dc1cdadb89622b7100868498e092e35233dd96f581cad0927c6c62ce89",
+      "bytes": 57382
+    },
+    {
+      "path": "src/objects/string.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/string.tq?format=TEXT",
+      "sha256": "075483d038c35e130eb70d84b02b87ab4b00b6f39bbad60d006f4ad1ce5eb322",
+      "bytes": 13750
+    },
+    {
+      "path": "src/objects/struct.h",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/struct.h?format=TEXT",
+      "sha256": "52b56ed65864acf24ba140fd4af59cc81d902ecdc9eaf2da6f56959afccc4dab",
+      "bytes": 5124
+    },
+    {
+      "path": "src/objects/struct.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/struct.tq?format=TEXT",
+      "sha256": "62deeb698fade1bb2b7e45e8432980b9f1472e54b9ab462d1bac7da825ac0730",
+      "bytes": 345
+    },
+    {
+      "path": "src/objects/swiss-hash-table-helpers.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/swiss-hash-table-helpers.tq?format=TEXT",
+      "sha256": "88deb9751afed01d59a3d79b4c957c7e3752055182202df1ecce4bc4c6c36902",
+      "bytes": 5365
+    },
+    {
+      "path": "src/objects/swiss-name-dictionary.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/swiss-name-dictionary.tq?format=TEXT",
+      "sha256": "06498462cd8c1870ce814919cba72fd01f163bd4eaa0b8ed9af749161adccecb",
+      "bytes": 11071
+    },
+    {
+      "path": "src/objects/synthetic-module.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/synthetic-module.tq?format=TEXT",
+      "sha256": "6e0cb1863ec2932d81f7923079acc97648544487b75857758d32ff298ea1572d",
+      "bytes": 289
+    },
+    {
+      "path": "src/objects/template-objects.h",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/template-objects.h?format=TEXT",
+      "sha256": "a5ce078308be98953df35790e091ae90d3a4d510b40532d659fde826abe098e1",
+      "bytes": 2042
+    },
+    {
+      "path": "src/objects/template-objects.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/template-objects.tq?format=TEXT",
+      "sha256": "c9914281ff001d120896ce675e666bd7357f8241fae918e7b9beb99627e720b8",
+      "bytes": 310
+    },
+    {
+      "path": "src/objects/templates.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/templates.tq?format=TEXT",
+      "sha256": "f0704642d7b379367d0a57ae6f14fbc535169d7e1e1ff07a46cc074df2a278ef",
+      "bytes": 4854
+    },
+    {
+      "path": "src/objects/torque-defined-classes.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/torque-defined-classes.tq?format=TEXT",
+      "sha256": "6438a134c9bb2482591df0dc38b144371fb134a2b422da178bd27b0d083e1d60",
+      "bytes": 812
+    },
+    {
+      "path": "src/objects/trusted-object.h",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/trusted-object.h?format=TEXT",
+      "sha256": "713d2dc5f509ae96cca13d355366b99504813e87e025508a6e7c99bc22ecf7ff",
+      "bytes": 9274
+    },
+    {
+      "path": "src/objects/trusted-object.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/trusted-object.tq?format=TEXT",
+      "sha256": "65babb88d1d58636be59721ecb1a5f0edbf9923a58f46bbd223605d602dde1fa",
+      "bytes": 404
+    },
+    {
+      "path": "src/objects/turbofan-types.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/turbofan-types.tq?format=TEXT",
+      "sha256": "2bbc1e87e1cdf25d97038bb896e978949a5ea01b198113b6c12e90b1cd4d6111",
+      "bytes": 7901
+    },
+    {
+      "path": "src/objects/turboshaft-types.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/objects/turboshaft-types.tq?format=TEXT",
+      "sha256": "857f8c18a601c69f8a40178b252788aa2eab03adc68757c37e9752cff6a23e50",
+      "bytes": 8877
+    },
+    {
+      "path": "src/roots/roots.h",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/roots/roots.h?format=TEXT",
+      "sha256": "0cb2e3764aede3ef8b59f4f17116b697c12624ebe743f803a100db01960ad9b4",
+      "bytes": 45128
+    },
+    {
+      "path": "src/roots/static-roots-intl-wasm.h",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/roots/static-roots-intl-wasm.h?format=TEXT",
+      "sha256": "d4c3e5dae81c2b5f775606eddea2a8a4b5a8aa5f2701dd90101c0eda8b9d9dfd",
+      "bytes": 107073
+    },
+    {
+      "path": "src/runtime/runtime.h",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/runtime/runtime.h?format=TEXT",
+      "sha256": "b22980ebb3bf7cbfbf4641c21fa6f238db401c341447adf72c31fc5e762496e5",
+      "bytes": 59822
+    },
+    {
+      "path": "src/snapshot/code-serializer.cc",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/snapshot/code-serializer.cc?format=TEXT",
+      "sha256": "40e67bbf4c335ac3eefd652097a86d9359fe1833b710ce56ba89d7a3873a277c",
+      "bytes": 37137
+    },
+    {
+      "path": "src/snapshot/code-serializer.h",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/snapshot/code-serializer.h?format=TEXT",
+      "sha256": "2f6b770181738757a86e0cc1c7227083427d9c398247ea996649b547d71afa65",
+      "bytes": 6626
+    },
+    {
+      "path": "src/snapshot/references.h",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/snapshot/references.h?format=TEXT",
+      "sha256": "742c1bff38562d819edca95f20140e16e82491808b2e98d0db54f82c355ab16b",
+      "bytes": 4265
+    },
+    {
+      "path": "src/snapshot/serializer-deserializer.h",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/snapshot/serializer-deserializer.h?format=TEXT",
+      "sha256": "4bb537f57b178959cd22e15120422dee3b6ed4c06d6a030904b423319e2a5171",
+      "bytes": 12648
+    },
+    {
+      "path": "src/snapshot/snapshot-data.h",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/snapshot/snapshot-data.h?format=TEXT",
+      "sha256": "785b8bab35323092d3e0a9e09e13d7656c8a14b64242260c694869ef969dd009",
+      "bytes": 3346
+    },
+    {
+      "path": "src/snapshot/snapshot-utils.cc",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/snapshot/snapshot-utils.cc?format=TEXT",
+      "sha256": "cdb4b2468fe01a19859945de9b3725750363b98cbdc965f5a0b765837f8f34fb",
+      "bytes": 1110
+    },
+    {
+      "path": "src/torque/torque-parser.cc",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/torque/torque-parser.cc?format=TEXT",
+      "sha256": "709fec92a2a22147acb46f8458bfb3b5fa42da515b6949cf6ac4fba6fe6519cb",
+      "bytes": 118104
+    },
+    {
+      "path": "src/wasm/wasm-objects.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/src/wasm/wasm-objects.tq?format=TEXT",
+      "sha256": "60ced06c325b4322845ee8a7a914d4b135a74122cc1dbff5abc9c579fa2494d4",
+      "bytes": 13160
+    },
+    {
+      "path": "test/torque/test-torque.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/test/torque/test-torque.tq?format=TEXT",
+      "sha256": "a3a5c445e59ada8d16346f57019a1c5af22099cfce2c5c88dee936754c5c4cf1",
+      "bytes": 32948
+    },
+    {
+      "path": "third_party/v8/builtins/array-sort.tq",
+      "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.6.202.34/third_party/v8/builtins/array-sort.tq?format=TEXT",
+      "sha256": "431b4a52e984d0e3add8bf2f0929a73390ad867b3bcebf41cc071d0c3c9e5310",
+      "bytes": 49977
+    }
+  ]
+}

@@ -1,0 +1,5756 @@
+{
+  "version": "14.4.258.16",
+  "total_roots": 1150,
+  "roots": {
+    "0": {
+      "cpp_name": "undefined_value",
+      "type": "oddball",
+      "value": "undefined"
+    },
+    "1": {
+      "cpp_name": "the_hole_value",
+      "type": "oddball",
+      "value": "the_hole"
+    },
+    "2": {
+      "cpp_name": "null_value",
+      "type": "oddball",
+      "value": "null"
+    },
+    "3": {
+      "cpp_name": "true_value",
+      "type": "oddball",
+      "value": true
+    },
+    "4": {
+      "cpp_name": "false_value",
+      "type": "oddball",
+      "value": false
+    },
+    "5": {
+      "cpp_name": "empty_string",
+      "type": "string",
+      "value": ""
+    },
+    "6": {
+      "cpp_name": "prototype_string",
+      "type": "string",
+      "value": "prototype"
+    },
+    "7": {
+      "cpp_name": "name_string",
+      "type": "string",
+      "value": "name"
+    },
+    "8": {
+      "cpp_name": "length_string",
+      "type": "string",
+      "value": "length"
+    },
+    "9": {
+      "cpp_name": "byte_array_map",
+      "type": "map",
+      "value": "byte_array_map"
+    },
+    "10": {
+      "cpp_name": "fixed_array_map",
+      "type": "map",
+      "value": "fixed_array_map"
+    },
+    "11": {
+      "cpp_name": "fixed_cow_array_map",
+      "type": "map",
+      "value": "fixed_cow_array_map"
+    },
+    "12": {
+      "cpp_name": "fixed_double_array_map",
+      "type": "map",
+      "value": "fixed_double_array_map"
+    },
+    "13": {
+      "cpp_name": "hash_table_map",
+      "type": "map",
+      "value": "hash_table_map"
+    },
+    "14": {
+      "cpp_name": "symbol_map",
+      "type": "map",
+      "value": "symbol_map"
+    },
+    "15": {
+      "cpp_name": "seq_one_byte_string_map",
+      "type": "map",
+      "value": "seq_one_byte_string_map"
+    },
+    "16": {
+      "cpp_name": "internalized_one_byte_string_map",
+      "type": "map",
+      "value": "internalized_one_byte_string_map"
+    },
+    "17": {
+      "cpp_name": "shared_function_info_map",
+      "type": "map",
+      "value": "shared_function_info_map"
+    },
+    "18": {
+      "cpp_name": "cell_map",
+      "type": "map",
+      "value": "cell_map"
+    },
+    "19": {
+      "cpp_name": "global_property_cell_map",
+      "type": "map",
+      "value": "global_property_cell_map"
+    },
+    "20": {
+      "cpp_name": "heap_number_map",
+      "type": "map",
+      "value": "heap_number_map"
+    },
+    "21": {
+      "cpp_name": "transition_array_map",
+      "type": "map",
+      "value": "transition_array_map"
+    },
+    "22": {
+      "cpp_name": "property_array_map",
+      "type": "map",
+      "value": "property_array_map"
+    },
+    "23": {
+      "cpp_name": "weak_fixed_array_map",
+      "type": "map",
+      "value": "weak_fixed_array_map"
+    },
+    "24": {
+      "cpp_name": "empty_enum_cache",
+      "type": "identifier",
+      "value": "empty_enum_cache"
+    },
+    "25": {
+      "cpp_name": "empty_scope_info",
+      "type": "identifier",
+      "value": "empty_scope_info"
+    },
+    "26": {
+      "cpp_name": "empty_property_array",
+      "type": "identifier",
+      "value": "empty_property_array"
+    },
+    "27": {
+      "cpp_name": "empty_fixed_array",
+      "type": "identifier",
+      "value": "empty_fixed_array"
+    },
+    "28": {
+      "cpp_name": "empty_descriptor_array",
+      "type": "identifier",
+      "value": "empty_descriptor_array"
+    },
+    "29": {
+      "cpp_name": "empty_weak_array_list",
+      "type": "identifier",
+      "value": "empty_weak_array_list"
+    },
+    "30": {
+      "cpp_name": "invalid_prototype_validity_cell",
+      "type": "identifier",
+      "value": "invalid_prototype_validity_cell"
+    },
+    "31": {
+      "cpp_name": "many_closures_cell",
+      "type": "identifier",
+      "value": "many_closures_cell"
+    },
+    "32": {
+      "cpp_name": "arguments_marker",
+      "type": "identifier",
+      "value": "arguments_marker"
+    },
+    "33": {
+      "cpp_name": "exception",
+      "type": "identifier",
+      "value": "exception"
+    },
+    "34": {
+      "cpp_name": "hash_table_hole_value",
+      "type": "identifier",
+      "value": "hash_table_hole_value"
+    },
+    "35": {
+      "cpp_name": "optimized_out",
+      "type": "identifier",
+      "value": "optimized_out"
+    },
+    "36": {
+      "cpp_name": "promise_hole_value",
+      "type": "identifier",
+      "value": "promise_hole_value"
+    },
+    "37": {
+      "cpp_name": "property_cell_hole_value",
+      "type": "identifier",
+      "value": "property_cell_hole_value"
+    },
+    "38": {
+      "cpp_name": "stale_register",
+      "type": "identifier",
+      "value": "stale_register"
+    },
+    "39": {
+      "cpp_name": "termination_exception",
+      "type": "identifier",
+      "value": "termination_exception"
+    },
+    "40": {
+      "cpp_name": "uninitialized_value",
+      "type": "identifier",
+      "value": "uninitialized_value"
+    },
+    "41": {
+      "cpp_name": "meta_map",
+      "type": "map",
+      "value": "meta_map"
+    },
+    "42": {
+      "cpp_name": "free_space_map",
+      "type": "map",
+      "value": "free_space_map"
+    },
+    "43": {
+      "cpp_name": "one_pointer_filler_map",
+      "type": "map",
+      "value": "one_pointer_filler_map"
+    },
+    "44": {
+      "cpp_name": "two_pointer_filler_map",
+      "type": "map",
+      "value": "two_pointer_filler_map"
+    },
+    "45": {
+      "cpp_name": "accessor_info_map",
+      "type": "map",
+      "value": "accessor_info_map"
+    },
+    "46": {
+      "cpp_name": "array_list_map",
+      "type": "map",
+      "value": "array_list_map"
+    },
+    "47": {
+      "cpp_name": "atom_regexp_data_map",
+      "type": "map",
+      "value": "atom_regexp_data_map"
+    },
+    "48": {
+      "cpp_name": "bigint_map",
+      "type": "map",
+      "value": "bigint_map"
+    },
+    "49": {
+      "cpp_name": "bytecode_array_map",
+      "type": "map",
+      "value": "bytecode_array_map"
+    },
+    "50": {
+      "cpp_name": "closure_feedback_cell_array_map",
+      "type": "map",
+      "value": "closure_feedback_cell_array_map"
+    },
+    "51": {
+      "cpp_name": "code_map",
+      "type": "map",
+      "value": "code_map"
+    },
+    "52": {
+      "cpp_name": "context_cell_map",
+      "type": "map",
+      "value": "context_cell_map"
+    },
+    "53": {
+      "cpp_name": "coverage_info_map",
+      "type": "map",
+      "value": "coverage_info_map"
+    },
+    "54": {
+      "cpp_name": "dictionary_template_info_map",
+      "type": "map",
+      "value": "dictionary_template_info_map"
+    },
+    "55": {
+      "cpp_name": "double_string_cache_map",
+      "type": "map",
+      "value": "double_string_cache_map"
+    },
+    "56": {
+      "cpp_name": "feedback_metadata_map",
+      "type": "map",
+      "value": "feedback_metadata_map"
+    },
+    "57": {
+      "cpp_name": "feedback_vector_map",
+      "type": "map",
+      "value": "feedback_vector_map"
+    },
+    "58": {
+      "cpp_name": "foreign_map",
+      "type": "map",
+      "value": "foreign_map"
+    },
+    "59": {
+      "cpp_name": "global_dictionary_map",
+      "type": "map",
+      "value": "global_dictionary_map"
+    },
+    "60": {
+      "cpp_name": "instruction_stream_map",
+      "type": "map",
+      "value": "instruction_stream_map"
+    },
+    "61": {
+      "cpp_name": "interceptor_info_map",
+      "type": "map",
+      "value": "interceptor_info_map"
+    },
+    "62": {
+      "cpp_name": "ir_regexp_data_map",
+      "type": "map",
+      "value": "ir_regexp_data_map"
+    },
+    "63": {
+      "cpp_name": "many_closures_cell_map",
+      "type": "map",
+      "value": "many_closures_cell_map"
+    },
+    "64": {
+      "cpp_name": "mega_dom_handler_map",
+      "type": "map",
+      "value": "mega_dom_handler_map"
+    },
+    "65": {
+      "cpp_name": "module_info_map",
+      "type": "map",
+      "value": "module_info_map"
+    },
+    "66": {
+      "cpp_name": "name_dictionary_map",
+      "type": "map",
+      "value": "name_dictionary_map"
+    },
+    "67": {
+      "cpp_name": "name_to_index_hash_table_map",
+      "type": "map",
+      "value": "name_to_index_hash_table_map"
+    },
+    "68": {
+      "cpp_name": "no_closures_cell_map",
+      "type": "map",
+      "value": "no_closures_cell_map"
+    },
+    "69": {
+      "cpp_name": "number_dictionary_map",
+      "type": "map",
+      "value": "number_dictionary_map"
+    },
+    "70": {
+      "cpp_name": "object_boilerplate_description_map",
+      "type": "map",
+      "value": "object_boilerplate_description_map"
+    },
+    "71": {
+      "cpp_name": "one_closure_cell_map",
+      "type": "map",
+      "value": "one_closure_cell_map"
+    },
+    "72": {
+      "cpp_name": "ordered_hash_map_map",
+      "type": "map",
+      "value": "ordered_hash_map_map"
+    },
+    "73": {
+      "cpp_name": "ordered_hash_set_map",
+      "type": "map",
+      "value": "ordered_hash_set_map"
+    },
+    "74": {
+      "cpp_name": "ordered_name_dictionary_map",
+      "type": "map",
+      "value": "ordered_name_dictionary_map"
+    },
+    "75": {
+      "cpp_name": "preparse_data_map",
+      "type": "map",
+      "value": "preparse_data_map"
+    },
+    "76": {
+      "cpp_name": "regexp_data_map",
+      "type": "map",
+      "value": "regexp_data_map"
+    },
+    "77": {
+      "cpp_name": "regexp_match_info_map",
+      "type": "map",
+      "value": "regexp_match_info_map"
+    },
+    "78": {
+      "cpp_name": "registered_symbol_table_map",
+      "type": "map",
+      "value": "registered_symbol_table_map"
+    },
+    "79": {
+      "cpp_name": "scope_info_map",
+      "type": "map",
+      "value": "scope_info_map"
+    },
+    "80": {
+      "cpp_name": "script_context_table_map",
+      "type": "map",
+      "value": "script_context_table_map"
+    },
+    "81": {
+      "cpp_name": "simple_name_dictionary_map",
+      "type": "map",
+      "value": "simple_name_dictionary_map"
+    },
+    "82": {
+      "cpp_name": "simple_number_dictionary_map",
+      "type": "map",
+      "value": "simple_number_dictionary_map"
+    },
+    "83": {
+      "cpp_name": "small_ordered_hash_map_map",
+      "type": "map",
+      "value": "small_ordered_hash_map_map"
+    },
+    "84": {
+      "cpp_name": "small_ordered_hash_set_map",
+      "type": "map",
+      "value": "small_ordered_hash_set_map"
+    },
+    "85": {
+      "cpp_name": "small_ordered_name_dictionary_map",
+      "type": "map",
+      "value": "small_ordered_name_dictionary_map"
+    },
+    "86": {
+      "cpp_name": "source_text_module_map",
+      "type": "map",
+      "value": "source_text_module_map"
+    },
+    "87": {
+      "cpp_name": "swiss_name_dictionary_map",
+      "type": "map",
+      "value": "swiss_name_dictionary_map"
+    },
+    "88": {
+      "cpp_name": "synthetic_module_map",
+      "type": "map",
+      "value": "synthetic_module_map"
+    },
+    "89": {
+      "cpp_name": "wasm_import_data_map",
+      "type": "map",
+      "value": "wasm_import_data_map"
+    },
+    "90": {
+      "cpp_name": "wasm_capi_function_data_map",
+      "type": "map",
+      "value": "wasm_capi_function_data_map"
+    },
+    "91": {
+      "cpp_name": "wasm_dispatch_table_map",
+      "type": "map",
+      "value": "wasm_dispatch_table_map"
+    },
+    "92": {
+      "cpp_name": "wasm_dispatch_table_for_imports_map",
+      "type": "map",
+      "value": "wasm_dispatch_table_for_imports_map"
+    },
+    "93": {
+      "cpp_name": "wasm_exported_function_data_map",
+      "type": "map",
+      "value": "wasm_exported_function_data_map"
+    },
+    "94": {
+      "cpp_name": "wasm_internal_function_map",
+      "type": "map",
+      "value": "wasm_internal_function_map"
+    },
+    "95": {
+      "cpp_name": "wasm_func_ref_map",
+      "type": "map",
+      "value": "wasm_func_ref_map"
+    },
+    "96": {
+      "cpp_name": "wasm_js_function_data_map",
+      "type": "map",
+      "value": "wasm_js_function_data_map"
+    },
+    "97": {
+      "cpp_name": "wasm_null_map",
+      "type": "map",
+      "value": "wasm_null_map"
+    },
+    "98": {
+      "cpp_name": "wasm_resume_data_map",
+      "type": "map",
+      "value": "wasm_resume_data_map"
+    },
+    "99": {
+      "cpp_name": "wasm_suspender_object_map",
+      "type": "map",
+      "value": "wasm_suspender_object_map"
+    },
+    "100": {
+      "cpp_name": "wasm_continuation_object_map",
+      "type": "map",
+      "value": "wasm_continuation_object_map"
+    },
+    "101": {
+      "cpp_name": "wasm_trusted_instance_data_map",
+      "type": "map",
+      "value": "wasm_trusted_instance_data_map"
+    },
+    "102": {
+      "cpp_name": "wasm_type_info_map",
+      "type": "map",
+      "value": "wasm_type_info_map"
+    },
+    "103": {
+      "cpp_name": "weak_array_list_map",
+      "type": "map",
+      "value": "weak_array_list_map"
+    },
+    "104": {
+      "cpp_name": "ephemeron_hash_table_map",
+      "type": "map",
+      "value": "ephemeron_hash_table_map"
+    },
+    "105": {
+      "cpp_name": "embedder_data_array_map",
+      "type": "map",
+      "value": "embedder_data_array_map"
+    },
+    "106": {
+      "cpp_name": "weak_cell_map",
+      "type": "map",
+      "value": "weak_cell_map"
+    },
+    "107": {
+      "cpp_name": "trusted_fixed_array_map",
+      "type": "map",
+      "value": "trusted_fixed_array_map"
+    },
+    "108": {
+      "cpp_name": "trusted_weak_fixed_array_map",
+      "type": "map",
+      "value": "trusted_weak_fixed_array_map"
+    },
+    "109": {
+      "cpp_name": "trusted_byte_array_map",
+      "type": "map",
+      "value": "trusted_byte_array_map"
+    },
+    "110": {
+      "cpp_name": "protected_fixed_array_map",
+      "type": "map",
+      "value": "protected_fixed_array_map"
+    },
+    "111": {
+      "cpp_name": "protected_weak_fixed_array_map",
+      "type": "map",
+      "value": "protected_weak_fixed_array_map"
+    },
+    "112": {
+      "cpp_name": "interpreter_data_map",
+      "type": "map",
+      "value": "interpreter_data_map"
+    },
+    "113": {
+      "cpp_name": "shared_function_info_wrapper_map",
+      "type": "map",
+      "value": "shared_function_info_wrapper_map"
+    },
+    "114": {
+      "cpp_name": "trusted_foreign_map",
+      "type": "map",
+      "value": "trusted_foreign_map"
+    },
+    "115": {
+      "cpp_name": "uncompiled_data_without_preparse_data_map",
+      "type": "map",
+      "value": "uncompiled_data_without_preparse_data_map"
+    },
+    "116": {
+      "cpp_name": "uncompiled_data_with_preparse_data_map",
+      "type": "map",
+      "value": "uncompiled_data_with_preparse_data_map"
+    },
+    "117": {
+      "cpp_name": "uncompiled_data_without_preparse_data_with_job_map",
+      "type": "map",
+      "value": "uncompiled_data_without_preparse_data_with_job_map"
+    },
+    "118": {
+      "cpp_name": "uncompiled_data_with_preparse_data_and_job_map",
+      "type": "map",
+      "value": "uncompiled_data_with_preparse_data_and_job_map"
+    },
+    "119": {
+      "cpp_name": "seq_two_byte_string_map",
+      "type": "map",
+      "value": "seq_two_byte_string_map"
+    },
+    "120": {
+      "cpp_name": "cons_two_byte_string_map",
+      "type": "map",
+      "value": "cons_two_byte_string_map"
+    },
+    "121": {
+      "cpp_name": "cons_one_byte_string_map",
+      "type": "map",
+      "value": "cons_one_byte_string_map"
+    },
+    "122": {
+      "cpp_name": "thin_two_byte_string_map",
+      "type": "map",
+      "value": "thin_two_byte_string_map"
+    },
+    "123": {
+      "cpp_name": "thin_one_byte_string_map",
+      "type": "map",
+      "value": "thin_one_byte_string_map"
+    },
+    "124": {
+      "cpp_name": "sliced_two_byte_string_map",
+      "type": "map",
+      "value": "sliced_two_byte_string_map"
+    },
+    "125": {
+      "cpp_name": "sliced_one_byte_string_map",
+      "type": "map",
+      "value": "sliced_one_byte_string_map"
+    },
+    "126": {
+      "cpp_name": "external_two_byte_string_map",
+      "type": "map",
+      "value": "external_two_byte_string_map"
+    },
+    "127": {
+      "cpp_name": "external_one_byte_string_map",
+      "type": "map",
+      "value": "external_one_byte_string_map"
+    },
+    "128": {
+      "cpp_name": "internalized_two_byte_string_map",
+      "type": "map",
+      "value": "internalized_two_byte_string_map"
+    },
+    "129": {
+      "cpp_name": "external_internalized_two_byte_string_map",
+      "type": "map",
+      "value": "external_internalized_two_byte_string_map"
+    },
+    "130": {
+      "cpp_name": "external_internalized_one_byte_string_map",
+      "type": "map",
+      "value": "external_internalized_one_byte_string_map"
+    },
+    "131": {
+      "cpp_name": "uncached_external_internalized_two_byte_string_map",
+      "type": "map",
+      "value": "uncached_external_internalized_two_byte_string_map"
+    },
+    "132": {
+      "cpp_name": "uncached_external_internalized_one_byte_string_map",
+      "type": "map",
+      "value": "uncached_external_internalized_one_byte_string_map"
+    },
+    "133": {
+      "cpp_name": "uncached_external_two_byte_string_map",
+      "type": "map",
+      "value": "uncached_external_two_byte_string_map"
+    },
+    "134": {
+      "cpp_name": "uncached_external_one_byte_string_map",
+      "type": "map",
+      "value": "uncached_external_one_byte_string_map"
+    },
+    "135": {
+      "cpp_name": "shared_seq_one_byte_string_map",
+      "type": "map",
+      "value": "shared_seq_one_byte_string_map"
+    },
+    "136": {
+      "cpp_name": "shared_seq_two_byte_string_map",
+      "type": "map",
+      "value": "shared_seq_two_byte_string_map"
+    },
+    "137": {
+      "cpp_name": "shared_external_one_byte_string_map",
+      "type": "map",
+      "value": "shared_external_one_byte_string_map"
+    },
+    "138": {
+      "cpp_name": "shared_external_two_byte_string_map",
+      "type": "map",
+      "value": "shared_external_two_byte_string_map"
+    },
+    "139": {
+      "cpp_name": "shared_uncached_external_one_byte_string_map",
+      "type": "map",
+      "value": "shared_uncached_external_one_byte_string_map"
+    },
+    "140": {
+      "cpp_name": "shared_uncached_external_two_byte_string_map",
+      "type": "map",
+      "value": "shared_uncached_external_two_byte_string_map"
+    },
+    "141": {
+      "cpp_name": "undefined_map",
+      "type": "map",
+      "value": "undefined_map"
+    },
+    "142": {
+      "cpp_name": "null_map",
+      "type": "map",
+      "value": "null_map"
+    },
+    "143": {
+      "cpp_name": "boolean_map",
+      "type": "map",
+      "value": "boolean_map"
+    },
+    "144": {
+      "cpp_name": "hole_map",
+      "type": "map",
+      "value": "hole_map"
+    },
+    "145": {
+      "cpp_name": "js_shared_array_map",
+      "type": "map",
+      "value": "js_shared_array_map"
+    },
+    "146": {
+      "cpp_name": "js_atomics_mutex_map",
+      "type": "map",
+      "value": "js_atomics_mutex_map"
+    },
+    "147": {
+      "cpp_name": "js_atomics_condition_map",
+      "type": "map",
+      "value": "js_atomics_condition_map"
+    },
+    "148": {
+      "cpp_name": "empty_byte_array",
+      "type": "identifier",
+      "value": "empty_byte_array"
+    },
+    "149": {
+      "cpp_name": "empty_object_boilerplate_description",
+      "type": "identifier",
+      "value": "empty_object_boilerplate_description"
+    },
+    "150": {
+      "cpp_name": "empty_array_boilerplate_description",
+      "type": "identifier",
+      "value": "empty_array_boilerplate_description"
+    },
+    "151": {
+      "cpp_name": "empty_closure_feedback_cell_array",
+      "type": "identifier",
+      "value": "empty_closure_feedback_cell_array"
+    },
+    "152": {
+      "cpp_name": "empty_slow_element_dictionary",
+      "type": "identifier",
+      "value": "empty_slow_element_dictionary"
+    },
+    "153": {
+      "cpp_name": "empty_ordered_hash_map",
+      "type": "map",
+      "value": "empty_ordered_hash_map"
+    },
+    "154": {
+      "cpp_name": "empty_ordered_hash_set",
+      "type": "identifier",
+      "value": "empty_ordered_hash_set"
+    },
+    "155": {
+      "cpp_name": "empty_feedback_metadata",
+      "type": "identifier",
+      "value": "empty_feedback_metadata"
+    },
+    "156": {
+      "cpp_name": "empty_property_dictionary",
+      "type": "identifier",
+      "value": "empty_property_dictionary"
+    },
+    "157": {
+      "cpp_name": "empty_ordered_property_dictionary",
+      "type": "identifier",
+      "value": "empty_ordered_property_dictionary"
+    },
+    "158": {
+      "cpp_name": "empty_swiss_property_dictionary",
+      "type": "identifier",
+      "value": "empty_swiss_property_dictionary"
+    },
+    "159": {
+      "cpp_name": "noop_interceptor_info",
+      "type": "identifier",
+      "value": "noop_interceptor_info"
+    },
+    "160": {
+      "cpp_name": "empty_array_list",
+      "type": "identifier",
+      "value": "empty_array_list"
+    },
+    "161": {
+      "cpp_name": "empty_weak_fixed_array",
+      "type": "identifier",
+      "value": "empty_weak_fixed_array"
+    },
+    "162": {
+      "cpp_name": "nan_value",
+      "type": "identifier",
+      "value": "nan_value"
+    },
+    "163": {
+      "cpp_name": "undefined_nan_value",
+      "type": "identifier",
+      "value": "undefined_nan_value"
+    },
+    "164": {
+      "cpp_name": "hole_nan_value",
+      "type": "identifier",
+      "value": "hole_nan_value"
+    },
+    "165": {
+      "cpp_name": "infinity_value",
+      "type": "identifier",
+      "value": "infinity_value"
+    },
+    "166": {
+      "cpp_name": "minus_zero_value",
+      "type": "identifier",
+      "value": "minus_zero_value"
+    },
+    "167": {
+      "cpp_name": "minus_infinity_value",
+      "type": "identifier",
+      "value": "minus_infinity_value"
+    },
+    "168": {
+      "cpp_name": "max_safe_integer",
+      "type": "identifier",
+      "value": "max_safe_integer"
+    },
+    "169": {
+      "cpp_name": "max_uint_32",
+      "type": "identifier",
+      "value": "max_uint_32"
+    },
+    "170": {
+      "cpp_name": "smi_min_value",
+      "type": "identifier",
+      "value": "smi_min_value"
+    },
+    "171": {
+      "cpp_name": "smi_max_value_plus_one",
+      "type": "identifier",
+      "value": "smi_max_value_plus_one"
+    },
+    "172": {
+      "cpp_name": "self_reference_marker",
+      "type": "identifier",
+      "value": "self_reference_marker"
+    },
+    "173": {
+      "cpp_name": "basic_block_counters_marker",
+      "type": "identifier",
+      "value": "basic_block_counters_marker"
+    },
+    "174": {
+      "cpp_name": "global_this_binding_scope_info",
+      "type": "identifier",
+      "value": "global_this_binding_scope_info"
+    },
+    "175": {
+      "cpp_name": "empty_function_scope_info",
+      "type": "identifier",
+      "value": "empty_function_scope_info"
+    },
+    "176": {
+      "cpp_name": "native_scope_info",
+      "type": "identifier",
+      "value": "native_scope_info"
+    },
+    "177": {
+      "cpp_name": "shadow_realm_scope_info",
+      "type": "identifier",
+      "value": "shadow_realm_scope_info"
+    },
+    "178": {
+      "cpp_name": "empty_symbol_table",
+      "type": "identifier",
+      "value": "empty_symbol_table"
+    },
+    "179": {
+      "cpp_name": "undefined_context_cell",
+      "type": "identifier",
+      "value": "undefined_context_cell"
+    },
+    "180": {
+      "cpp_name": "hash_seed",
+      "type": "identifier",
+      "value": "hash_seed"
+    },
+    "181": {
+      "cpp_name": "preallocated_number_string_table",
+      "type": "identifier",
+      "value": "preallocated_number_string_table"
+    },
+    "182": {
+      "cpp_name": "wasm_null",
+      "type": "identifier",
+      "value": "wasm_null"
+    },
+    "183": {
+      "cpp_name": "enumerable_string",
+      "type": "string",
+      "value": "enumerable"
+    },
+    "184": {
+      "cpp_name": "configurable_string",
+      "type": "string",
+      "value": "configurable"
+    },
+    "185": {
+      "cpp_name": "value_string",
+      "type": "string",
+      "value": "value"
+    },
+    "186": {
+      "cpp_name": "writable_string",
+      "type": "string",
+      "value": "writable"
+    },
+    "187": {
+      "cpp_name": "adoptText_string",
+      "type": "string",
+      "value": "adoptText"
+    },
+    "188": {
+      "cpp_name": "approximatelySign_string",
+      "type": "string",
+      "value": "approximatelySign"
+    },
+    "189": {
+      "cpp_name": "baseName_string",
+      "type": "string",
+      "value": "baseName"
+    },
+    "190": {
+      "cpp_name": "accounting_string",
+      "type": "string",
+      "value": "accounting"
+    },
+    "191": {
+      "cpp_name": "breakType_string",
+      "type": "string",
+      "value": "breakType"
+    },
+    "192": {
+      "cpp_name": "calendars_string",
+      "type": "string",
+      "value": "calendars"
+    },
+    "193": {
+      "cpp_name": "cardinal_string",
+      "type": "string",
+      "value": "cardinal"
+    },
+    "194": {
+      "cpp_name": "caseFirst_string",
+      "type": "string",
+      "value": "caseFirst"
+    },
+    "195": {
+      "cpp_name": "ceil_string",
+      "type": "string",
+      "value": "ceil"
+    },
+    "196": {
+      "cpp_name": "compare_string",
+      "type": "string",
+      "value": "compare"
+    },
+    "197": {
+      "cpp_name": "collation_string",
+      "type": "string",
+      "value": "collation"
+    },
+    "198": {
+      "cpp_name": "collations_string",
+      "type": "string",
+      "value": "collations"
+    },
+    "199": {
+      "cpp_name": "compact_string",
+      "type": "string",
+      "value": "compact"
+    },
+    "200": {
+      "cpp_name": "compactDisplay_string",
+      "type": "string",
+      "value": "compactDisplay"
+    },
+    "201": {
+      "cpp_name": "currency_string",
+      "type": "string",
+      "value": "currency"
+    },
+    "202": {
+      "cpp_name": "currencyDisplay_string",
+      "type": "string",
+      "value": "currencyDisplay"
+    },
+    "203": {
+      "cpp_name": "currencySign_string",
+      "type": "string",
+      "value": "currencySign"
+    },
+    "204": {
+      "cpp_name": "dateStyle_string",
+      "type": "string",
+      "value": "dateStyle"
+    },
+    "205": {
+      "cpp_name": "dateTimeField_string",
+      "type": "string",
+      "value": "dateTimeField"
+    },
+    "206": {
+      "cpp_name": "dayPeriod_string",
+      "type": "string",
+      "value": "dayPeriod"
+    },
+    "207": {
+      "cpp_name": "daysDisplay_string",
+      "type": "string",
+      "value": "daysDisplay"
+    },
+    "208": {
+      "cpp_name": "decimal_string",
+      "type": "string",
+      "value": "decimal"
+    },
+    "209": {
+      "cpp_name": "dialect_string",
+      "type": "string",
+      "value": "dialect"
+    },
+    "210": {
+      "cpp_name": "digital_string",
+      "type": "string",
+      "value": "digital"
+    },
+    "211": {
+      "cpp_name": "endRange_string",
+      "type": "string",
+      "value": "endRange"
+    },
+    "212": {
+      "cpp_name": "engineering_string",
+      "type": "string",
+      "value": "engineering"
+    },
+    "213": {
+      "cpp_name": "exceptZero_string",
+      "type": "string",
+      "value": "exceptZero"
+    },
+    "214": {
+      "cpp_name": "expand_string",
+      "type": "string",
+      "value": "expand"
+    },
+    "215": {
+      "cpp_name": "exponentInteger_string",
+      "type": "string",
+      "value": "exponentInteger"
+    },
+    "216": {
+      "cpp_name": "exponentMinusSign_string",
+      "type": "string",
+      "value": "exponentMinusSign"
+    },
+    "217": {
+      "cpp_name": "exponentSeparator_string",
+      "type": "string",
+      "value": "exponentSeparator"
+    },
+    "218": {
+      "cpp_name": "fallback_string",
+      "type": "string",
+      "value": "fallback"
+    },
+    "219": {
+      "cpp_name": "first_string",
+      "type": "string",
+      "value": "first"
+    },
+    "220": {
+      "cpp_name": "firstDay_string",
+      "type": "string",
+      "value": "firstDay"
+    },
+    "221": {
+      "cpp_name": "firstDayOfWeek_string",
+      "type": "string",
+      "value": "firstDayOfWeek"
+    },
+    "222": {
+      "cpp_name": "floor_string",
+      "type": "string",
+      "value": "floor"
+    },
+    "223": {
+      "cpp_name": "format_string",
+      "type": "string",
+      "value": "format"
+    },
+    "224": {
+      "cpp_name": "formatMatcher_string",
+      "type": "string",
+      "value": "formatMatcher"
+    },
+    "225": {
+      "cpp_name": "fraction_string",
+      "type": "string",
+      "value": "fraction"
+    },
+    "226": {
+      "cpp_name": "fractionalDigits_string",
+      "type": "string",
+      "value": "fractionalDigits"
+    },
+    "227": {
+      "cpp_name": "fractionalSecond_string",
+      "type": "string",
+      "value": "fractionalSecond"
+    },
+    "228": {
+      "cpp_name": "full_string",
+      "type": "string",
+      "value": "full"
+    },
+    "229": {
+      "cpp_name": "granularity_string",
+      "type": "string",
+      "value": "granularity"
+    },
+    "230": {
+      "cpp_name": "grapheme_string",
+      "type": "string",
+      "value": "grapheme"
+    },
+    "231": {
+      "cpp_name": "group_string",
+      "type": "string",
+      "value": "group"
+    },
+    "232": {
+      "cpp_name": "h11_string",
+      "type": "string",
+      "value": "h11"
+    },
+    "233": {
+      "cpp_name": "h12_string",
+      "type": "string",
+      "value": "h12"
+    },
+    "234": {
+      "cpp_name": "h23_string",
+      "type": "string",
+      "value": "h23"
+    },
+    "235": {
+      "cpp_name": "h24_string",
+      "type": "string",
+      "value": "h24"
+    },
+    "236": {
+      "cpp_name": "halfCeil_string",
+      "type": "string",
+      "value": "halfCeil"
+    },
+    "237": {
+      "cpp_name": "halfEven_string",
+      "type": "string",
+      "value": "halfEven"
+    },
+    "238": {
+      "cpp_name": "halfExpand_string",
+      "type": "string",
+      "value": "halfExpand"
+    },
+    "239": {
+      "cpp_name": "halfFloor_string",
+      "type": "string",
+      "value": "halfFloor"
+    },
+    "240": {
+      "cpp_name": "halfTrunc_string",
+      "type": "string",
+      "value": "halfTrunc"
+    },
+    "241": {
+      "cpp_name": "hour12_string",
+      "type": "string",
+      "value": "hour12"
+    },
+    "242": {
+      "cpp_name": "hourCycle_string",
+      "type": "string",
+      "value": "hourCycle"
+    },
+    "243": {
+      "cpp_name": "hourCycles_string",
+      "type": "string",
+      "value": "hourCycles"
+    },
+    "244": {
+      "cpp_name": "hoursDisplay_string",
+      "type": "string",
+      "value": "hoursDisplay"
+    },
+    "245": {
+      "cpp_name": "ideo_string",
+      "type": "string",
+      "value": "ideo"
+    },
+    "246": {
+      "cpp_name": "ignorePunctuation_string",
+      "type": "string",
+      "value": "ignorePunctuation"
+    },
+    "247": {
+      "cpp_name": "Invalid_Date_string",
+      "type": "string",
+      "value": "Invalid Date"
+    },
+    "248": {
+      "cpp_name": "integer_string",
+      "type": "string",
+      "value": "integer"
+    },
+    "249": {
+      "cpp_name": "isWordLike_string",
+      "type": "string",
+      "value": "isWordLike"
+    },
+    "250": {
+      "cpp_name": "kana_string",
+      "type": "string",
+      "value": "kana"
+    },
+    "251": {
+      "cpp_name": "language_string",
+      "type": "string",
+      "value": "language"
+    },
+    "252": {
+      "cpp_name": "languageDisplay_string",
+      "type": "string",
+      "value": "languageDisplay"
+    },
+    "253": {
+      "cpp_name": "lessPrecision_string",
+      "type": "string",
+      "value": "lessPrecision"
+    },
+    "254": {
+      "cpp_name": "letter_string",
+      "type": "string",
+      "value": "letter"
+    },
+    "255": {
+      "cpp_name": "list_string",
+      "type": "string",
+      "value": "list"
+    },
+    "256": {
+      "cpp_name": "literal_string",
+      "type": "string",
+      "value": "literal"
+    },
+    "257": {
+      "cpp_name": "locale_string",
+      "type": "string",
+      "value": "locale"
+    },
+    "258": {
+      "cpp_name": "localeMatcher_string",
+      "type": "string",
+      "value": "localeMatcher"
+    },
+    "259": {
+      "cpp_name": "loose_string",
+      "type": "string",
+      "value": "loose"
+    },
+    "260": {
+      "cpp_name": "lower_string",
+      "type": "string",
+      "value": "lower"
+    },
+    "261": {
+      "cpp_name": "ltr_string",
+      "type": "string",
+      "value": "ltr"
+    },
+    "262": {
+      "cpp_name": "maximumFractionDigits_string",
+      "type": "string",
+      "value": "maximumFractionDigits"
+    },
+    "263": {
+      "cpp_name": "maximumSignificantDigits_string",
+      "type": "string",
+      "value": "maximumSignificantDigits"
+    },
+    "264": {
+      "cpp_name": "microsecondsDisplay_string",
+      "type": "string",
+      "value": "microsecondsDisplay"
+    },
+    "265": {
+      "cpp_name": "millisecondsDisplay_string",
+      "type": "string",
+      "value": "millisecondsDisplay"
+    },
+    "266": {
+      "cpp_name": "min2_string",
+      "type": "string",
+      "value": "min2"
+    },
+    "267": {
+      "cpp_name": "minimalDays_string",
+      "type": "string",
+      "value": "minimalDays"
+    },
+    "268": {
+      "cpp_name": "minimumFractionDigits_string",
+      "type": "string",
+      "value": "minimumFractionDigits"
+    },
+    "269": {
+      "cpp_name": "minimumIntegerDigits_string",
+      "type": "string",
+      "value": "minimumIntegerDigits"
+    },
+    "270": {
+      "cpp_name": "minimumSignificantDigits_string",
+      "type": "string",
+      "value": "minimumSignificantDigits"
+    },
+    "271": {
+      "cpp_name": "minus_0",
+      "type": "string",
+      "value": "-0"
+    },
+    "272": {
+      "cpp_name": "minusSign_string",
+      "type": "string",
+      "value": "minusSign"
+    },
+    "273": {
+      "cpp_name": "minutesDisplay_string",
+      "type": "string",
+      "value": "minutesDisplay"
+    },
+    "274": {
+      "cpp_name": "monthsDisplay_string",
+      "type": "string",
+      "value": "monthsDisplay"
+    },
+    "275": {
+      "cpp_name": "morePrecision_string",
+      "type": "string",
+      "value": "morePrecision"
+    },
+    "276": {
+      "cpp_name": "nan_string",
+      "type": "string",
+      "value": "nan"
+    },
+    "277": {
+      "cpp_name": "nanosecondsDisplay_string",
+      "type": "string",
+      "value": "nanosecondsDisplay"
+    },
+    "278": {
+      "cpp_name": "narrowSymbol_string",
+      "type": "string",
+      "value": "narrowSymbol"
+    },
+    "279": {
+      "cpp_name": "negative_string",
+      "type": "string",
+      "value": "negative"
+    },
+    "280": {
+      "cpp_name": "never_string",
+      "type": "string",
+      "value": "never"
+    },
+    "281": {
+      "cpp_name": "none_string",
+      "type": "string",
+      "value": "none"
+    },
+    "282": {
+      "cpp_name": "notation_string",
+      "type": "string",
+      "value": "notation"
+    },
+    "283": {
+      "cpp_name": "normal_string",
+      "type": "string",
+      "value": "normal"
+    },
+    "284": {
+      "cpp_name": "numberingSystem_string",
+      "type": "string",
+      "value": "numberingSystem"
+    },
+    "285": {
+      "cpp_name": "numberingSystems_string",
+      "type": "string",
+      "value": "numberingSystems"
+    },
+    "286": {
+      "cpp_name": "numeric_string",
+      "type": "string",
+      "value": "numeric"
+    },
+    "287": {
+      "cpp_name": "ordinal_string",
+      "type": "string",
+      "value": "ordinal"
+    },
+    "288": {
+      "cpp_name": "percentSign_string",
+      "type": "string",
+      "value": "percentSign"
+    },
+    "289": {
+      "cpp_name": "plusSign_string",
+      "type": "string",
+      "value": "plusSign"
+    },
+    "290": {
+      "cpp_name": "quarter_string",
+      "type": "string",
+      "value": "quarter"
+    },
+    "291": {
+      "cpp_name": "region_string",
+      "type": "string",
+      "value": "region"
+    },
+    "292": {
+      "cpp_name": "relatedYear_string",
+      "type": "string",
+      "value": "relatedYear"
+    },
+    "293": {
+      "cpp_name": "roundingPriority_string",
+      "type": "string",
+      "value": "roundingPriority"
+    },
+    "294": {
+      "cpp_name": "rtl_string",
+      "type": "string",
+      "value": "rtl"
+    },
+    "295": {
+      "cpp_name": "scientific_string",
+      "type": "string",
+      "value": "scientific"
+    },
+    "296": {
+      "cpp_name": "secondsDisplay_string",
+      "type": "string",
+      "value": "secondsDisplay"
+    },
+    "297": {
+      "cpp_name": "segment_string",
+      "type": "string",
+      "value": "segment"
+    },
+    "298": {
+      "cpp_name": "SegmentIterator_string",
+      "type": "string",
+      "value": "Segment Iterator"
+    },
+    "299": {
+      "cpp_name": "Segments_string",
+      "type": "string",
+      "value": "Segments"
+    },
+    "300": {
+      "cpp_name": "sensitivity_string",
+      "type": "string",
+      "value": "sensitivity"
+    },
+    "301": {
+      "cpp_name": "sep_string",
+      "type": "string",
+      "value": "sep"
+    },
+    "302": {
+      "cpp_name": "shared_string",
+      "type": "string",
+      "value": "shared"
+    },
+    "303": {
+      "cpp_name": "signDisplay_string",
+      "type": "string",
+      "value": "signDisplay"
+    },
+    "304": {
+      "cpp_name": "standard_string",
+      "type": "string",
+      "value": "standard"
+    },
+    "305": {
+      "cpp_name": "startRange_string",
+      "type": "string",
+      "value": "startRange"
+    },
+    "306": {
+      "cpp_name": "strict_string",
+      "type": "string",
+      "value": "strict"
+    },
+    "307": {
+      "cpp_name": "stripIfInteger_string",
+      "type": "string",
+      "value": "stripIfInteger"
+    },
+    "308": {
+      "cpp_name": "style_string",
+      "type": "string",
+      "value": "style"
+    },
+    "309": {
+      "cpp_name": "term_string",
+      "type": "string",
+      "value": "term"
+    },
+    "310": {
+      "cpp_name": "textInfo_string",
+      "type": "string",
+      "value": "textInfo"
+    },
+    "311": {
+      "cpp_name": "timeStyle_string",
+      "type": "string",
+      "value": "timeStyle"
+    },
+    "312": {
+      "cpp_name": "timeZones_string",
+      "type": "string",
+      "value": "timeZones"
+    },
+    "313": {
+      "cpp_name": "trailingZeroDisplay_string",
+      "type": "string",
+      "value": "trailingZeroDisplay"
+    },
+    "314": {
+      "cpp_name": "trunc_string",
+      "type": "string",
+      "value": "trunc"
+    },
+    "315": {
+      "cpp_name": "two_digit_string",
+      "type": "string",
+      "value": "2-digit"
+    },
+    "316": {
+      "cpp_name": "type_string",
+      "type": "string",
+      "value": "type"
+    },
+    "317": {
+      "cpp_name": "unknown_string",
+      "type": "string",
+      "value": "unknown"
+    },
+    "318": {
+      "cpp_name": "upper_string",
+      "type": "string",
+      "value": "upper"
+    },
+    "319": {
+      "cpp_name": "usage_string",
+      "type": "string",
+      "value": "usage"
+    },
+    "320": {
+      "cpp_name": "useGrouping_string",
+      "type": "string",
+      "value": "useGrouping"
+    },
+    "321": {
+      "cpp_name": "unitDisplay_string",
+      "type": "string",
+      "value": "unitDisplay"
+    },
+    "322": {
+      "cpp_name": "variants_string",
+      "type": "string",
+      "value": "variants"
+    },
+    "323": {
+      "cpp_name": "weekday_string",
+      "type": "string",
+      "value": "weekday"
+    },
+    "324": {
+      "cpp_name": "weekend_string",
+      "type": "string",
+      "value": "weekend"
+    },
+    "325": {
+      "cpp_name": "weeksDisplay_string",
+      "type": "string",
+      "value": "weeksDisplay"
+    },
+    "326": {
+      "cpp_name": "weekInfo_string",
+      "type": "string",
+      "value": "weekInfo"
+    },
+    "327": {
+      "cpp_name": "yearName_string",
+      "type": "string",
+      "value": "yearName"
+    },
+    "328": {
+      "cpp_name": "yearsDisplay_string",
+      "type": "string",
+      "value": "yearsDisplay"
+    },
+    "329": {
+      "cpp_name": "ascii_nul_string",
+      "type": "string",
+      "value": "\u0000"
+    },
+    "330": {
+      "cpp_name": "ascii_soh_string",
+      "type": "string",
+      "value": "\u0001"
+    },
+    "331": {
+      "cpp_name": "ascii_stx_string",
+      "type": "string",
+      "value": "\u0002"
+    },
+    "332": {
+      "cpp_name": "ascii_etx_string",
+      "type": "string",
+      "value": "\u0003"
+    },
+    "333": {
+      "cpp_name": "ascii_eot_string",
+      "type": "string",
+      "value": "\u0004"
+    },
+    "334": {
+      "cpp_name": "ascii_enq_string",
+      "type": "string",
+      "value": "\u0005"
+    },
+    "335": {
+      "cpp_name": "ascii_ack_string",
+      "type": "string",
+      "value": "\u0006"
+    },
+    "336": {
+      "cpp_name": "ascii_bel_string",
+      "type": "string",
+      "value": "\u0007"
+    },
+    "337": {
+      "cpp_name": "ascii_bs_string",
+      "type": "string",
+      "value": "\b"
+    },
+    "338": {
+      "cpp_name": "ascii_ht_string",
+      "type": "string",
+      "value": "\t"
+    },
+    "339": {
+      "cpp_name": "ascii_lf_string",
+      "type": "string",
+      "value": "\n"
+    },
+    "340": {
+      "cpp_name": "ascii_vt_string",
+      "type": "string",
+      "value": "\u000b"
+    },
+    "341": {
+      "cpp_name": "ascii_ff_string",
+      "type": "string",
+      "value": "\f"
+    },
+    "342": {
+      "cpp_name": "ascii_cr_string",
+      "type": "string",
+      "value": "\r"
+    },
+    "343": {
+      "cpp_name": "ascii_so_string",
+      "type": "string",
+      "value": "\u000e"
+    },
+    "344": {
+      "cpp_name": "ascii_si_string",
+      "type": "string",
+      "value": "\u000f"
+    },
+    "345": {
+      "cpp_name": "ascii_dle_string",
+      "type": "string",
+      "value": "\u0010"
+    },
+    "346": {
+      "cpp_name": "ascii_dc1_string",
+      "type": "string",
+      "value": "\u0011"
+    },
+    "347": {
+      "cpp_name": "ascii_dc2_string",
+      "type": "string",
+      "value": "\u0012"
+    },
+    "348": {
+      "cpp_name": "ascii_dc3_string",
+      "type": "string",
+      "value": "\u0013"
+    },
+    "349": {
+      "cpp_name": "ascii_dc4_string",
+      "type": "string",
+      "value": "\u0014"
+    },
+    "350": {
+      "cpp_name": "ascii_nak_string",
+      "type": "string",
+      "value": "\u0015"
+    },
+    "351": {
+      "cpp_name": "ascii_syn_string",
+      "type": "string",
+      "value": "\u0016"
+    },
+    "352": {
+      "cpp_name": "ascii_etb_string",
+      "type": "string",
+      "value": "\u0017"
+    },
+    "353": {
+      "cpp_name": "ascii_can_string",
+      "type": "string",
+      "value": "\u0018"
+    },
+    "354": {
+      "cpp_name": "ascii_em_string",
+      "type": "string",
+      "value": "\u0019"
+    },
+    "355": {
+      "cpp_name": "ascii_sub_string",
+      "type": "string",
+      "value": "\u001a"
+    },
+    "356": {
+      "cpp_name": "ascii_esc_string",
+      "type": "string",
+      "value": "\u001b"
+    },
+    "357": {
+      "cpp_name": "ascii_fs_string",
+      "type": "string",
+      "value": "\u001c"
+    },
+    "358": {
+      "cpp_name": "ascii_gs_string",
+      "type": "string",
+      "value": "\u001d"
+    },
+    "359": {
+      "cpp_name": "ascii_rs_string",
+      "type": "string",
+      "value": "\u001e"
+    },
+    "360": {
+      "cpp_name": "ascii_us_string",
+      "type": "string",
+      "value": "\u001f"
+    },
+    "361": {
+      "cpp_name": "space_string",
+      "type": "string",
+      "value": ""
+    },
+    "362": {
+      "cpp_name": "exclamation_mark_string",
+      "type": "string",
+      "value": "!"
+    },
+    "363": {
+      "cpp_name": "double_quotes_string",
+      "type": "string",
+      "value": "\""
+    },
+    "364": {
+      "cpp_name": "hash_string",
+      "type": "string",
+      "value": "#"
+    },
+    "365": {
+      "cpp_name": "dollar_string",
+      "type": "string",
+      "value": "$"
+    },
+    "366": {
+      "cpp_name": "percent_sign_string",
+      "type": "string",
+      "value": "%"
+    },
+    "367": {
+      "cpp_name": "ampersand_string",
+      "type": "string",
+      "value": "&"
+    },
+    "368": {
+      "cpp_name": "single_quote_string",
+      "type": "string",
+      "value": "'"
+    },
+    "369": {
+      "cpp_name": "open_parenthesis_string",
+      "type": "string",
+      "value": "("
+    },
+    "370": {
+      "cpp_name": "close_parenthesis_string",
+      "type": "string",
+      "value": ")"
+    },
+    "371": {
+      "cpp_name": "asterisk_string",
+      "type": "string",
+      "value": "*"
+    },
+    "372": {
+      "cpp_name": "plus_string",
+      "type": "string",
+      "value": "+"
+    },
+    "373": {
+      "cpp_name": "comma_string",
+      "type": "string",
+      "value": ","
+    },
+    "374": {
+      "cpp_name": "minus_string",
+      "type": "string",
+      "value": "-"
+    },
+    "375": {
+      "cpp_name": "dot_string",
+      "type": "string",
+      "value": "."
+    },
+    "376": {
+      "cpp_name": "slash_string",
+      "type": "string",
+      "value": "/"
+    },
+    "377": {
+      "cpp_name": "zero_string",
+      "type": "string",
+      "value": "0"
+    },
+    "378": {
+      "cpp_name": "one_string",
+      "type": "string",
+      "value": "1"
+    },
+    "379": {
+      "cpp_name": "two_string",
+      "type": "string",
+      "value": "2"
+    },
+    "380": {
+      "cpp_name": "three_string",
+      "type": "string",
+      "value": "3"
+    },
+    "381": {
+      "cpp_name": "four_string",
+      "type": "string",
+      "value": "4"
+    },
+    "382": {
+      "cpp_name": "five_string",
+      "type": "string",
+      "value": "5"
+    },
+    "383": {
+      "cpp_name": "six_string",
+      "type": "string",
+      "value": "6"
+    },
+    "384": {
+      "cpp_name": "seven_string",
+      "type": "string",
+      "value": "7"
+    },
+    "385": {
+      "cpp_name": "eight_string",
+      "type": "string",
+      "value": "8"
+    },
+    "386": {
+      "cpp_name": "nine_string",
+      "type": "string",
+      "value": "9"
+    },
+    "387": {
+      "cpp_name": "colon_string",
+      "type": "string",
+      "value": ":"
+    },
+    "388": {
+      "cpp_name": "semicolon_string",
+      "type": "string",
+      "value": ";"
+    },
+    "389": {
+      "cpp_name": "less_than_string",
+      "type": "string",
+      "value": "<"
+    },
+    "390": {
+      "cpp_name": "equals_string",
+      "type": "string",
+      "value": "="
+    },
+    "391": {
+      "cpp_name": "greater_than_string",
+      "type": "string",
+      "value": ">"
+    },
+    "392": {
+      "cpp_name": "question_mark_string",
+      "type": "string",
+      "value": "?"
+    },
+    "393": {
+      "cpp_name": "at_sign_string",
+      "type": "string",
+      "value": "@"
+    },
+    "394": {
+      "cpp_name": "A_string",
+      "type": "string",
+      "value": "A"
+    },
+    "395": {
+      "cpp_name": "B_string",
+      "type": "string",
+      "value": "B"
+    },
+    "396": {
+      "cpp_name": "C_string",
+      "type": "string",
+      "value": "C"
+    },
+    "397": {
+      "cpp_name": "D_string",
+      "type": "string",
+      "value": "D"
+    },
+    "398": {
+      "cpp_name": "E_string",
+      "type": "string",
+      "value": "E"
+    },
+    "399": {
+      "cpp_name": "F_string",
+      "type": "string",
+      "value": "F"
+    },
+    "400": {
+      "cpp_name": "G_string",
+      "type": "string",
+      "value": "G"
+    },
+    "401": {
+      "cpp_name": "H_string",
+      "type": "string",
+      "value": "H"
+    },
+    "402": {
+      "cpp_name": "I_string",
+      "type": "string",
+      "value": "I"
+    },
+    "403": {
+      "cpp_name": "J_string",
+      "type": "string",
+      "value": "J"
+    },
+    "404": {
+      "cpp_name": "K_string",
+      "type": "string",
+      "value": "K"
+    },
+    "405": {
+      "cpp_name": "L_string",
+      "type": "string",
+      "value": "L"
+    },
+    "406": {
+      "cpp_name": "M_string",
+      "type": "string",
+      "value": "M"
+    },
+    "407": {
+      "cpp_name": "N_string",
+      "type": "string",
+      "value": "N"
+    },
+    "408": {
+      "cpp_name": "O_string",
+      "type": "string",
+      "value": "O"
+    },
+    "409": {
+      "cpp_name": "P_string",
+      "type": "string",
+      "value": "P"
+    },
+    "410": {
+      "cpp_name": "Q_string",
+      "type": "string",
+      "value": "Q"
+    },
+    "411": {
+      "cpp_name": "R_string",
+      "type": "string",
+      "value": "R"
+    },
+    "412": {
+      "cpp_name": "S_string",
+      "type": "string",
+      "value": "S"
+    },
+    "413": {
+      "cpp_name": "T_string",
+      "type": "string",
+      "value": "T"
+    },
+    "414": {
+      "cpp_name": "U_string",
+      "type": "string",
+      "value": "U"
+    },
+    "415": {
+      "cpp_name": "V_string",
+      "type": "string",
+      "value": "V"
+    },
+    "416": {
+      "cpp_name": "W_string",
+      "type": "string",
+      "value": "W"
+    },
+    "417": {
+      "cpp_name": "X_string",
+      "type": "string",
+      "value": "X"
+    },
+    "418": {
+      "cpp_name": "Y_string",
+      "type": "string",
+      "value": "Y"
+    },
+    "419": {
+      "cpp_name": "Z_string",
+      "type": "string",
+      "value": "Z"
+    },
+    "420": {
+      "cpp_name": "open_bracket_string",
+      "type": "string",
+      "value": "["
+    },
+    "421": {
+      "cpp_name": "backslash_string",
+      "type": "string",
+      "value": "\\"
+    },
+    "422": {
+      "cpp_name": "close_bracket_string",
+      "type": "string",
+      "value": "]"
+    },
+    "423": {
+      "cpp_name": "caret_string",
+      "type": "string",
+      "value": "^"
+    },
+    "424": {
+      "cpp_name": "underscore_string",
+      "type": "string",
+      "value": "_"
+    },
+    "425": {
+      "cpp_name": "backtick_string",
+      "type": "string",
+      "value": "`"
+    },
+    "426": {
+      "cpp_name": "a_string",
+      "type": "string",
+      "value": "a"
+    },
+    "427": {
+      "cpp_name": "b_string",
+      "type": "string",
+      "value": "b"
+    },
+    "428": {
+      "cpp_name": "c_string",
+      "type": "string",
+      "value": "c"
+    },
+    "429": {
+      "cpp_name": "d_string",
+      "type": "string",
+      "value": "d"
+    },
+    "430": {
+      "cpp_name": "e_string",
+      "type": "string",
+      "value": "e"
+    },
+    "431": {
+      "cpp_name": "f_string",
+      "type": "string",
+      "value": "f"
+    },
+    "432": {
+      "cpp_name": "g_string",
+      "type": "string",
+      "value": "g"
+    },
+    "433": {
+      "cpp_name": "h_string",
+      "type": "string",
+      "value": "h"
+    },
+    "434": {
+      "cpp_name": "i_string",
+      "type": "string",
+      "value": "i"
+    },
+    "435": {
+      "cpp_name": "j_string",
+      "type": "string",
+      "value": "j"
+    },
+    "436": {
+      "cpp_name": "k_string",
+      "type": "string",
+      "value": "k"
+    },
+    "437": {
+      "cpp_name": "l_string",
+      "type": "string",
+      "value": "l"
+    },
+    "438": {
+      "cpp_name": "m_string",
+      "type": "string",
+      "value": "m"
+    },
+    "439": {
+      "cpp_name": "n_string",
+      "type": "string",
+      "value": "n"
+    },
+    "440": {
+      "cpp_name": "o_string",
+      "type": "string",
+      "value": "o"
+    },
+    "441": {
+      "cpp_name": "p_string",
+      "type": "string",
+      "value": "p"
+    },
+    "442": {
+      "cpp_name": "q_string",
+      "type": "string",
+      "value": "q"
+    },
+    "443": {
+      "cpp_name": "r_string",
+      "type": "string",
+      "value": "r"
+    },
+    "444": {
+      "cpp_name": "s_string",
+      "type": "string",
+      "value": "s"
+    },
+    "445": {
+      "cpp_name": "t_string",
+      "type": "string",
+      "value": "t"
+    },
+    "446": {
+      "cpp_name": "u_string",
+      "type": "string",
+      "value": "u"
+    },
+    "447": {
+      "cpp_name": "v_string",
+      "type": "string",
+      "value": "v"
+    },
+    "448": {
+      "cpp_name": "w_string",
+      "type": "string",
+      "value": "w"
+    },
+    "449": {
+      "cpp_name": "x_string",
+      "type": "string",
+      "value": "x"
+    },
+    "450": {
+      "cpp_name": "y_string",
+      "type": "string",
+      "value": "y"
+    },
+    "451": {
+      "cpp_name": "z_string",
+      "type": "string",
+      "value": "z"
+    },
+    "452": {
+      "cpp_name": "open_brace_string",
+      "type": "string",
+      "value": "{"
+    },
+    "453": {
+      "cpp_name": "pipe_string",
+      "type": "string",
+      "value": "|"
+    },
+    "454": {
+      "cpp_name": "close_brace_string",
+      "type": "string",
+      "value": "}"
+    },
+    "455": {
+      "cpp_name": "tilde_string",
+      "type": "string",
+      "value": "~"
+    },
+    "456": {
+      "cpp_name": "ascii_del_string",
+      "type": "string",
+      "value": ""
+    },
+    "457": {
+      "cpp_name": "latin1_80_string",
+      "type": "string",
+      "value": ""
+    },
+    "458": {
+      "cpp_name": "latin1_81_string",
+      "type": "string",
+      "value": ""
+    },
+    "459": {
+      "cpp_name": "latin1_82_string",
+      "type": "string",
+      "value": ""
+    },
+    "460": {
+      "cpp_name": "latin1_83_string",
+      "type": "string",
+      "value": ""
+    },
+    "461": {
+      "cpp_name": "latin1_84_string",
+      "type": "string",
+      "value": ""
+    },
+    "462": {
+      "cpp_name": "latin1_85_string",
+      "type": "string",
+      "value": ""
+    },
+    "463": {
+      "cpp_name": "latin1_86_string",
+      "type": "string",
+      "value": ""
+    },
+    "464": {
+      "cpp_name": "latin1_87_string",
+      "type": "string",
+      "value": ""
+    },
+    "465": {
+      "cpp_name": "latin1_88_string",
+      "type": "string",
+      "value": ""
+    },
+    "466": {
+      "cpp_name": "latin1_89_string",
+      "type": "string",
+      "value": ""
+    },
+    "467": {
+      "cpp_name": "latin1_8a_string",
+      "type": "string",
+      "value": ""
+    },
+    "468": {
+      "cpp_name": "latin1_8b_string",
+      "type": "string",
+      "value": ""
+    },
+    "469": {
+      "cpp_name": "latin1_8c_string",
+      "type": "string",
+      "value": ""
+    },
+    "470": {
+      "cpp_name": "latin1_8d_string",
+      "type": "string",
+      "value": ""
+    },
+    "471": {
+      "cpp_name": "latin1_8e_string",
+      "type": "string",
+      "value": ""
+    },
+    "472": {
+      "cpp_name": "latin1_8f_string",
+      "type": "string",
+      "value": ""
+    },
+    "473": {
+      "cpp_name": "latin1_90_string",
+      "type": "string",
+      "value": ""
+    },
+    "474": {
+      "cpp_name": "latin1_91_string",
+      "type": "string",
+      "value": ""
+    },
+    "475": {
+      "cpp_name": "latin1_92_string",
+      "type": "string",
+      "value": ""
+    },
+    "476": {
+      "cpp_name": "latin1_93_string",
+      "type": "string",
+      "value": ""
+    },
+    "477": {
+      "cpp_name": "latin1_94_string",
+      "type": "string",
+      "value": ""
+    },
+    "478": {
+      "cpp_name": "latin1_95_string",
+      "type": "string",
+      "value": ""
+    },
+    "479": {
+      "cpp_name": "latin1_96_string",
+      "type": "string",
+      "value": ""
+    },
+    "480": {
+      "cpp_name": "latin1_97_string",
+      "type": "string",
+      "value": ""
+    },
+    "481": {
+      "cpp_name": "latin1_98_string",
+      "type": "string",
+      "value": ""
+    },
+    "482": {
+      "cpp_name": "latin1_99_string",
+      "type": "string",
+      "value": ""
+    },
+    "483": {
+      "cpp_name": "latin1_9a_string",
+      "type": "string",
+      "value": ""
+    },
+    "484": {
+      "cpp_name": "latin1_9b_string",
+      "type": "string",
+      "value": ""
+    },
+    "485": {
+      "cpp_name": "latin1_9c_string",
+      "type": "string",
+      "value": ""
+    },
+    "486": {
+      "cpp_name": "latin1_9d_string",
+      "type": "string",
+      "value": ""
+    },
+    "487": {
+      "cpp_name": "latin1_9e_string",
+      "type": "string",
+      "value": ""
+    },
+    "488": {
+      "cpp_name": "latin1_9f_string",
+      "type": "string",
+      "value": ""
+    },
+    "489": {
+      "cpp_name": "latin1_a0_string",
+      "type": "string",
+      "value": " "
+    },
+    "490": {
+      "cpp_name": "latin1_a1_string",
+      "type": "string",
+      "value": "¡"
+    },
+    "491": {
+      "cpp_name": "latin1_a2_string",
+      "type": "string",
+      "value": "¢"
+    },
+    "492": {
+      "cpp_name": "latin1_a3_string",
+      "type": "string",
+      "value": "£"
+    },
+    "493": {
+      "cpp_name": "latin1_a4_string",
+      "type": "string",
+      "value": "¤"
+    },
+    "494": {
+      "cpp_name": "latin1_a5_string",
+      "type": "string",
+      "value": "¥"
+    },
+    "495": {
+      "cpp_name": "latin1_a6_string",
+      "type": "string",
+      "value": "¦"
+    },
+    "496": {
+      "cpp_name": "latin1_a7_string",
+      "type": "string",
+      "value": "§"
+    },
+    "497": {
+      "cpp_name": "latin1_a8_string",
+      "type": "string",
+      "value": "¨"
+    },
+    "498": {
+      "cpp_name": "latin1_a9_string",
+      "type": "string",
+      "value": "©"
+    },
+    "499": {
+      "cpp_name": "latin1_aa_string",
+      "type": "string",
+      "value": "ª"
+    },
+    "500": {
+      "cpp_name": "latin1_ab_string",
+      "type": "string",
+      "value": "«"
+    },
+    "501": {
+      "cpp_name": "latin1_ac_string",
+      "type": "string",
+      "value": "¬"
+    },
+    "502": {
+      "cpp_name": "latin1_ad_string",
+      "type": "string",
+      "value": "­"
+    },
+    "503": {
+      "cpp_name": "latin1_ae_string",
+      "type": "string",
+      "value": "®"
+    },
+    "504": {
+      "cpp_name": "latin1_af_string",
+      "type": "string",
+      "value": "¯"
+    },
+    "505": {
+      "cpp_name": "latin1_b0_string",
+      "type": "string",
+      "value": "°"
+    },
+    "506": {
+      "cpp_name": "latin1_b1_string",
+      "type": "string",
+      "value": "±"
+    },
+    "507": {
+      "cpp_name": "latin1_b2_string",
+      "type": "string",
+      "value": "²"
+    },
+    "508": {
+      "cpp_name": "latin1_b3_string",
+      "type": "string",
+      "value": "³"
+    },
+    "509": {
+      "cpp_name": "latin1_b4_string",
+      "type": "string",
+      "value": "´"
+    },
+    "510": {
+      "cpp_name": "latin1_b5_string",
+      "type": "string",
+      "value": "µ"
+    },
+    "511": {
+      "cpp_name": "latin1_b6_string",
+      "type": "string",
+      "value": "¶"
+    },
+    "512": {
+      "cpp_name": "latin1_b7_string",
+      "type": "string",
+      "value": "·"
+    },
+    "513": {
+      "cpp_name": "latin1_b8_string",
+      "type": "string",
+      "value": "¸"
+    },
+    "514": {
+      "cpp_name": "latin1_b9_string",
+      "type": "string",
+      "value": "¹"
+    },
+    "515": {
+      "cpp_name": "latin1_ba_string",
+      "type": "string",
+      "value": "º"
+    },
+    "516": {
+      "cpp_name": "latin1_bb_string",
+      "type": "string",
+      "value": "»"
+    },
+    "517": {
+      "cpp_name": "latin1_bc_string",
+      "type": "string",
+      "value": "¼"
+    },
+    "518": {
+      "cpp_name": "latin1_bd_string",
+      "type": "string",
+      "value": "½"
+    },
+    "519": {
+      "cpp_name": "latin1_be_string",
+      "type": "string",
+      "value": "¾"
+    },
+    "520": {
+      "cpp_name": "latin1_bf_string",
+      "type": "string",
+      "value": "¿"
+    },
+    "521": {
+      "cpp_name": "latin1_c0_string",
+      "type": "string",
+      "value": "À"
+    },
+    "522": {
+      "cpp_name": "latin1_c1_string",
+      "type": "string",
+      "value": "Á"
+    },
+    "523": {
+      "cpp_name": "latin1_c2_string",
+      "type": "string",
+      "value": "Â"
+    },
+    "524": {
+      "cpp_name": "latin1_c3_string",
+      "type": "string",
+      "value": "Ã"
+    },
+    "525": {
+      "cpp_name": "latin1_c4_string",
+      "type": "string",
+      "value": "Ä"
+    },
+    "526": {
+      "cpp_name": "latin1_c5_string",
+      "type": "string",
+      "value": "Å"
+    },
+    "527": {
+      "cpp_name": "latin1_c6_string",
+      "type": "string",
+      "value": "Æ"
+    },
+    "528": {
+      "cpp_name": "latin1_c7_string",
+      "type": "string",
+      "value": "Ç"
+    },
+    "529": {
+      "cpp_name": "latin1_c8_string",
+      "type": "string",
+      "value": "È"
+    },
+    "530": {
+      "cpp_name": "latin1_c9_string",
+      "type": "string",
+      "value": "É"
+    },
+    "531": {
+      "cpp_name": "latin1_ca_string",
+      "type": "string",
+      "value": "Ê"
+    },
+    "532": {
+      "cpp_name": "latin1_cb_string",
+      "type": "string",
+      "value": "Ë"
+    },
+    "533": {
+      "cpp_name": "latin1_cc_string",
+      "type": "string",
+      "value": "Ì"
+    },
+    "534": {
+      "cpp_name": "latin1_cd_string",
+      "type": "string",
+      "value": "Í"
+    },
+    "535": {
+      "cpp_name": "latin1_ce_string",
+      "type": "string",
+      "value": "Î"
+    },
+    "536": {
+      "cpp_name": "latin1_cf_string",
+      "type": "string",
+      "value": "Ï"
+    },
+    "537": {
+      "cpp_name": "latin1_d0_string",
+      "type": "string",
+      "value": "Ð"
+    },
+    "538": {
+      "cpp_name": "latin1_d1_string",
+      "type": "string",
+      "value": "Ñ"
+    },
+    "539": {
+      "cpp_name": "latin1_d2_string",
+      "type": "string",
+      "value": "Ò"
+    },
+    "540": {
+      "cpp_name": "latin1_d3_string",
+      "type": "string",
+      "value": "Ó"
+    },
+    "541": {
+      "cpp_name": "latin1_d4_string",
+      "type": "string",
+      "value": "Ô"
+    },
+    "542": {
+      "cpp_name": "latin1_d5_string",
+      "type": "string",
+      "value": "Õ"
+    },
+    "543": {
+      "cpp_name": "latin1_d6_string",
+      "type": "string",
+      "value": "Ö"
+    },
+    "544": {
+      "cpp_name": "latin1_d7_string",
+      "type": "string",
+      "value": "×"
+    },
+    "545": {
+      "cpp_name": "latin1_d8_string",
+      "type": "string",
+      "value": "Ø"
+    },
+    "546": {
+      "cpp_name": "latin1_d9_string",
+      "type": "string",
+      "value": "Ù"
+    },
+    "547": {
+      "cpp_name": "latin1_da_string",
+      "type": "string",
+      "value": "Ú"
+    },
+    "548": {
+      "cpp_name": "latin1_db_string",
+      "type": "string",
+      "value": "Û"
+    },
+    "549": {
+      "cpp_name": "latin1_dc_string",
+      "type": "string",
+      "value": "Ü"
+    },
+    "550": {
+      "cpp_name": "latin1_dd_string",
+      "type": "string",
+      "value": "Ý"
+    },
+    "551": {
+      "cpp_name": "latin1_de_string",
+      "type": "string",
+      "value": "Þ"
+    },
+    "552": {
+      "cpp_name": "latin1_df_string",
+      "type": "string",
+      "value": "ß"
+    },
+    "553": {
+      "cpp_name": "latin1_e0_string",
+      "type": "string",
+      "value": "à"
+    },
+    "554": {
+      "cpp_name": "latin1_e1_string",
+      "type": "string",
+      "value": "á"
+    },
+    "555": {
+      "cpp_name": "latin1_e2_string",
+      "type": "string",
+      "value": "â"
+    },
+    "556": {
+      "cpp_name": "latin1_e3_string",
+      "type": "string",
+      "value": "ã"
+    },
+    "557": {
+      "cpp_name": "latin1_e4_string",
+      "type": "string",
+      "value": "ä"
+    },
+    "558": {
+      "cpp_name": "latin1_e5_string",
+      "type": "string",
+      "value": "å"
+    },
+    "559": {
+      "cpp_name": "latin1_e6_string",
+      "type": "string",
+      "value": "æ"
+    },
+    "560": {
+      "cpp_name": "latin1_e7_string",
+      "type": "string",
+      "value": "ç"
+    },
+    "561": {
+      "cpp_name": "latin1_e8_string",
+      "type": "string",
+      "value": "è"
+    },
+    "562": {
+      "cpp_name": "latin1_e9_string",
+      "type": "string",
+      "value": "é"
+    },
+    "563": {
+      "cpp_name": "latin1_ea_string",
+      "type": "string",
+      "value": "ê"
+    },
+    "564": {
+      "cpp_name": "latin1_eb_string",
+      "type": "string",
+      "value": "ë"
+    },
+    "565": {
+      "cpp_name": "latin1_ec_string",
+      "type": "string",
+      "value": "ì"
+    },
+    "566": {
+      "cpp_name": "latin1_ed_string",
+      "type": "string",
+      "value": "í"
+    },
+    "567": {
+      "cpp_name": "latin1_ee_string",
+      "type": "string",
+      "value": "î"
+    },
+    "568": {
+      "cpp_name": "latin1_ef_string",
+      "type": "string",
+      "value": "ï"
+    },
+    "569": {
+      "cpp_name": "latin1_f0_string",
+      "type": "string",
+      "value": "ð"
+    },
+    "570": {
+      "cpp_name": "latin1_f1_string",
+      "type": "string",
+      "value": "ñ"
+    },
+    "571": {
+      "cpp_name": "latin1_f2_string",
+      "type": "string",
+      "value": "ò"
+    },
+    "572": {
+      "cpp_name": "latin1_f3_string",
+      "type": "string",
+      "value": "ó"
+    },
+    "573": {
+      "cpp_name": "latin1_f4_string",
+      "type": "string",
+      "value": "ô"
+    },
+    "574": {
+      "cpp_name": "latin1_f5_string",
+      "type": "string",
+      "value": "õ"
+    },
+    "575": {
+      "cpp_name": "latin1_f6_string",
+      "type": "string",
+      "value": "ö"
+    },
+    "576": {
+      "cpp_name": "latin1_f7_string",
+      "type": "string",
+      "value": "÷"
+    },
+    "577": {
+      "cpp_name": "latin1_f8_string",
+      "type": "string",
+      "value": "ø"
+    },
+    "578": {
+      "cpp_name": "latin1_f9_string",
+      "type": "string",
+      "value": "ù"
+    },
+    "579": {
+      "cpp_name": "latin1_fa_string",
+      "type": "string",
+      "value": "ú"
+    },
+    "580": {
+      "cpp_name": "latin1_fb_string",
+      "type": "string",
+      "value": "û"
+    },
+    "581": {
+      "cpp_name": "latin1_fc_string",
+      "type": "string",
+      "value": "ü"
+    },
+    "582": {
+      "cpp_name": "latin1_fd_string",
+      "type": "string",
+      "value": "ý"
+    },
+    "583": {
+      "cpp_name": "latin1_fe_string",
+      "type": "string",
+      "value": "þ"
+    },
+    "584": {
+      "cpp_name": "latin1_ff_string",
+      "type": "string",
+      "value": "ÿ"
+    },
+    "585": {
+      "cpp_name": "add_string",
+      "type": "string",
+      "value": "add"
+    },
+    "586": {
+      "cpp_name": "AggregateError_string",
+      "type": "string",
+      "value": "AggregateError"
+    },
+    "587": {
+      "cpp_name": "alphabet_string",
+      "type": "string",
+      "value": "alphabet"
+    },
+    "588": {
+      "cpp_name": "always_string",
+      "type": "string",
+      "value": "always"
+    },
+    "589": {
+      "cpp_name": "anonymous_string",
+      "type": "string",
+      "value": "anonymous"
+    },
+    "590": {
+      "cpp_name": "apply_string",
+      "type": "string",
+      "value": "apply"
+    },
+    "591": {
+      "cpp_name": "Arguments_string",
+      "type": "string",
+      "value": "Arguments"
+    },
+    "592": {
+      "cpp_name": "arguments_string",
+      "type": "string",
+      "value": "arguments"
+    },
+    "593": {
+      "cpp_name": "arguments_to_string",
+      "type": "string",
+      "value": "[object Arguments]"
+    },
+    "594": {
+      "cpp_name": "Array_string",
+      "type": "string",
+      "value": "Array"
+    },
+    "595": {
+      "cpp_name": "array_to_string",
+      "type": "string",
+      "value": "[object Array]"
+    },
+    "596": {
+      "cpp_name": "ArrayBuffer_string",
+      "type": "string",
+      "value": "ArrayBuffer"
+    },
+    "597": {
+      "cpp_name": "ArrayIterator_string",
+      "type": "string",
+      "value": "Array Iterator"
+    },
+    "598": {
+      "cpp_name": "as_string",
+      "type": "string",
+      "value": "as"
+    },
+    "599": {
+      "cpp_name": "assert_string",
+      "type": "string",
+      "value": "assert"
+    },
+    "600": {
+      "cpp_name": "async_string",
+      "type": "string",
+      "value": "async"
+    },
+    "601": {
+      "cpp_name": "AtomicsCondition_string",
+      "type": "string",
+      "value": "Atomics.Condition"
+    },
+    "602": {
+      "cpp_name": "AtomicsMutex_string",
+      "type": "string",
+      "value": "Atomics.Mutex"
+    },
+    "603": {
+      "cpp_name": "auto_string",
+      "type": "string",
+      "value": "auto"
+    },
+    "604": {
+      "cpp_name": "BigInt64Array_string",
+      "type": "string",
+      "value": "BigInt64Array"
+    },
+    "605": {
+      "cpp_name": "BigInt_string",
+      "type": "string",
+      "value": "BigInt"
+    },
+    "606": {
+      "cpp_name": "bigint_string",
+      "type": "string",
+      "value": "bigint"
+    },
+    "607": {
+      "cpp_name": "BigUint64Array_string",
+      "type": "string",
+      "value": "BigUint64Array"
+    },
+    "608": {
+      "cpp_name": "bind_string",
+      "type": "string",
+      "value": "bind"
+    },
+    "609": {
+      "cpp_name": "blank_string",
+      "type": "string",
+      "value": "blank"
+    },
+    "610": {
+      "cpp_name": "Boolean_string",
+      "type": "string",
+      "value": "Boolean"
+    },
+    "611": {
+      "cpp_name": "boolean_string",
+      "type": "string",
+      "value": "boolean"
+    },
+    "612": {
+      "cpp_name": "boolean_to_string",
+      "type": "string",
+      "value": "[object Boolean]"
+    },
+    "613": {
+      "cpp_name": "bound__string",
+      "type": "string",
+      "value": "bound"
+    },
+    "614": {
+      "cpp_name": "buffer_string",
+      "type": "string",
+      "value": "buffer"
+    },
+    "615": {
+      "cpp_name": "byte_length_string",
+      "type": "string",
+      "value": "byteLength"
+    },
+    "616": {
+      "cpp_name": "byte_offset_string",
+      "type": "string",
+      "value": "byteOffset"
+    },
+    "617": {
+      "cpp_name": "calendar_string",
+      "type": "string",
+      "value": "calendar"
+    },
+    "618": {
+      "cpp_name": "calendarId_string",
+      "type": "string",
+      "value": "calendarId"
+    },
+    "619": {
+      "cpp_name": "calendarName_string",
+      "type": "string",
+      "value": "calendarName"
+    },
+    "620": {
+      "cpp_name": "callee_string",
+      "type": "string",
+      "value": "callee"
+    },
+    "621": {
+      "cpp_name": "caller_string",
+      "type": "string",
+      "value": "caller"
+    },
+    "622": {
+      "cpp_name": "cause_string",
+      "type": "string",
+      "value": "cause"
+    },
+    "623": {
+      "cpp_name": "character_string",
+      "type": "string",
+      "value": "character"
+    },
+    "624": {
+      "cpp_name": "code_string",
+      "type": "string",
+      "value": "code"
+    },
+    "625": {
+      "cpp_name": "column_string",
+      "type": "string",
+      "value": "column"
+    },
+    "626": {
+      "cpp_name": "CompileError_string",
+      "type": "string",
+      "value": "CompileError"
+    },
+    "627": {
+      "cpp_name": "computed_string",
+      "type": "string",
+      "value": "<computed>"
+    },
+    "628": {
+      "cpp_name": "conjunction_string",
+      "type": "string",
+      "value": "conjunction"
+    },
+    "629": {
+      "cpp_name": "console_string",
+      "type": "string",
+      "value": "console"
+    },
+    "630": {
+      "cpp_name": "constrain_string",
+      "type": "string",
+      "value": "constrain"
+    },
+    "631": {
+      "cpp_name": "construct_string",
+      "type": "string",
+      "value": "construct"
+    },
+    "632": {
+      "cpp_name": "current_string",
+      "type": "string",
+      "value": "current"
+    },
+    "633": {
+      "cpp_name": "Date_string",
+      "type": "string",
+      "value": "Date"
+    },
+    "634": {
+      "cpp_name": "date_to_string",
+      "type": "string",
+      "value": "[object Date]"
+    },
+    "635": {
+      "cpp_name": "dateAdd_string",
+      "type": "string",
+      "value": "dateAdd"
+    },
+    "636": {
+      "cpp_name": "dateFromFields_string",
+      "type": "string",
+      "value": "dateFromFields"
+    },
+    "637": {
+      "cpp_name": "dateUntil_string",
+      "type": "string",
+      "value": "dateUntil"
+    },
+    "638": {
+      "cpp_name": "day_string",
+      "type": "string",
+      "value": "day"
+    },
+    "639": {
+      "cpp_name": "dayOfWeek_string",
+      "type": "string",
+      "value": "dayOfWeek"
+    },
+    "640": {
+      "cpp_name": "dayOfYear_string",
+      "type": "string",
+      "value": "dayOfYear"
+    },
+    "641": {
+      "cpp_name": "days_string",
+      "type": "string",
+      "value": "days"
+    },
+    "642": {
+      "cpp_name": "daysInMonth_string",
+      "type": "string",
+      "value": "daysInMonth"
+    },
+    "643": {
+      "cpp_name": "daysInWeek_string",
+      "type": "string",
+      "value": "daysInWeek"
+    },
+    "644": {
+      "cpp_name": "daysInYear_string",
+      "type": "string",
+      "value": "daysInYear"
+    },
+    "645": {
+      "cpp_name": "default_string",
+      "type": "string",
+      "value": "default"
+    },
+    "646": {
+      "cpp_name": "defer_string",
+      "type": "string",
+      "value": "defer"
+    },
+    "647": {
+      "cpp_name": "defineProperty_string",
+      "type": "string",
+      "value": "defineProperty"
+    },
+    "648": {
+      "cpp_name": "deleteProperty_string",
+      "type": "string",
+      "value": "deleteProperty"
+    },
+    "649": {
+      "cpp_name": "detached_string",
+      "type": "string",
+      "value": "detached"
+    },
+    "650": {
+      "cpp_name": "direction_string",
+      "type": "string",
+      "value": "direction"
+    },
+    "651": {
+      "cpp_name": "disambiguation_string",
+      "type": "string",
+      "value": "disambiguation"
+    },
+    "652": {
+      "cpp_name": "disjunction_string",
+      "type": "string",
+      "value": "disjunction"
+    },
+    "653": {
+      "cpp_name": "disposed_string",
+      "type": "string",
+      "value": "disposed"
+    },
+    "654": {
+      "cpp_name": "done_string",
+      "type": "string",
+      "value": "done"
+    },
+    "655": {
+      "cpp_name": "dot_brand_string",
+      "type": "string",
+      "value": ".brand"
+    },
+    "656": {
+      "cpp_name": "dot_catch_string",
+      "type": "string",
+      "value": ".catch"
+    },
+    "657": {
+      "cpp_name": "dot_default_string",
+      "type": "string",
+      "value": ".default"
+    },
+    "658": {
+      "cpp_name": "dot_for_string",
+      "type": "string",
+      "value": ".for"
+    },
+    "659": {
+      "cpp_name": "dot_generator_object_string",
+      "type": "string",
+      "value": ".generator_object"
+    },
+    "660": {
+      "cpp_name": "dot_home_object_string",
+      "type": "string",
+      "value": ".home_object"
+    },
+    "661": {
+      "cpp_name": "dot_new_target_string",
+      "type": "string",
+      "value": ".new.target"
+    },
+    "662": {
+      "cpp_name": "dot_repl_result_string",
+      "type": "string",
+      "value": ".repl_result"
+    },
+    "663": {
+      "cpp_name": "dot_result_string",
+      "type": "string",
+      "value": ".result"
+    },
+    "664": {
+      "cpp_name": "dot_static_home_object_string",
+      "type": "string",
+      "value": ".static_home_object"
+    },
+    "665": {
+      "cpp_name": "dot_switch_tag_string",
+      "type": "string",
+      "value": ".switch_tag"
+    },
+    "666": {
+      "cpp_name": "dot_this_function_string",
+      "type": "string",
+      "value": ".this_function"
+    },
+    "667": {
+      "cpp_name": "dotAll_string",
+      "type": "string",
+      "value": "dotAll"
+    },
+    "668": {
+      "cpp_name": "element_string",
+      "type": "string",
+      "value": "element"
+    },
+    "669": {
+      "cpp_name": "epochMilliseconds_string",
+      "type": "string",
+      "value": "epochMilliseconds"
+    },
+    "670": {
+      "cpp_name": "epochNanoseconds_string",
+      "type": "string",
+      "value": "epochNanoseconds"
+    },
+    "671": {
+      "cpp_name": "era_string",
+      "type": "string",
+      "value": "era"
+    },
+    "672": {
+      "cpp_name": "eraYear_string",
+      "type": "string",
+      "value": "eraYear"
+    },
+    "673": {
+      "cpp_name": "Error_string",
+      "type": "string",
+      "value": "Error"
+    },
+    "674": {
+      "cpp_name": "error_string",
+      "type": "string",
+      "value": "error"
+    },
+    "675": {
+      "cpp_name": "error_to_string",
+      "type": "string",
+      "value": "[object Error]"
+    },
+    "676": {
+      "cpp_name": "errors_string",
+      "type": "string",
+      "value": "errors"
+    },
+    "677": {
+      "cpp_name": "eval_string",
+      "type": "string",
+      "value": "eval"
+    },
+    "678": {
+      "cpp_name": "EvalError_string",
+      "type": "string",
+      "value": "EvalError"
+    },
+    "679": {
+      "cpp_name": "exception_string",
+      "type": "string",
+      "value": "exception"
+    },
+    "680": {
+      "cpp_name": "exec_string",
+      "type": "string",
+      "value": "exec"
+    },
+    "681": {
+      "cpp_name": "false_string",
+      "type": "string",
+      "value": "false"
+    },
+    "682": {
+      "cpp_name": "fields_string",
+      "type": "string",
+      "value": "fields"
+    },
+    "683": {
+      "cpp_name": "FinalizationRegistry_string",
+      "type": "string",
+      "value": "FinalizationRegistry"
+    },
+    "684": {
+      "cpp_name": "flags_string",
+      "type": "string",
+      "value": "flags"
+    },
+    "685": {
+      "cpp_name": "Float16Array_string",
+      "type": "string",
+      "value": "Float16Array"
+    },
+    "686": {
+      "cpp_name": "Float32Array_string",
+      "type": "string",
+      "value": "Float32Array"
+    },
+    "687": {
+      "cpp_name": "Float64Array_string",
+      "type": "string",
+      "value": "Float64Array"
+    },
+    "688": {
+      "cpp_name": "fractionalSecondDigits_string",
+      "type": "string",
+      "value": "fractionalSecondDigits"
+    },
+    "689": {
+      "cpp_name": "from_string",
+      "type": "string",
+      "value": "from"
+    },
+    "690": {
+      "cpp_name": "function_native_code_string",
+      "type": "string",
+      "value": "function () { [native code] }"
+    },
+    "691": {
+      "cpp_name": "Function_prototype_apply_string",
+      "type": "string",
+      "value": "Function.prototype.apply"
+    },
+    "692": {
+      "cpp_name": "Function_prototype_call_string",
+      "type": "string",
+      "value": "Function.prototype.call"
+    },
+    "693": {
+      "cpp_name": "Function_string",
+      "type": "string",
+      "value": "Function"
+    },
+    "694": {
+      "cpp_name": "function_string",
+      "type": "string",
+      "value": "function"
+    },
+    "695": {
+      "cpp_name": "function_to_string",
+      "type": "string",
+      "value": "[object Function]"
+    },
+    "696": {
+      "cpp_name": "Generator_string",
+      "type": "string",
+      "value": "Generator"
+    },
+    "697": {
+      "cpp_name": "get_space_string",
+      "type": "string",
+      "value": "get"
+    },
+    "698": {
+      "cpp_name": "get_string",
+      "type": "string",
+      "value": "get"
+    },
+    "699": {
+      "cpp_name": "getOffsetNanosecondsFor_string",
+      "type": "string",
+      "value": "getOffsetNanosecondsFor"
+    },
+    "700": {
+      "cpp_name": "getOwnPropertyDescriptor_string",
+      "type": "string",
+      "value": "getOwnPropertyDescriptor"
+    },
+    "701": {
+      "cpp_name": "getPossibleInstantsFor_string",
+      "type": "string",
+      "value": "getPossibleInstantsFor"
+    },
+    "702": {
+      "cpp_name": "getPrototypeOf_string",
+      "type": "string",
+      "value": "getPrototypeOf"
+    },
+    "703": {
+      "cpp_name": "getTimeZoneTransition_string",
+      "type": "string",
+      "value": "getTimeZoneTransition"
+    },
+    "704": {
+      "cpp_name": "global_string",
+      "type": "string",
+      "value": "global"
+    },
+    "705": {
+      "cpp_name": "globalThis_string",
+      "type": "string",
+      "value": "globalThis"
+    },
+    "706": {
+      "cpp_name": "groups_string",
+      "type": "string",
+      "value": "groups"
+    },
+    "707": {
+      "cpp_name": "growable_string",
+      "type": "string",
+      "value": "growable"
+    },
+    "708": {
+      "cpp_name": "has_string",
+      "type": "string",
+      "value": "has"
+    },
+    "709": {
+      "cpp_name": "hasIndices_string",
+      "type": "string",
+      "value": "hasIndices"
+    },
+    "710": {
+      "cpp_name": "hour_string",
+      "type": "string",
+      "value": "hour"
+    },
+    "711": {
+      "cpp_name": "hours_string",
+      "type": "string",
+      "value": "hours"
+    },
+    "712": {
+      "cpp_name": "hoursInDay_string",
+      "type": "string",
+      "value": "hoursInDay"
+    },
+    "713": {
+      "cpp_name": "id_string",
+      "type": "string",
+      "value": "id"
+    },
+    "714": {
+      "cpp_name": "ignoreCase_string",
+      "type": "string",
+      "value": "ignoreCase"
+    },
+    "715": {
+      "cpp_name": "illegal_access_string",
+      "type": "string",
+      "value": "illegal access"
+    },
+    "716": {
+      "cpp_name": "illegal_argument_string",
+      "type": "string",
+      "value": "illegal argument"
+    },
+    "717": {
+      "cpp_name": "index_string",
+      "type": "string",
+      "value": "index"
+    },
+    "718": {
+      "cpp_name": "indices_string",
+      "type": "string",
+      "value": "indices"
+    },
+    "719": {
+      "cpp_name": "Infinity_string",
+      "type": "string",
+      "value": "Infinity"
+    },
+    "720": {
+      "cpp_name": "infinity_string",
+      "type": "string",
+      "value": "infinity"
+    },
+    "721": {
+      "cpp_name": "inLeapYear_string",
+      "type": "string",
+      "value": "inLeapYear"
+    },
+    "722": {
+      "cpp_name": "input_string",
+      "type": "string",
+      "value": "input"
+    },
+    "723": {
+      "cpp_name": "instance_members_initializer_string",
+      "type": "string",
+      "value": "<instance_members_initializer>"
+    },
+    "724": {
+      "cpp_name": "Int16Array_string",
+      "type": "string",
+      "value": "Int16Array"
+    },
+    "725": {
+      "cpp_name": "Int32Array_string",
+      "type": "string",
+      "value": "Int32Array"
+    },
+    "726": {
+      "cpp_name": "Int8Array_string",
+      "type": "string",
+      "value": "Int8Array"
+    },
+    "727": {
+      "cpp_name": "isExtensible_string",
+      "type": "string",
+      "value": "isExtensible"
+    },
+    "728": {
+      "cpp_name": "iso8601_string",
+      "type": "string",
+      "value": "iso8601"
+    },
+    "729": {
+      "cpp_name": "isoDay_string",
+      "type": "string",
+      "value": "isoDay"
+    },
+    "730": {
+      "cpp_name": "isoHour_string",
+      "type": "string",
+      "value": "isoHour"
+    },
+    "731": {
+      "cpp_name": "isoMicrosecond_string",
+      "type": "string",
+      "value": "isoMicrosecond"
+    },
+    "732": {
+      "cpp_name": "isoMillisecond_string",
+      "type": "string",
+      "value": "isoMillisecond"
+    },
+    "733": {
+      "cpp_name": "isoMinute_string",
+      "type": "string",
+      "value": "isoMinute"
+    },
+    "734": {
+      "cpp_name": "isoMonth_string",
+      "type": "string",
+      "value": "isoMonth"
+    },
+    "735": {
+      "cpp_name": "isoNanosecond_string",
+      "type": "string",
+      "value": "isoNanosecond"
+    },
+    "736": {
+      "cpp_name": "isoSecond_string",
+      "type": "string",
+      "value": "isoSecond"
+    },
+    "737": {
+      "cpp_name": "isoYear_string",
+      "type": "string",
+      "value": "isoYear"
+    },
+    "738": {
+      "cpp_name": "Iterator_string",
+      "type": "string",
+      "value": "Iterator"
+    },
+    "739": {
+      "cpp_name": "jsMemoryEstimate_string",
+      "type": "string",
+      "value": "jsMemoryEstimate"
+    },
+    "740": {
+      "cpp_name": "jsMemoryRange_string",
+      "type": "string",
+      "value": "jsMemoryRange"
+    },
+    "741": {
+      "cpp_name": "keys_string",
+      "type": "string",
+      "value": "keys"
+    },
+    "742": {
+      "cpp_name": "largestUnit_string",
+      "type": "string",
+      "value": "largestUnit"
+    },
+    "743": {
+      "cpp_name": "last_chunk_handling_string",
+      "type": "string",
+      "value": "lastChunkHandling"
+    },
+    "744": {
+      "cpp_name": "lastIndex_string",
+      "type": "string",
+      "value": "lastIndex"
+    },
+    "745": {
+      "cpp_name": "let_string",
+      "type": "string",
+      "value": "let"
+    },
+    "746": {
+      "cpp_name": "line_string",
+      "type": "string",
+      "value": "line"
+    },
+    "747": {
+      "cpp_name": "linear_string",
+      "type": "string",
+      "value": "linear"
+    },
+    "748": {
+      "cpp_name": "LinkError_string",
+      "type": "string",
+      "value": "LinkError"
+    },
+    "749": {
+      "cpp_name": "long_string",
+      "type": "string",
+      "value": "long"
+    },
+    "750": {
+      "cpp_name": "Map_string",
+      "type": "string",
+      "value": "Map"
+    },
+    "751": {
+      "cpp_name": "MapIterator_string",
+      "type": "string",
+      "value": "Map Iterator"
+    },
+    "752": {
+      "cpp_name": "max_byte_length_string",
+      "type": "string",
+      "value": "maxByteLength"
+    },
+    "753": {
+      "cpp_name": "medium_string",
+      "type": "string",
+      "value": "medium"
+    },
+    "754": {
+      "cpp_name": "mergeFields_string",
+      "type": "string",
+      "value": "mergeFields"
+    },
+    "755": {
+      "cpp_name": "message_string",
+      "type": "string",
+      "value": "message"
+    },
+    "756": {
+      "cpp_name": "meta_string",
+      "type": "string",
+      "value": "meta"
+    },
+    "757": {
+      "cpp_name": "microsecond_string",
+      "type": "string",
+      "value": "microsecond"
+    },
+    "758": {
+      "cpp_name": "microseconds_string",
+      "type": "string",
+      "value": "microseconds"
+    },
+    "759": {
+      "cpp_name": "millisecond_string",
+      "type": "string",
+      "value": "millisecond"
+    },
+    "760": {
+      "cpp_name": "milliseconds_string",
+      "type": "string",
+      "value": "milliseconds"
+    },
+    "761": {
+      "cpp_name": "minus_Infinity_string",
+      "type": "string",
+      "value": "-Infinity"
+    },
+    "762": {
+      "cpp_name": "minute_string",
+      "type": "string",
+      "value": "minute"
+    },
+    "763": {
+      "cpp_name": "minutes_string",
+      "type": "string",
+      "value": "minutes"
+    },
+    "764": {
+      "cpp_name": "Module_string",
+      "type": "string",
+      "value": "Module"
+    },
+    "765": {
+      "cpp_name": "month_string",
+      "type": "string",
+      "value": "month"
+    },
+    "766": {
+      "cpp_name": "monthCode_string",
+      "type": "string",
+      "value": "monthCode"
+    },
+    "767": {
+      "cpp_name": "monthDayFromFields_string",
+      "type": "string",
+      "value": "monthDayFromFields"
+    },
+    "768": {
+      "cpp_name": "months_string",
+      "type": "string",
+      "value": "months"
+    },
+    "769": {
+      "cpp_name": "monthsInYear_string",
+      "type": "string",
+      "value": "monthsInYear"
+    },
+    "770": {
+      "cpp_name": "multiline_string",
+      "type": "string",
+      "value": "multiline"
+    },
+    "771": {
+      "cpp_name": "NaN_string",
+      "type": "string",
+      "value": "NaN"
+    },
+    "772": {
+      "cpp_name": "nanosecond_string",
+      "type": "string",
+      "value": "nanosecond"
+    },
+    "773": {
+      "cpp_name": "nanoseconds_string",
+      "type": "string",
+      "value": "nanoseconds"
+    },
+    "774": {
+      "cpp_name": "narrow_string",
+      "type": "string",
+      "value": "narrow"
+    },
+    "775": {
+      "cpp_name": "native_string",
+      "type": "string",
+      "value": "native"
+    },
+    "776": {
+      "cpp_name": "NFC_string",
+      "type": "string",
+      "value": "NFC"
+    },
+    "777": {
+      "cpp_name": "NFD_string",
+      "type": "string",
+      "value": "NFD"
+    },
+    "778": {
+      "cpp_name": "NFKC_string",
+      "type": "string",
+      "value": "NFKC"
+    },
+    "779": {
+      "cpp_name": "NFKD_string",
+      "type": "string",
+      "value": "NFKD"
+    },
+    "780": {
+      "cpp_name": "not_equal_string",
+      "type": "string",
+      "value": "not-equal"
+    },
+    "781": {
+      "cpp_name": "null_string",
+      "type": "string",
+      "value": "null"
+    },
+    "782": {
+      "cpp_name": "null_to_string",
+      "type": "string",
+      "value": "[object Null]"
+    },
+    "783": {
+      "cpp_name": "Number_string",
+      "type": "string",
+      "value": "Number"
+    },
+    "784": {
+      "cpp_name": "number_string",
+      "type": "string",
+      "value": "number"
+    },
+    "785": {
+      "cpp_name": "number_to_string",
+      "type": "string",
+      "value": "[object Number]"
+    },
+    "786": {
+      "cpp_name": "Object_prototype_string",
+      "type": "string",
+      "value": "Object.prototype"
+    },
+    "787": {
+      "cpp_name": "Object_string",
+      "type": "string",
+      "value": "Object"
+    },
+    "788": {
+      "cpp_name": "object_string",
+      "type": "string",
+      "value": "object"
+    },
+    "789": {
+      "cpp_name": "object_to_string",
+      "type": "string",
+      "value": "[object Object]"
+    },
+    "790": {
+      "cpp_name": "offset_string",
+      "type": "string",
+      "value": "offset"
+    },
+    "791": {
+      "cpp_name": "offsetNanoseconds_string",
+      "type": "string",
+      "value": "offsetNanoseconds"
+    },
+    "792": {
+      "cpp_name": "ok_string",
+      "type": "string",
+      "value": "ok"
+    },
+    "793": {
+      "cpp_name": "other_string",
+      "type": "string",
+      "value": "other"
+    },
+    "794": {
+      "cpp_name": "overflow_string",
+      "type": "string",
+      "value": "overflow"
+    },
+    "795": {
+      "cpp_name": "ownKeys_string",
+      "type": "string",
+      "value": "ownKeys"
+    },
+    "796": {
+      "cpp_name": "percent_string",
+      "type": "string",
+      "value": "percent"
+    },
+    "797": {
+      "cpp_name": "plainDate_string",
+      "type": "string",
+      "value": "plainDate"
+    },
+    "798": {
+      "cpp_name": "plainTime_string",
+      "type": "string",
+      "value": "plainTime"
+    },
+    "799": {
+      "cpp_name": "position_string",
+      "type": "string",
+      "value": "position"
+    },
+    "800": {
+      "cpp_name": "preventExtensions_string",
+      "type": "string",
+      "value": "preventExtensions"
+    },
+    "801": {
+      "cpp_name": "private_constructor_string",
+      "type": "string",
+      "value": "#constructor"
+    },
+    "802": {
+      "cpp_name": "Promise_string",
+      "type": "string",
+      "value": "Promise"
+    },
+    "803": {
+      "cpp_name": "promise_string",
+      "type": "string",
+      "value": "promise"
+    },
+    "804": {
+      "cpp_name": "proto_string",
+      "type": "string",
+      "value": "__proto__"
+    },
+    "805": {
+      "cpp_name": "proxy_string",
+      "type": "string",
+      "value": "proxy"
+    },
+    "806": {
+      "cpp_name": "Proxy_string",
+      "type": "string",
+      "value": "Proxy"
+    },
+    "807": {
+      "cpp_name": "query_colon_string",
+      "type": "string",
+      "value": "(?:)"
+    },
+    "808": {
+      "cpp_name": "RangeError_string",
+      "type": "string",
+      "value": "RangeError"
+    },
+    "809": {
+      "cpp_name": "raw_json_string",
+      "type": "string",
+      "value": "rawJSON"
+    },
+    "810": {
+      "cpp_name": "raw_string",
+      "type": "string",
+      "value": "raw"
+    },
+    "811": {
+      "cpp_name": "read_string",
+      "type": "string",
+      "value": "read"
+    },
+    "812": {
+      "cpp_name": "ReferenceError_string",
+      "type": "string",
+      "value": "ReferenceError"
+    },
+    "813": {
+      "cpp_name": "ReflectGet_string",
+      "type": "string",
+      "value": "Reflect.get"
+    },
+    "814": {
+      "cpp_name": "ReflectHas_string",
+      "type": "string",
+      "value": "Reflect.has"
+    },
+    "815": {
+      "cpp_name": "RegExp_string",
+      "type": "string",
+      "value": "RegExp"
+    },
+    "816": {
+      "cpp_name": "regexp_to_string",
+      "type": "string",
+      "value": "[object RegExp]"
+    },
+    "817": {
+      "cpp_name": "reject_string",
+      "type": "string",
+      "value": "reject"
+    },
+    "818": {
+      "cpp_name": "relativeTo_string",
+      "type": "string",
+      "value": "relativeTo"
+    },
+    "819": {
+      "cpp_name": "resizable_string",
+      "type": "string",
+      "value": "resizable"
+    },
+    "820": {
+      "cpp_name": "ResizableArrayBuffer_string",
+      "type": "string",
+      "value": "ResizableArrayBuffer"
+    },
+    "821": {
+      "cpp_name": "return_string",
+      "type": "string",
+      "value": "return"
+    },
+    "822": {
+      "cpp_name": "revoke_string",
+      "type": "string",
+      "value": "revoke"
+    },
+    "823": {
+      "cpp_name": "roundingIncrement_string",
+      "type": "string",
+      "value": "roundingIncrement"
+    },
+    "824": {
+      "cpp_name": "roundingMode_string",
+      "type": "string",
+      "value": "roundingMode"
+    },
+    "825": {
+      "cpp_name": "RuntimeError_string",
+      "type": "string",
+      "value": "RuntimeError"
+    },
+    "826": {
+      "cpp_name": "Script_string",
+      "type": "string",
+      "value": "Script"
+    },
+    "827": {
+      "cpp_name": "script_string",
+      "type": "string",
+      "value": "script"
+    },
+    "828": {
+      "cpp_name": "second_string",
+      "type": "string",
+      "value": "second"
+    },
+    "829": {
+      "cpp_name": "seconds_string",
+      "type": "string",
+      "value": "seconds"
+    },
+    "830": {
+      "cpp_name": "sentence_string",
+      "type": "string",
+      "value": "sentence"
+    },
+    "831": {
+      "cpp_name": "set_space_string",
+      "type": "string",
+      "value": "set"
+    },
+    "832": {
+      "cpp_name": "Set_string",
+      "type": "string",
+      "value": "Set"
+    },
+    "833": {
+      "cpp_name": "set_string",
+      "type": "string",
+      "value": "set"
+    },
+    "834": {
+      "cpp_name": "SetIterator_string",
+      "type": "string",
+      "value": "Set Iterator"
+    },
+    "835": {
+      "cpp_name": "setPrototypeOf_string",
+      "type": "string",
+      "value": "setPrototypeOf"
+    },
+    "836": {
+      "cpp_name": "ShadowRealm_string",
+      "type": "string",
+      "value": "ShadowRealm"
+    },
+    "837": {
+      "cpp_name": "SharedArray_string",
+      "type": "string",
+      "value": "SharedArray"
+    },
+    "838": {
+      "cpp_name": "SharedArrayBuffer_string",
+      "type": "string",
+      "value": "SharedArrayBuffer"
+    },
+    "839": {
+      "cpp_name": "SharedStruct_string",
+      "type": "string",
+      "value": "SharedStruct"
+    },
+    "840": {
+      "cpp_name": "short_string",
+      "type": "string",
+      "value": "short"
+    },
+    "841": {
+      "cpp_name": "sign_string",
+      "type": "string",
+      "value": "sign"
+    },
+    "842": {
+      "cpp_name": "size_string",
+      "type": "string",
+      "value": "size"
+    },
+    "843": {
+      "cpp_name": "smallestUnit_string",
+      "type": "string",
+      "value": "smallestUnit"
+    },
+    "844": {
+      "cpp_name": "source_string",
+      "type": "string",
+      "value": "source"
+    },
+    "845": {
+      "cpp_name": "sourceText_string",
+      "type": "string",
+      "value": "sourceText"
+    },
+    "846": {
+      "cpp_name": "stack_string",
+      "type": "string",
+      "value": "stack"
+    },
+    "847": {
+      "cpp_name": "stackTraceLimit_string",
+      "type": "string",
+      "value": "stackTraceLimit"
+    },
+    "848": {
+      "cpp_name": "static_initializer_string",
+      "type": "string",
+      "value": "<static_initializer>"
+    },
+    "849": {
+      "cpp_name": "sticky_string",
+      "type": "string",
+      "value": "sticky"
+    },
+    "850": {
+      "cpp_name": "String_string",
+      "type": "string",
+      "value": "String"
+    },
+    "851": {
+      "cpp_name": "string_string",
+      "type": "string",
+      "value": "string"
+    },
+    "852": {
+      "cpp_name": "string_to_string",
+      "type": "string",
+      "value": "[object String]"
+    },
+    "853": {
+      "cpp_name": "suppressed_string",
+      "type": "string",
+      "value": "suppressed"
+    },
+    "854": {
+      "cpp_name": "SuppressedError_string",
+      "type": "string",
+      "value": "SuppressedError"
+    },
+    "855": {
+      "cpp_name": "SuspendError_string",
+      "type": "string",
+      "value": "SuspendError"
+    },
+    "856": {
+      "cpp_name": "Symbol_iterator_string",
+      "type": "string",
+      "value": "Symbol.iterator"
+    },
+    "857": {
+      "cpp_name": "Symbol_match_all_string",
+      "type": "string",
+      "value": "Symbol.matchAll"
+    },
+    "858": {
+      "cpp_name": "Symbol_replace_string",
+      "type": "string",
+      "value": "Symbol.replace"
+    },
+    "859": {
+      "cpp_name": "symbol_species_string",
+      "type": "string",
+      "value": "[Symbol.species]"
+    },
+    "860": {
+      "cpp_name": "Symbol_species_string",
+      "type": "string",
+      "value": "Symbol.species"
+    },
+    "861": {
+      "cpp_name": "Symbol_split_string",
+      "type": "string",
+      "value": "Symbol.split"
+    },
+    "862": {
+      "cpp_name": "Symbol_string",
+      "type": "string",
+      "value": "Symbol"
+    },
+    "863": {
+      "cpp_name": "symbol_string",
+      "type": "string",
+      "value": "symbol"
+    },
+    "864": {
+      "cpp_name": "SyntaxError_string",
+      "type": "string",
+      "value": "SyntaxError"
+    },
+    "865": {
+      "cpp_name": "target_string",
+      "type": "string",
+      "value": "target"
+    },
+    "866": {
+      "cpp_name": "this_string",
+      "type": "string",
+      "value": "this"
+    },
+    "867": {
+      "cpp_name": "throw_string",
+      "type": "string",
+      "value": "throw"
+    },
+    "868": {
+      "cpp_name": "timed_out_string",
+      "type": "string",
+      "value": "timed-out"
+    },
+    "869": {
+      "cpp_name": "timeZone_string",
+      "type": "string",
+      "value": "timeZone"
+    },
+    "870": {
+      "cpp_name": "timeZoneId_string",
+      "type": "string",
+      "value": "timeZoneId"
+    },
+    "871": {
+      "cpp_name": "timeZoneName_string",
+      "type": "string",
+      "value": "timeZoneName"
+    },
+    "872": {
+      "cpp_name": "toJSON_string",
+      "type": "string",
+      "value": "toJSON"
+    },
+    "873": {
+      "cpp_name": "toString_string",
+      "type": "string",
+      "value": "toString"
+    },
+    "874": {
+      "cpp_name": "total_string",
+      "type": "string",
+      "value": "total"
+    },
+    "875": {
+      "cpp_name": "true_string",
+      "type": "string",
+      "value": "true"
+    },
+    "876": {
+      "cpp_name": "TypedArrayLength_string",
+      "type": "string",
+      "value": "get TypedArray.prototype.length"
+    },
+    "877": {
+      "cpp_name": "TypeError_string",
+      "type": "string",
+      "value": "TypeError"
+    },
+    "878": {
+      "cpp_name": "Uint16Array_string",
+      "type": "string",
+      "value": "Uint16Array"
+    },
+    "879": {
+      "cpp_name": "Uint32Array_string",
+      "type": "string",
+      "value": "Uint32Array"
+    },
+    "880": {
+      "cpp_name": "Uint8Array_string",
+      "type": "string",
+      "value": "Uint8Array"
+    },
+    "881": {
+      "cpp_name": "Uint8ClampedArray_string",
+      "type": "string",
+      "value": "Uint8ClampedArray"
+    },
+    "882": {
+      "cpp_name": "undefined_string",
+      "type": "string",
+      "value": "undefined"
+    },
+    "883": {
+      "cpp_name": "undefined_to_string",
+      "type": "string",
+      "value": "[object Undefined]"
+    },
+    "884": {
+      "cpp_name": "unicode_string",
+      "type": "string",
+      "value": "unicode"
+    },
+    "885": {
+      "cpp_name": "unicodeSets_string",
+      "type": "string",
+      "value": "unicodeSets"
+    },
+    "886": {
+      "cpp_name": "unit_string",
+      "type": "string",
+      "value": "unit"
+    },
+    "887": {
+      "cpp_name": "URIError_string",
+      "type": "string",
+      "value": "URIError"
+    },
+    "888": {
+      "cpp_name": "UTC_string",
+      "type": "string",
+      "value": "UTC"
+    },
+    "889": {
+      "cpp_name": "WeakMap_string",
+      "type": "string",
+      "value": "WeakMap"
+    },
+    "890": {
+      "cpp_name": "WeakRef_string",
+      "type": "string",
+      "value": "WeakRef"
+    },
+    "891": {
+      "cpp_name": "WeakSet_string",
+      "type": "string",
+      "value": "WeakSet"
+    },
+    "892": {
+      "cpp_name": "WebAssemblyException_string",
+      "type": "string",
+      "value": "WebAssembly.Exception"
+    },
+    "893": {
+      "cpp_name": "WebAssemblyModule_string",
+      "type": "string",
+      "value": "WebAssembly.Module"
+    },
+    "894": {
+      "cpp_name": "week_string",
+      "type": "string",
+      "value": "week"
+    },
+    "895": {
+      "cpp_name": "weekOfYear_string",
+      "type": "string",
+      "value": "weekOfYear"
+    },
+    "896": {
+      "cpp_name": "weeks_string",
+      "type": "string",
+      "value": "weeks"
+    },
+    "897": {
+      "cpp_name": "with_string",
+      "type": "string",
+      "value": "with"
+    },
+    "898": {
+      "cpp_name": "word_string",
+      "type": "string",
+      "value": "word"
+    },
+    "899": {
+      "cpp_name": "written_string",
+      "type": "string",
+      "value": "written"
+    },
+    "900": {
+      "cpp_name": "year_string",
+      "type": "string",
+      "value": "year"
+    },
+    "901": {
+      "cpp_name": "yearMonthFromFields_string",
+      "type": "string",
+      "value": "yearMonthFromFields"
+    },
+    "902": {
+      "cpp_name": "yearOfWeek_string",
+      "type": "string",
+      "value": "yearOfWeek"
+    },
+    "903": {
+      "cpp_name": "years_string",
+      "type": "string",
+      "value": "years"
+    },
+    "904": {
+      "cpp_name": "not_mapped_symbol",
+      "type": "symbol",
+      "value": "Symbol.not_mapped"
+    },
+    "905": {
+      "cpp_name": "uninitialized_symbol",
+      "type": "symbol",
+      "value": "Symbol.uninitialized"
+    },
+    "906": {
+      "cpp_name": "megamorphic_symbol",
+      "type": "symbol",
+      "value": "Symbol.megamorphic"
+    },
+    "907": {
+      "cpp_name": "elements_transition_symbol",
+      "type": "symbol",
+      "value": "Symbol.elements_transition"
+    },
+    "908": {
+      "cpp_name": "mega_dom_symbol",
+      "type": "symbol",
+      "value": "Symbol.mega_dom"
+    },
+    "909": {
+      "cpp_name": "array_buffer_wasm_memory_symbol",
+      "type": "symbol",
+      "value": "Symbol.array_buffer_wasm_memory"
+    },
+    "910": {
+      "cpp_name": "call_site_info_symbol",
+      "type": "symbol",
+      "value": "Symbol.call_site_info"
+    },
+    "911": {
+      "cpp_name": "class_fields_symbol",
+      "type": "symbol",
+      "value": "Symbol.class_fields"
+    },
+    "912": {
+      "cpp_name": "class_positions_symbol",
+      "type": "symbol",
+      "value": "Symbol.class_positions"
+    },
+    "913": {
+      "cpp_name": "error_end_pos_symbol",
+      "type": "symbol",
+      "value": "Symbol.error_end_pos"
+    },
+    "914": {
+      "cpp_name": "error_message_symbol",
+      "type": "symbol",
+      "value": "Symbol.error_message"
+    },
+    "915": {
+      "cpp_name": "error_script_symbol",
+      "type": "symbol",
+      "value": "Symbol.error_script"
+    },
+    "916": {
+      "cpp_name": "error_stack_symbol",
+      "type": "symbol",
+      "value": "Symbol.error_stack"
+    },
+    "917": {
+      "cpp_name": "error_start_pos_symbol",
+      "type": "symbol",
+      "value": "Symbol.error_start_pos"
+    },
+    "918": {
+      "cpp_name": "frozen_symbol",
+      "type": "symbol",
+      "value": "Symbol.frozen"
+    },
+    "919": {
+      "cpp_name": "interpreter_trampoline_symbol",
+      "type": "symbol",
+      "value": "Symbol.interpreter_trampoline"
+    },
+    "920": {
+      "cpp_name": "native_context_index_symbol",
+      "type": "symbol",
+      "value": "Symbol.native_context_index"
+    },
+    "921": {
+      "cpp_name": "nonextensible_symbol",
+      "type": "symbol",
+      "value": "Symbol.nonextensible"
+    },
+    "922": {
+      "cpp_name": "promise_debug_message_symbol",
+      "type": "symbol",
+      "value": "Symbol.promise_debug_message"
+    },
+    "923": {
+      "cpp_name": "promise_forwarding_handler_symbol",
+      "type": "symbol",
+      "value": "Symbol.promise_forwarding_handler"
+    },
+    "924": {
+      "cpp_name": "promise_handled_by_symbol",
+      "type": "symbol",
+      "value": "Symbol.promise_handled_by"
+    },
+    "925": {
+      "cpp_name": "promise_awaited_by_symbol",
+      "type": "symbol",
+      "value": "Symbol.promise_awaited_by"
+    },
+    "926": {
+      "cpp_name": "regexp_result_names_symbol",
+      "type": "symbol",
+      "value": "Symbol.regexp_result_names"
+    },
+    "927": {
+      "cpp_name": "regexp_result_regexp_input_symbol",
+      "type": "symbol",
+      "value": "Symbol.regexp_result_regexp_input"
+    },
+    "928": {
+      "cpp_name": "regexp_result_regexp_last_index_symbol",
+      "type": "symbol",
+      "value": "Symbol.regexp_result_regexp_last_index"
+    },
+    "929": {
+      "cpp_name": "sealed_symbol",
+      "type": "symbol",
+      "value": "Symbol.sealed"
+    },
+    "930": {
+      "cpp_name": "shared_struct_map_elements_template_symbol",
+      "type": "symbol",
+      "value": "Symbol.shared_struct_map_elements_template"
+    },
+    "931": {
+      "cpp_name": "shared_struct_map_registry_key_symbol",
+      "type": "symbol",
+      "value": "Symbol.shared_struct_map_registry_key"
+    },
+    "932": {
+      "cpp_name": "strict_function_transition_symbol",
+      "type": "symbol",
+      "value": "Symbol.strict_function_transition"
+    },
+    "933": {
+      "cpp_name": "template_literal_function_literal_id_symbol",
+      "type": "symbol",
+      "value": "Symbol.template_literal_function_literal_id"
+    },
+    "934": {
+      "cpp_name": "template_literal_slot_id_symbol",
+      "type": "symbol",
+      "value": "Symbol.template_literal_slot_id"
+    },
+    "935": {
+      "cpp_name": "wasm_asm_single_function_symbol",
+      "type": "symbol",
+      "value": "Symbol.wasm_asm_single_function"
+    },
+    "936": {
+      "cpp_name": "wasm_cross_instance_call_symbol",
+      "type": "symbol",
+      "value": "Symbol.wasm_cross_instance_call"
+    },
+    "937": {
+      "cpp_name": "wasm_exception_tag_symbol",
+      "type": "symbol",
+      "value": "Symbol.wasm_exception_tag"
+    },
+    "938": {
+      "cpp_name": "wasm_exception_values_symbol",
+      "type": "symbol",
+      "value": "Symbol.wasm_exception_values"
+    },
+    "939": {
+      "cpp_name": "wasm_uncatchable_symbol",
+      "type": "symbol",
+      "value": "Symbol.wasm_uncatchable"
+    },
+    "940": {
+      "cpp_name": "wasm_debug_proxy_cache_symbol",
+      "type": "symbol",
+      "value": "Symbol.wasm_debug_proxy_cache"
+    },
+    "941": {
+      "cpp_name": "wasm_debug_proxy_names_symbol",
+      "type": "symbol",
+      "value": "Symbol.wasm_debug_proxy_names"
+    },
+    "942": {
+      "cpp_name": "async_iterator_symbol",
+      "type": "symbol",
+      "value": "Symbol.async_iterator"
+    },
+    "943": {
+      "cpp_name": "intl_fallback_symbol",
+      "type": "symbol",
+      "value": "Symbol.intl_fallback"
+    },
+    "944": {
+      "cpp_name": "match_symbol",
+      "type": "symbol",
+      "value": "Symbol.match"
+    },
+    "945": {
+      "cpp_name": "search_symbol",
+      "type": "symbol",
+      "value": "Symbol.search"
+    },
+    "946": {
+      "cpp_name": "unscopables_symbol",
+      "type": "symbol",
+      "value": "Symbol.unscopables"
+    },
+    "947": {
+      "cpp_name": "dispose_symbol",
+      "type": "symbol",
+      "value": "Symbol.dispose"
+    },
+    "948": {
+      "cpp_name": "async_dispose_symbol",
+      "type": "symbol",
+      "value": "Symbol.async_dispose"
+    },
+    "949": {
+      "cpp_name": "has_instance_symbol",
+      "type": "symbol",
+      "value": "Symbol.has_instance"
+    },
+    "950": {
+      "cpp_name": "to_string_tag_symbol",
+      "type": "symbol",
+      "value": "Symbol.to_string_tag"
+    },
+    "951": {
+      "cpp_name": "promise_fulfill_reaction_job_task_map",
+      "type": "map",
+      "value": "promise_fulfill_reaction_job_task_map"
+    },
+    "952": {
+      "cpp_name": "promise_reject_reaction_job_task_map",
+      "type": "map",
+      "value": "promise_reject_reaction_job_task_map"
+    },
+    "953": {
+      "cpp_name": "callable_task_map",
+      "type": "map",
+      "value": "callable_task_map"
+    },
+    "954": {
+      "cpp_name": "callback_task_map",
+      "type": "map",
+      "value": "callback_task_map"
+    },
+    "955": {
+      "cpp_name": "promise_resolve_thenable_job_task_map",
+      "type": "map",
+      "value": "promise_resolve_thenable_job_task_map"
+    },
+    "956": {
+      "cpp_name": "access_check_info_map",
+      "type": "map",
+      "value": "access_check_info_map"
+    },
+    "957": {
+      "cpp_name": "accessor_pair_map",
+      "type": "map",
+      "value": "accessor_pair_map"
+    },
+    "958": {
+      "cpp_name": "aliased_arguments_entry_map",
+      "type": "map",
+      "value": "aliased_arguments_entry_map"
+    },
+    "959": {
+      "cpp_name": "allocation_memento_map",
+      "type": "map",
+      "value": "allocation_memento_map"
+    },
+    "960": {
+      "cpp_name": "array_boilerplate_description_map",
+      "type": "map",
+      "value": "array_boilerplate_description_map"
+    },
+    "961": {
+      "cpp_name": "asm_wasm_data_map",
+      "type": "map",
+      "value": "asm_wasm_data_map"
+    },
+    "962": {
+      "cpp_name": "async_generator_request_map",
+      "type": "map",
+      "value": "async_generator_request_map"
+    },
+    "963": {
+      "cpp_name": "break_point_map",
+      "type": "map",
+      "value": "break_point_map"
+    },
+    "964": {
+      "cpp_name": "break_point_info_map",
+      "type": "map",
+      "value": "break_point_info_map"
+    },
+    "965": {
+      "cpp_name": "bytecode_wrapper_map",
+      "type": "map",
+      "value": "bytecode_wrapper_map"
+    },
+    "966": {
+      "cpp_name": "call_site_info_map",
+      "type": "map",
+      "value": "call_site_info_map"
+    },
+    "967": {
+      "cpp_name": "class_boilerplate_map",
+      "type": "map",
+      "value": "class_boilerplate_map"
+    },
+    "968": {
+      "cpp_name": "class_positions_map",
+      "type": "map",
+      "value": "class_positions_map"
+    },
+    "969": {
+      "cpp_name": "code_wrapper_map",
+      "type": "map",
+      "value": "code_wrapper_map"
+    },
+    "970": {
+      "cpp_name": "debug_info_map",
+      "type": "map",
+      "value": "debug_info_map"
+    },
+    "971": {
+      "cpp_name": "enum_cache_map",
+      "type": "map",
+      "value": "enum_cache_map"
+    },
+    "972": {
+      "cpp_name": "error_stack_data_map",
+      "type": "map",
+      "value": "error_stack_data_map"
+    },
+    "973": {
+      "cpp_name": "function_template_rare_data_map",
+      "type": "map",
+      "value": "function_template_rare_data_map"
+    },
+    "974": {
+      "cpp_name": "module_request_map",
+      "type": "map",
+      "value": "module_request_map"
+    },
+    "975": {
+      "cpp_name": "promise_capability_map",
+      "type": "map",
+      "value": "promise_capability_map"
+    },
+    "976": {
+      "cpp_name": "promise_reaction_map",
+      "type": "map",
+      "value": "promise_reaction_map"
+    },
+    "977": {
+      "cpp_name": "property_descriptor_object_map",
+      "type": "map",
+      "value": "property_descriptor_object_map"
+    },
+    "978": {
+      "cpp_name": "prototype_info_map",
+      "type": "map",
+      "value": "prototype_info_map"
+    },
+    "979": {
+      "cpp_name": "regexp_boilerplate_description_map",
+      "type": "map",
+      "value": "regexp_boilerplate_description_map"
+    },
+    "980": {
+      "cpp_name": "regexp_data_wrapper_map",
+      "type": "map",
+      "value": "regexp_data_wrapper_map"
+    },
+    "981": {
+      "cpp_name": "script_map",
+      "type": "map",
+      "value": "script_map"
+    },
+    "982": {
+      "cpp_name": "script_or_module_map",
+      "type": "map",
+      "value": "script_or_module_map"
+    },
+    "983": {
+      "cpp_name": "module_info_entry_map",
+      "type": "map",
+      "value": "module_info_entry_map"
+    },
+    "984": {
+      "cpp_name": "stack_frame_info_map",
+      "type": "map",
+      "value": "stack_frame_info_map"
+    },
+    "985": {
+      "cpp_name": "stack_trace_info_map",
+      "type": "map",
+      "value": "stack_trace_info_map"
+    },
+    "986": {
+      "cpp_name": "template_object_description_map",
+      "type": "map",
+      "value": "template_object_description_map"
+    },
+    "987": {
+      "cpp_name": "tuple2_map",
+      "type": "map",
+      "value": "tuple2_map"
+    },
+    "988": {
+      "cpp_name": "wasm_exception_tag_map",
+      "type": "map",
+      "value": "wasm_exception_tag_map"
+    },
+    "989": {
+      "cpp_name": "function_template_info_map",
+      "type": "map",
+      "value": "function_template_info_map"
+    },
+    "990": {
+      "cpp_name": "sloppy_arguments_elements_map",
+      "type": "map",
+      "value": "sloppy_arguments_elements_map"
+    },
+    "991": {
+      "cpp_name": "descriptor_array_map",
+      "type": "map",
+      "value": "descriptor_array_map"
+    },
+    "992": {
+      "cpp_name": "strong_descriptor_array_map",
+      "type": "map",
+      "value": "strong_descriptor_array_map"
+    },
+    "993": {
+      "cpp_name": "on_heap_basic_block_profiler_data_map",
+      "type": "map",
+      "value": "on_heap_basic_block_profiler_data_map"
+    },
+    "994": {
+      "cpp_name": "object_template_info_map",
+      "type": "map",
+      "value": "object_template_info_map"
+    },
+    "995": {
+      "cpp_name": "turbofan_bitset_type_map",
+      "type": "map",
+      "value": "turbofan_bitset_type_map"
+    },
+    "996": {
+      "cpp_name": "turbofan_union_type_map",
+      "type": "map",
+      "value": "turbofan_union_type_map"
+    },
+    "997": {
+      "cpp_name": "turbofan_range_type_map",
+      "type": "map",
+      "value": "turbofan_range_type_map"
+    },
+    "998": {
+      "cpp_name": "turbofan_heap_constant_type_map",
+      "type": "map",
+      "value": "turbofan_heap_constant_type_map"
+    },
+    "999": {
+      "cpp_name": "turbofan_other_number_constant_type_map",
+      "type": "map",
+      "value": "turbofan_other_number_constant_type_map"
+    },
+    "1000": {
+      "cpp_name": "turboshaft_word32type_map",
+      "type": "map",
+      "value": "turboshaft_word32type_map"
+    },
+    "1001": {
+      "cpp_name": "turboshaft_word32range_type_map",
+      "type": "map",
+      "value": "turboshaft_word32range_type_map"
+    },
+    "1002": {
+      "cpp_name": "turboshaft_word32set_type_map",
+      "type": "map",
+      "value": "turboshaft_word32set_type_map"
+    },
+    "1003": {
+      "cpp_name": "turboshaft_word64type_map",
+      "type": "map",
+      "value": "turboshaft_word64type_map"
+    },
+    "1004": {
+      "cpp_name": "turboshaft_word64range_type_map",
+      "type": "map",
+      "value": "turboshaft_word64range_type_map"
+    },
+    "1005": {
+      "cpp_name": "turboshaft_word64set_type_map",
+      "type": "map",
+      "value": "turboshaft_word64set_type_map"
+    },
+    "1006": {
+      "cpp_name": "turboshaft_float64type_map",
+      "type": "map",
+      "value": "turboshaft_float64type_map"
+    },
+    "1007": {
+      "cpp_name": "turboshaft_float64range_type_map",
+      "type": "map",
+      "value": "turboshaft_float64range_type_map"
+    },
+    "1008": {
+      "cpp_name": "turboshaft_float64set_type_map",
+      "type": "map",
+      "value": "turboshaft_float64set_type_map"
+    },
+    "1009": {
+      "cpp_name": "internal_class_map",
+      "type": "map",
+      "value": "internal_class_map"
+    },
+    "1010": {
+      "cpp_name": "smi_pair_map",
+      "type": "map",
+      "value": "smi_pair_map"
+    },
+    "1011": {
+      "cpp_name": "smi_box_map",
+      "type": "map",
+      "value": "smi_box_map"
+    },
+    "1012": {
+      "cpp_name": "exported_sub_class_base_map",
+      "type": "map",
+      "value": "exported_sub_class_base_map"
+    },
+    "1013": {
+      "cpp_name": "exported_sub_class_map",
+      "type": "map",
+      "value": "exported_sub_class_map"
+    },
+    "1014": {
+      "cpp_name": "abstract_internal_class_subclass1_map",
+      "type": "map",
+      "value": "abstract_internal_class_subclass1_map"
+    },
+    "1015": {
+      "cpp_name": "abstract_internal_class_subclass2_map",
+      "type": "map",
+      "value": "abstract_internal_class_subclass2_map"
+    },
+    "1016": {
+      "cpp_name": "internal_class_with_struct_elements_map",
+      "type": "map",
+      "value": "internal_class_with_struct_elements_map"
+    },
+    "1017": {
+      "cpp_name": "exported_sub_class2_map",
+      "type": "map",
+      "value": "exported_sub_class2_map"
+    },
+    "1018": {
+      "cpp_name": "sort_state_map",
+      "type": "map",
+      "value": "sort_state_map"
+    },
+    "1019": {
+      "cpp_name": "wasm_fast_api_call_data_map",
+      "type": "map",
+      "value": "wasm_fast_api_call_data_map"
+    },
+    "1020": {
+      "cpp_name": "wasm_string_view_iter_map",
+      "type": "map",
+      "value": "wasm_string_view_iter_map"
+    },
+    "1021": {
+      "cpp_name": "allocation_site_map",
+      "type": "map",
+      "value": "allocation_site_map"
+    },
+    "1022": {
+      "cpp_name": "allocation_site_without_weaknext_map",
+      "type": "map",
+      "value": "allocation_site_without_weaknext_map"
+    },
+    "1023": {
+      "cpp_name": "constructor_string",
+      "type": "string",
+      "value": "constructor"
+    },
+    "1024": {
+      "cpp_name": "next_string",
+      "type": "string",
+      "value": "next"
+    },
+    "1025": {
+      "cpp_name": "resolve_string",
+      "type": "string",
+      "value": "resolve"
+    },
+    "1026": {
+      "cpp_name": "then_string",
+      "type": "string",
+      "value": "then"
+    },
+    "1027": {
+      "cpp_name": "valueOf_string",
+      "type": "string",
+      "value": "valueOf"
+    },
+    "1028": {
+      "cpp_name": "iterator_symbol",
+      "type": "symbol",
+      "value": "Symbol.iterator"
+    },
+    "1029": {
+      "cpp_name": "match_all_symbol",
+      "type": "symbol",
+      "value": "Symbol.match_all"
+    },
+    "1030": {
+      "cpp_name": "replace_symbol",
+      "type": "symbol",
+      "value": "Symbol.replace"
+    },
+    "1031": {
+      "cpp_name": "species_symbol",
+      "type": "symbol",
+      "value": "Symbol.species"
+    },
+    "1032": {
+      "cpp_name": "split_symbol",
+      "type": "symbol",
+      "value": "Symbol.split"
+    },
+    "1033": {
+      "cpp_name": "to_primitive_symbol",
+      "type": "symbol",
+      "value": "Symbol.to_primitive"
+    },
+    "1034": {
+      "cpp_name": "is_concat_spreadable_symbol",
+      "type": "symbol",
+      "value": "Symbol.is_concat_spreadable"
+    },
+    "1035": {
+      "cpp_name": "load_handler1_map",
+      "type": "map",
+      "value": "load_handler1_map"
+    },
+    "1036": {
+      "cpp_name": "load_handler2_map",
+      "type": "map",
+      "value": "load_handler2_map"
+    },
+    "1037": {
+      "cpp_name": "load_handler3_map",
+      "type": "map",
+      "value": "load_handler3_map"
+    },
+    "1038": {
+      "cpp_name": "store_handler0_map",
+      "type": "map",
+      "value": "store_handler0_map"
+    },
+    "1039": {
+      "cpp_name": "store_handler1_map",
+      "type": "map",
+      "value": "store_handler1_map"
+    },
+    "1040": {
+      "cpp_name": "store_handler2_map",
+      "type": "map",
+      "value": "store_handler2_map"
+    },
+    "1041": {
+      "cpp_name": "store_handler3_map",
+      "type": "map",
+      "value": "store_handler3_map"
+    },
+    "1042": {
+      "cpp_name": "external_map",
+      "type": "map",
+      "value": "external_map"
+    },
+    "1043": {
+      "cpp_name": "message_object_map",
+      "type": "map",
+      "value": "message_object_map"
+    },
+    "1044": {
+      "cpp_name": "cpp_heap_external_map",
+      "type": "map",
+      "value": "cpp_heap_external_map"
+    },
+    "1045": {
+      "cpp_name": "arguments_iterator_accessor",
+      "type": "identifier",
+      "value": "arguments_iterator_accessor"
+    },
+    "1046": {
+      "cpp_name": "array_length_accessor",
+      "type": "identifier",
+      "value": "array_length_accessor"
+    },
+    "1047": {
+      "cpp_name": "bound_function_length_accessor",
+      "type": "identifier",
+      "value": "bound_function_length_accessor"
+    },
+    "1048": {
+      "cpp_name": "bound_function_name_accessor",
+      "type": "identifier",
+      "value": "bound_function_name_accessor"
+    },
+    "1049": {
+      "cpp_name": "function_name_accessor",
+      "type": "identifier",
+      "value": "function_name_accessor"
+    },
+    "1050": {
+      "cpp_name": "function_length_accessor",
+      "type": "identifier",
+      "value": "function_length_accessor"
+    },
+    "1051": {
+      "cpp_name": "function_prototype_accessor",
+      "type": "identifier",
+      "value": "function_prototype_accessor"
+    },
+    "1052": {
+      "cpp_name": "string_length_accessor",
+      "type": "identifier",
+      "value": "string_length_accessor"
+    },
+    "1053": {
+      "cpp_name": "value_unavailable_accessor",
+      "type": "identifier",
+      "value": "value_unavailable_accessor"
+    },
+    "1054": {
+      "cpp_name": "wrapped_function_length_accessor",
+      "type": "identifier",
+      "value": "wrapped_function_length_accessor"
+    },
+    "1055": {
+      "cpp_name": "wrapped_function_name_accessor",
+      "type": "identifier",
+      "value": "wrapped_function_name_accessor"
+    },
+    "1056": {
+      "cpp_name": "empty_script",
+      "type": "identifier",
+      "value": "empty_script"
+    },
+    "1057": {
+      "cpp_name": "no_elements_protector",
+      "type": "identifier",
+      "value": "no_elements_protector"
+    },
+    "1058": {
+      "cpp_name": "mega_dom_protector",
+      "type": "identifier",
+      "value": "mega_dom_protector"
+    },
+    "1059": {
+      "cpp_name": "no_profiling_protector",
+      "type": "identifier",
+      "value": "no_profiling_protector"
+    },
+    "1060": {
+      "cpp_name": "no_undetectable_objects_protector",
+      "type": "identifier",
+      "value": "no_undetectable_objects_protector"
+    },
+    "1061": {
+      "cpp_name": "is_concat_spreadable_protector",
+      "type": "identifier",
+      "value": "is_concat_spreadable_protector"
+    },
+    "1062": {
+      "cpp_name": "array_species_protector",
+      "type": "identifier",
+      "value": "array_species_protector"
+    },
+    "1063": {
+      "cpp_name": "typed_array_species_protector",
+      "type": "identifier",
+      "value": "typed_array_species_protector"
+    },
+    "1064": {
+      "cpp_name": "no_date_time_configuration_change_protector",
+      "type": "identifier",
+      "value": "no_date_time_configuration_change_protector"
+    },
+    "1065": {
+      "cpp_name": "promise_species_protector",
+      "type": "identifier",
+      "value": "promise_species_protector"
+    },
+    "1066": {
+      "cpp_name": "regexp_species_protector",
+      "type": "identifier",
+      "value": "regexp_species_protector"
+    },
+    "1067": {
+      "cpp_name": "string_length_protector",
+      "type": "identifier",
+      "value": "string_length_protector"
+    },
+    "1068": {
+      "cpp_name": "array_iterator_protector",
+      "type": "identifier",
+      "value": "array_iterator_protector"
+    },
+    "1069": {
+      "cpp_name": "array_buffer_detaching_protector",
+      "type": "identifier",
+      "value": "array_buffer_detaching_protector"
+    },
+    "1070": {
+      "cpp_name": "promise_hook_protector",
+      "type": "identifier",
+      "value": "promise_hook_protector"
+    },
+    "1071": {
+      "cpp_name": "promise_resolve_protector",
+      "type": "identifier",
+      "value": "promise_resolve_protector"
+    },
+    "1072": {
+      "cpp_name": "map_iterator_protector",
+      "type": "identifier",
+      "value": "map_iterator_protector"
+    },
+    "1073": {
+      "cpp_name": "promise_then_protector",
+      "type": "identifier",
+      "value": "promise_then_protector"
+    },
+    "1074": {
+      "cpp_name": "set_iterator_protector",
+      "type": "identifier",
+      "value": "set_iterator_protector"
+    },
+    "1075": {
+      "cpp_name": "string_iterator_protector",
+      "type": "identifier",
+      "value": "string_iterator_protector"
+    },
+    "1076": {
+      "cpp_name": "string_wrapper_to_primitive_protector",
+      "type": "identifier",
+      "value": "string_wrapper_to_primitive_protector"
+    },
+    "1077": {
+      "cpp_name": "number_string_not_regexp_like_protector",
+      "type": "identifier",
+      "value": "number_string_not_regexp_like_protector"
+    },
+    "1078": {
+      "cpp_name": "string_split_cache",
+      "type": "identifier",
+      "value": "string_split_cache"
+    },
+    "1079": {
+      "cpp_name": "regexp_multiple_cache",
+      "type": "identifier",
+      "value": "regexp_multiple_cache"
+    },
+    "1080": {
+      "cpp_name": "regexp_match_global_atom_cache",
+      "type": "identifier",
+      "value": "regexp_match_global_atom_cache"
+    },
+    "1081": {
+      "cpp_name": "builtins_constants_table",
+      "type": "identifier",
+      "value": "builtins_constants_table"
+    },
+    "1082": {
+      "cpp_name": "source_text_module_execute_async_module_fulfilled_sfi",
+      "type": "identifier",
+      "value": "source_text_module_execute_async_module_fulfilled_sfi"
+    },
+    "1083": {
+      "cpp_name": "source_text_module_execute_async_module_rejected_sfi",
+      "type": "identifier",
+      "value": "source_text_module_execute_async_module_rejected_sfi"
+    },
+    "1084": {
+      "cpp_name": "async_disposable_stack_on_fulfilled_shared_fun",
+      "type": "identifier",
+      "value": "async_disposable_stack_on_fulfilled_shared_fun"
+    },
+    "1085": {
+      "cpp_name": "async_disposable_stack_on_rejected_shared_fun",
+      "type": "identifier",
+      "value": "async_disposable_stack_on_rejected_shared_fun"
+    },
+    "1086": {
+      "cpp_name": "async_dispose_from_sync_dispose_shared_fun",
+      "type": "identifier",
+      "value": "async_dispose_from_sync_dispose_shared_fun"
+    },
+    "1087": {
+      "cpp_name": "proxy_revoke_shared_fun",
+      "type": "identifier",
+      "value": "proxy_revoke_shared_fun"
+    },
+    "1088": {
+      "cpp_name": "async_from_sync_iterator_close_sync_and_rethrow_shared_fun",
+      "type": "identifier",
+      "value": "async_from_sync_iterator_close_sync_and_rethrow_shared_fun"
+    },
+    "1089": {
+      "cpp_name": "async_function_await_reject_closure_shared_fun",
+      "type": "identifier",
+      "value": "async_function_await_reject_closure_shared_fun"
+    },
+    "1090": {
+      "cpp_name": "async_function_await_resolve_closure_shared_fun",
+      "type": "identifier",
+      "value": "async_function_await_resolve_closure_shared_fun"
+    },
+    "1091": {
+      "cpp_name": "async_generator_await_reject_closure_shared_fun",
+      "type": "identifier",
+      "value": "async_generator_await_reject_closure_shared_fun"
+    },
+    "1092": {
+      "cpp_name": "async_generator_await_resolve_closure_shared_fun",
+      "type": "identifier",
+      "value": "async_generator_await_resolve_closure_shared_fun"
+    },
+    "1093": {
+      "cpp_name": "async_generator_yield_with_await_resolve_closure_shared_fun",
+      "type": "identifier",
+      "value": "async_generator_yield_with_await_resolve_closure_shared_fun"
+    },
+    "1094": {
+      "cpp_name": "async_generator_return_closed_resolve_closure_shared_fun",
+      "type": "identifier",
+      "value": "async_generator_return_closed_resolve_closure_shared_fun"
+    },
+    "1095": {
+      "cpp_name": "async_generator_return_closed_reject_closure_shared_fun",
+      "type": "identifier",
+      "value": "async_generator_return_closed_reject_closure_shared_fun"
+    },
+    "1096": {
+      "cpp_name": "async_generator_return_resolve_closure_shared_fun",
+      "type": "identifier",
+      "value": "async_generator_return_resolve_closure_shared_fun"
+    },
+    "1097": {
+      "cpp_name": "async_iterator_value_unwrap_shared_fun",
+      "type": "identifier",
+      "value": "async_iterator_value_unwrap_shared_fun"
+    },
+    "1098": {
+      "cpp_name": "array_from_async_array_like_on_fulfilled_shared_fun",
+      "type": "identifier",
+      "value": "array_from_async_array_like_on_fulfilled_shared_fun"
+    },
+    "1099": {
+      "cpp_name": "array_from_async_array_like_on_rejected_shared_fun",
+      "type": "identifier",
+      "value": "array_from_async_array_like_on_rejected_shared_fun"
+    },
+    "1100": {
+      "cpp_name": "array_from_async_iterable_on_fulfilled_shared_fun",
+      "type": "identifier",
+      "value": "array_from_async_iterable_on_fulfilled_shared_fun"
+    },
+    "1101": {
+      "cpp_name": "array_from_async_iterable_on_rejected_shared_fun",
+      "type": "identifier",
+      "value": "array_from_async_iterable_on_rejected_shared_fun"
+    },
+    "1102": {
+      "cpp_name": "promise_capability_default_resolve_shared_fun",
+      "type": "identifier",
+      "value": "promise_capability_default_resolve_shared_fun"
+    },
+    "1103": {
+      "cpp_name": "promise_capability_default_reject_shared_fun",
+      "type": "identifier",
+      "value": "promise_capability_default_reject_shared_fun"
+    },
+    "1104": {
+      "cpp_name": "promise_get_capabilities_executor_shared_fun",
+      "type": "identifier",
+      "value": "promise_get_capabilities_executor_shared_fun"
+    },
+    "1105": {
+      "cpp_name": "promise_all_settled_resolve_element_closure_shared_fun",
+      "type": "identifier",
+      "value": "promise_all_settled_resolve_element_closure_shared_fun"
+    },
+    "1106": {
+      "cpp_name": "promise_all_settled_reject_element_closure_shared_fun",
+      "type": "identifier",
+      "value": "promise_all_settled_reject_element_closure_shared_fun"
+    },
+    "1107": {
+      "cpp_name": "promise_all_resolve_element_closure_shared_fun",
+      "type": "identifier",
+      "value": "promise_all_resolve_element_closure_shared_fun"
+    },
+    "1108": {
+      "cpp_name": "promise_any_reject_element_closure_shared_fun",
+      "type": "identifier",
+      "value": "promise_any_reject_element_closure_shared_fun"
+    },
+    "1109": {
+      "cpp_name": "promise_thrower_finally_shared_fun",
+      "type": "identifier",
+      "value": "promise_thrower_finally_shared_fun"
+    },
+    "1110": {
+      "cpp_name": "promise_value_thunk_finally_shared_fun",
+      "type": "identifier",
+      "value": "promise_value_thunk_finally_shared_fun"
+    },
+    "1111": {
+      "cpp_name": "promise_then_finally_shared_fun",
+      "type": "identifier",
+      "value": "promise_then_finally_shared_fun"
+    },
+    "1112": {
+      "cpp_name": "promise_catch_finally_shared_fun",
+      "type": "identifier",
+      "value": "promise_catch_finally_shared_fun"
+    },
+    "1113": {
+      "cpp_name": "shadow_realm_import_value_fulfilled_shared_fun",
+      "type": "identifier",
+      "value": "shadow_realm_import_value_fulfilled_shared_fun"
+    },
+    "1114": {
+      "cpp_name": "async_iterator_prototype_async_dispose_resolve_closure_shared_fun",
+      "type": "identifier",
+      "value": "async_iterator_prototype_async_dispose_resolve_closure_shared_fun"
+    },
+    "1115": {
+      "cpp_name": "empty_trusted_byte_array",
+      "type": "identifier",
+      "value": "empty_trusted_byte_array"
+    },
+    "1116": {
+      "cpp_name": "empty_trusted_fixed_array",
+      "type": "identifier",
+      "value": "empty_trusted_fixed_array"
+    },
+    "1117": {
+      "cpp_name": "empty_trusted_weak_fixed_array",
+      "type": "identifier",
+      "value": "empty_trusted_weak_fixed_array"
+    },
+    "1118": {
+      "cpp_name": "empty_protected_fixed_array",
+      "type": "identifier",
+      "value": "empty_protected_fixed_array"
+    },
+    "1119": {
+      "cpp_name": "empty_protected_weak_fixed_array",
+      "type": "identifier",
+      "value": "empty_protected_weak_fixed_array"
+    },
+    "1120": {
+      "cpp_name": "smi_string_cache",
+      "type": "identifier",
+      "value": "smi_string_cache"
+    },
+    "1121": {
+      "cpp_name": "double_string_cache",
+      "type": "identifier",
+      "value": "double_string_cache"
+    },
+    "1122": {
+      "cpp_name": "public_symbol_table",
+      "type": "identifier",
+      "value": "public_symbol_table"
+    },
+    "1123": {
+      "cpp_name": "api_symbol_table",
+      "type": "identifier",
+      "value": "api_symbol_table"
+    },
+    "1124": {
+      "cpp_name": "api_private_symbol_table",
+      "type": "identifier",
+      "value": "api_private_symbol_table"
+    },
+    "1125": {
+      "cpp_name": "script_list",
+      "type": "identifier",
+      "value": "script_list"
+    },
+    "1126": {
+      "cpp_name": "materialized_objects",
+      "type": "identifier",
+      "value": "materialized_objects"
+    },
+    "1127": {
+      "cpp_name": "detached_contexts",
+      "type": "identifier",
+      "value": "detached_contexts"
+    },
+    "1128": {
+      "cpp_name": "feedback_vectors_for_profiling_tools",
+      "type": "identifier",
+      "value": "feedback_vectors_for_profiling_tools"
+    },
+    "1129": {
+      "cpp_name": "serialized_objects",
+      "type": "identifier",
+      "value": "serialized_objects"
+    },
+    "1130": {
+      "cpp_name": "serialized_global_proxy_sizes",
+      "type": "identifier",
+      "value": "serialized_global_proxy_sizes"
+    },
+    "1131": {
+      "cpp_name": "message_listeners",
+      "type": "identifier",
+      "value": "message_listeners"
+    },
+    "1132": {
+      "cpp_name": "current_microtask",
+      "type": "identifier",
+      "value": "current_microtask"
+    },
+    "1133": {
+      "cpp_name": "weak_refs_keep_during_job",
+      "type": "identifier",
+      "value": "weak_refs_keep_during_job"
+    },
+    "1134": {
+      "cpp_name": "functions_marked_for_manual_optimization",
+      "type": "identifier",
+      "value": "functions_marked_for_manual_optimization"
+    },
+    "1135": {
+      "cpp_name": "basic_block_profiling_data",
+      "type": "identifier",
+      "value": "basic_block_profiling_data"
+    },
+    "1136": {
+      "cpp_name": "shared_wasm_memories",
+      "type": "identifier",
+      "value": "shared_wasm_memories"
+    },
+    "1137": {
+      "cpp_name": "locals_block_list_cache",
+      "type": "identifier",
+      "value": "locals_block_list_cache"
+    },
+    "1138": {
+      "cpp_name": "js_to_wasm_wrappers",
+      "type": "identifier",
+      "value": "js_to_wasm_wrappers"
+    },
+    "1139": {
+      "cpp_name": "wasm_canonical_rtts",
+      "type": "identifier",
+      "value": "wasm_canonical_rtts"
+    },
+    "1140": {
+      "cpp_name": "error_stack_getter_fun_template",
+      "type": "identifier",
+      "value": "error_stack_getter_fun_template"
+    },
+    "1141": {
+      "cpp_name": "error_stack_setter_fun_template",
+      "type": "identifier",
+      "value": "error_stack_setter_fun_template"
+    },
+    "1142": {
+      "cpp_name": "last_script_id",
+      "type": "identifier",
+      "value": "last_script_id"
+    },
+    "1143": {
+      "cpp_name": "last_debugging_id",
+      "type": "identifier",
+      "value": "last_debugging_id"
+    },
+    "1144": {
+      "cpp_name": "last_stack_trace_id",
+      "type": "identifier",
+      "value": "last_stack_trace_id"
+    },
+    "1145": {
+      "cpp_name": "next_template_serial_number",
+      "type": "identifier",
+      "value": "next_template_serial_number"
+    },
+    "1146": {
+      "cpp_name": "construct_stub_create_deopt_pc_offset",
+      "type": "identifier",
+      "value": "construct_stub_create_deopt_pc_offset"
+    },
+    "1147": {
+      "cpp_name": "construct_stub_invoke_deopt_pc_offset",
+      "type": "identifier",
+      "value": "construct_stub_invoke_deopt_pc_offset"
+    },
+    "1148": {
+      "cpp_name": "deopt_pc_offset_after_adapt_shadow_stack",
+      "type": "identifier",
+      "value": "deopt_pc_offset_after_adapt_shadow_stack"
+    },
+    "1149": {
+      "cpp_name": "interpreter_entry_return_pc_offset",
+      "type": "identifier",
+      "value": "interpreter_entry_return_pc_offset"
+    }
+  }
+}

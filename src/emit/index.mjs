@@ -1,0 +1,842 @@
+// src/emit/index.mjs
+//
+// Stage E of ARCHITECTURE.md 4.5, and the join of 11.3: T7's values and T8's
+// graph shape become one JavaScript file.
+//
+//   emit(recovered, structured, opts) -> { code, map, ast, perFunction, report }
+//
+// `recovered` / `structured` are the arrays T7 and T8 produce for one .jsc, in
+// the same unit order (a single pair is accepted too). `decompile.mjs` is the
+// 11.4 entry point that runs the whole pipeline to get them.
+//
+// Layering (11.0): this directory imports src/ir, src/structure and src/load
+// and nothing from src/verify/ or tools/. It holds no version literal --
+// everything version-specific was resolved upstream, which is what makes the
+// emitter version-independent rather than accidentally compatible.
+//
+// ---------------------------------------------------------------------------
+// FUNCTIONS ARE EMITTED NESTED, AND THAT IS A CORRECTNESS DECISION
+//
+// Each unit becomes one function, placed inside the unit its SFI names as its
+// parent, with `{e:'fn', sfiId}` emitting a reference to that nested
+// declaration's name. The flat alternative -- every unit a top-level function
+// -- is simpler and WRONG: `LdaContextSlot depth 1` is a read of the
+// ENCLOSING function's variable, and T7 resolves it to that variable's real
+// ScopeInfo name (docs/RECOVER.md 4). Emitted flat, that name is free, so
+// every closure variable becomes an undeclared global; emitted nested, the
+// enclosing function's declaration is in scope and the closure is intact.
+// names.mjs rule 3 is the other half of the same decision.
+//
+// The top-level unit is the exception: its body is the FILE's top level, not a
+// function. A `.jsc` top-level unit IS the script, so wrapping it in a
+// function would add a frame V8 never compiled -- and the oracles compare our
+// text's script function against the original's.
+//
+// Three consequences, all measured rather than assumed:
+//   * a unit whose parent is missing, or whose parent failed, is emitted at
+//     the top level with an `ORPHAN` marker, so 11.5's "every function enters
+//     the output" cannot be lost to a broken parent link;
+//   * a class constructor referenced by `{e:'class'}` and an object literal's
+//     accessor are emitted INLINE (a `super` inside them is only legal there)
+//     and `claimed` keeps them from also being emitted as a sibling;
+//   * names are allocated once for the whole file, so a reference by name can
+//     never resolve to the wrong function.
+
+import * as t from '@babel/types';
+import generatorModule from '@babel/generator';
+import { structureFacts } from '../structure/facts.mjs';
+import { terminatorInputs } from '../structure/conditions.mjs';
+import { planNames, declarationPrologue, sanitise } from './names.mjs';
+import { expr, nameOf } from './expr.mjs';
+import { regionStatements } from './region.mjs';
+import { holeExpr, holeStmt, noteStmt, mark, HOLE_IDENTIFIER } from './holes.mjs';
+import { joinPoints, verifyEmitted, walkAst, variableIdentifiers } from './verify.mjs';
+import { applyPositions, monotonicity, finishMap } from './sourcemap.mjs';
+
+const generate = generatorModule.default ?? generatorModule;
+
+export class EmitError extends Error {
+  constructor(message, detail = {}) { super(message); this.detail = detail; }
+}
+
+const toArray = (x) => (x === null || x === undefined ? [] : (Array.isArray(x) ? x : [x]));
+
+/** How much of a failure message, and of its top frame, is kept. */
+const MAX_ERROR = 300;
+const MAX_FRAME = 200;
+
+function newReport() {
+  return {
+    holes: { total: 0, byWhy: {}, byKind: { expr: 0, stmt: 0, region: 0 } },
+    blocksWithoutStatements: 0,
+    declarationsWithoutAnInitialiser: 0,
+    unresolvedNames: 0, globalReads: 0,
+    loops: 0, loopForms: {}, loopIdioms: {}, loopsWithoutAnInit: 0, endlessLoops: 0,
+    tries: 0, triesByPrediction: {}, triesWithoutAFinalizer: 0,
+    finallyShapes: 0, finallyShapeKinds: {},
+    switches: 0, switchForms: {}, switchGuardBlocks: 0,
+    ifs: 0, breaks: 0, continues: 0, labels: 0,
+    unstructuredRegions: 0, unstructuredBlocks: 0,
+    regionKindsNot112: {}, unknownRegionKinds: {},
+    catchWithoutAParam: 0, sharedExprWithNoValue: 0,
+    forcedAsync: 0, forcedGenerator: 0,
+    loopTestChainsMaterialised: 0, loopTestChainStatements: 0,
+    namesReadTwice: 0,
+    forInRebuilt: 0, forInNotRebuilt: 0,
+    catchContextBindings: 0, catchContextBindingsAmbiguous: 0,
+  };
+}
+
+/** The per-function emit context every other module in this directory takes. */
+function makeContext({ rec, sf, unit, facts, plan, file, resolveFn, resolveClass, opts }) {
+  const report = newReport();
+  const ctx = {
+    rec, sf, ir: sf.ir, unit, facts, plan, file, report, opts,
+    depth: 0, regionCount: 0,
+    isAsync: !!unit.isAsync, isGenerator: !!unit.isGenerator,
+    allowSuper: false,
+    positions: [],
+    extraDeclNames: new Set(),
+    blockEmitCounts: new Map(),
+    blockStatementCounts: new Map(),
+    visitCounts: new Map(),
+    exprOwners: new Map(),
+    scratchSeq: 0,
+
+    countHole(why, kind) {
+      report.holes.total++;
+      report.holes.byWhy[why] = (report.holes.byWhy[why] ?? 0) + 1;
+      report.holes.byKind[kind] = (report.holes.byKind[kind] ?? 0) + 1;
+    },
+    visit(e) { ctx.visitCounts.set(e, (ctx.visitCounts.get(e) ?? 0) + 1); },
+    needHoleIdentifier() { ctx.extraDeclNames.add(HOLE_IDENTIFIER); },
+    needSuperPlaceholder() { ctx.extraDeclNames.add('__super'); },
+    needDispatchVar(name) { ctx.extraDeclNames.add(name); },
+    scratchName(base = '__t') {
+      const n = `${base}$${ctx.scratchSeq++}`;
+      ctx.extraDeclNames.add(n);
+      return n;
+    },
+    nameOfExpr(e) { return nameOf(ctx, e); },
+    forceAsync() { ctx.isAsync = true; report.forcedAsync++; },
+    forceGenerator() { ctx.isGenerator = true; report.forcedGenerator++; },
+
+    /** 11.3 invariant 2, at the point of use: resolve an SSA value. */
+    exprOfValue(id, why) {
+      if (id === null || id === undefined) return holeExpr(ctx, 'joinUnresolved', why);
+      const e = rec.exprs.get(id);
+      if (!e) return holeExpr(ctx, 'joinUnresolved', `${why}: value ${id} has no exprs entry`);
+      return expr(ctx, e);
+    },
+    /** The SSA value a block's terminator reads, as an expression. */
+    terminatorValueExpr(blockId, why) {
+      const { value } = terminatorInputs(ctx.ir, blockId);
+      return ctx.exprOfValue(value, why);
+    },
+    /** The successor of a two-way terminator taken when its predicate holds. */
+    takenSuccessor(blockId) {
+      for (const eid of ctx.ir.blocks[blockId].outEdges) {
+        const e = ctx.ir.edges[eid];
+        if (e.kind === 'true') return e.to;
+      }
+      return null;
+    },
+    noteBlockEmitted(id) { ctx.blockEmitCounts.set(id, (ctx.blockEmitCounts.get(id) ?? 0) + 1); },
+    noteStatementsEmitted(id, n) { ctx.blockStatementCounts.set(id, (ctx.blockStatementCounts.get(id) ?? 0) + n); },
+
+    functionLike(e, role) { return resolveFn(ctx, e, role); },
+    classLike(e) { return resolveClass(ctx, e); },
+  };
+  // 11.3 invariant 4's index: one T7 Expr object -> every value resolving to it
+  for (const [id, e] of rec.exprs) {
+    if (!e || typeof e !== 'object') continue;
+    const list = ctx.exprOwners.get(e);
+    if (list) list.push(id); else ctx.exprOwners.set(e, [id]);
+  }
+  return ctx;
+}
+
+/** The Exprs a region tree reaches outside `stmts`, for names.mjs. */
+function joinExprs(rec, sf) {
+  const out = [];
+  const { tests, targets } = joinPoints(sf);
+  for (const { test } of tests) {
+    if (!test) continue;
+    const ids = test.valueless ? (test.values ?? []) : [test.value];
+    for (const id of ids) { const e = rec.exprs.get(id); if (e) out.push(e); }
+  }
+  for (const { target } of targets) {
+    if (!target) continue;
+    const e = rec.exprs.get(target.value ?? target.slotValue);
+    if (e) out.push(e);
+  }
+  return out;
+}
+
+/** The function keyword flavour for a unit. */
+function flavour(unit, ctx) {
+  return { isAsync: ctx ? ctx.isAsync : !!unit.isAsync, isGenerator: ctx ? ctx.isGenerator : !!unit.isGenerator };
+}
+
+/**
+ * @param {object|object[]} recovered  T7's output, one per unit
+ * @param {object|object[]} structured T8's output, same order
+ * @param {object} opts  { file, units, failures, perFunctionCode, verify }
+ */
+export function emit(recovered, structured, opts = {}) {
+  const t0 = process.hrtime.bigint();
+  const recs = toArray(recovered);
+  const sfs = toArray(structured);
+  if (recs.length !== sfs.length) {
+    throw new EmitError(`emit() needs one StructuredFunction per RecoveredFunction (${recs.length} vs ${sfs.length})`);
+  }
+  const file = opts.file ?? null;
+  const sourceName = opts.sourceName ?? (file ? String(file).replace(/\\/g, '/').split('/').pop() : 'unknown.jsc');
+
+  // ------------------------------------------------- the unit table
+  const byId = new Map();                       // sfiId -> record
+  const order = [];
+  const addRecord = (rec0) => {
+    if (byId.has(rec0.sfiId)) return;
+    byId.set(rec0.sfiId, rec0);
+    order.push(rec0);
+  };
+  for (let i = 0; i < recs.length; i++) {
+    const rec = recs[i];
+    const sf = sfs[i];
+    const unit = rec?.ir?.unit ?? sf?.ir?.unit;
+    if (!unit) throw new EmitError(`pair ${i} carries no unit`);
+    addRecord({ sfiId: unit.sfiId, unit, rec, sf, failure: null });
+  }
+  for (const u of opts.units ?? []) {
+    if (byId.has(u.sfiId)) continue;
+    const f = (opts.failures ?? []).find((x) => x.sfiId === u.sfiId || x.unit === u.bytecodeId);
+    addRecord({ sfiId: u.sfiId, unit: u, rec: null, sf: null, failure: f ?? (u.bytecode ? { error: 'no recovered/structured pair for this unit' } : null) });
+  }
+
+  // ------------------------------------------------- one name per unit, file-wide
+  const taken = new Set([HOLE_IDENTIFIER, '__super']);
+  const emitName = new Map();
+  const nameUnits = [...order].sort((a, b) => a.sfiId - b.sfiId);
+  for (const r of nameUnits) {
+    if (r.unit.isTopLevel) { emitName.set(r.sfiId, null); continue; }
+    const base = sanitise(r.unit.name || inferredBase(r.unit));
+    let name = base;
+    for (let n = 2; taken.has(name); n++) name = `${base}$${n}`;
+    taken.add(name);
+    emitName.set(r.sfiId, name);
+  }
+
+  // ------------------------------------------------- the tree
+  const { childrenOf, roots, treeSource } = buildUnitTree(order, byId);
+
+  const state = {
+    emitted: new Set(), claimed: new Set(), inProgress: new Set(),
+    perFunction: [], report: fileReport(), byId, childrenOf, emitName,
+    positions: [], opts, file, sourceName,
+  };
+
+  // ------------------------------------------------- emit, roots first
+  const programBody = [];
+  const scriptRoot = roots.find((r) => r.unit.isTopLevel) ?? null;
+  if (scriptRoot) programBody.push(...emitUnit(state, scriptRoot, { role: 'script', inherited: new Set(), topLevel: true }));
+  for (const r of roots) {
+    if (r === scriptRoot) continue;
+    programBody.push(...asStatements(emitUnit(state, r, { role: 'declaration', inherited: new Set(), topLevel: true })));
+  }
+  // Nothing may be lost to a broken parent link (11.5: every function enters
+  // the output). Anything still unemitted goes to the top level, marked.
+  for (const r of order) {
+    if (state.emitted.has(r.sfiId) || state.claimed.has(r.sfiId)) continue;
+    const stmts = asStatements(emitUnit(state, r, { role: 'declaration', inherited: new Set(), topLevel: true }));
+    if (stmts.length) {
+      mark(stmts[0], `ORPHAN: parent sfi ${r.unit.parentSfiId ?? 'none'} is not in this file`);
+      state.report.orphans++;
+    }
+    programBody.push(...stmts);
+  }
+
+  const program = t.program(programBody, [], 'script');
+  const ast = t.file(program, [], []);
+
+  // ------------------------------------------------- text, map, checks
+  const withPosition = applyPositions(state.positions);
+  const gen = generate(ast, {
+    comments: true, compact: false, concise: false, retainLines: false,
+    sourceMaps: opts.sourceMaps !== false, sourceFileName: sourceName,
+    jsescOption: { minimal: true },
+  });
+  const code = gen.code ?? '';
+  const map = finishMap(gen.map, sourceName, { file: opts.outFile ?? null });
+
+  // 11.3 invariant 5, file-wide, counted the same way verify.mjs counts it per
+  // function: an Identifier in a VARIABLE position. A property called `ctx`
+  // (`o.ctx`, `{ctx: 1}`) is recovered source, not the invented context object
+  // the baseline's 1 710 336 occurrences were, and names.mjs::sanitise makes
+  // it impossible for a variable to be spelled that way.
+  const ctxIdentifiers = variableIdentifiers(ast).filter((n) => n.name === 'ctx').length;
+  let holeIdentifiers = 0;
+  let ctxProperties = 0;
+  walkAst(ast, (n) => {
+    if (n.type !== 'Identifier') return;
+    if (n.name === HOLE_IDENTIFIER) holeIdentifiers++;
+    else if (n.name === 'ctx') ctxProperties++;
+  });
+  ctxProperties -= ctxIdentifiers;
+
+  const r = state.report;
+  r.file = sourceName;
+  r.units = order.length;
+  r.compiledUnits = order.filter((x) => x.unit.bytecode).length;
+  r.functionsEmitted = state.perFunction.length;
+  r.functionsClaimedInline = state.claimed.size;
+  r.codeBytes = Buffer.byteLength(code, 'utf8');
+  r.sourcePositionsApplied = withPosition;
+  r.ctxIdentifiersInTheOutput = ctxIdentifiers;
+  r.ctxPropertyNamesInTheOutput = ctxProperties;
+  r.holeIdentifiersInTheOutput = holeIdentifiers;
+  r.elapsedMs = Number(process.hrtime.bigint() - t0) / 1e6;
+  r.invariants = summariseInvariants(state.perFunction);
+  r.unitTree = treeSource;
+  r.metrics = fileMetrics(state, r);
+
+  return { code, map, ast, perFunction: state.perFunction, report: r };
+}
+
+/**
+ * Which unit encloses which.
+ *
+ * `src/heap` fills in `parentSfiId` from the CONSTANT POOL: a `{t:'sfi'}`
+ * entry is a `CreateClosure` target, so the pool gives the tree for every
+ * closure a function creates. Measured: it does NOT give it for a top-level
+ * function DECLARATION. `loop-while.jsc`'s script unit has constants
+ * `[array, string, string, string, string]` and no `sfi` entry at all, because
+ * V8 hoists declarations through `DeclareGlobals`, whose operand is a
+ * FixedArray of (name, slot, SFI) triples that `src/heap` renders as one
+ * `{t:'array'}`. So all three units of that file arrive with
+ * `parentSfiId: null` and `children: []`.
+ *
+ * The source range is the other, independent statement of the same fact: a
+ * function literal's `[startPosition, endPosition)` is strictly inside its
+ * enclosing literal's, because both come from the parser. So the tree is built
+ * by containment and `parentSfiId` is used to confirm it. A unit with no
+ * usable range (an assembled test unit has 0..0) stays a root rather than
+ * being guessed into someone's body.
+ */
+export function buildUnitTree(order, byId) {
+  const childrenOf = new Map();
+  for (const r of order) childrenOf.set(r.sfiId, []);
+  const roots = [];
+  const usable = (u) => Number.isInteger(u.startPosition) && Number.isInteger(u.endPosition)
+    && u.endPosition > u.startPosition;
+  const ranged = order.filter((r) => usable(r.unit));
+  const unranged = order.filter((r) => !usable(r.unit));
+  const treeSource = { byRange: 0, byParentSfiId: 0, disagreed: 0, rootsWithoutARange: unranged.length };
+
+  ranged.sort((a, b) => (a.unit.startPosition - b.unit.startPosition)
+    || (b.unit.endPosition - a.unit.endPosition) || (a.sfiId - b.sfiId));
+  const stack = [];
+  for (const r of ranged) {
+    while (stack.length) {
+      const top = stack[stack.length - 1].unit;
+      if (r.unit.startPosition >= top.startPosition && r.unit.endPosition <= top.endPosition) break;
+      stack.pop();
+    }
+    const parent = stack.length ? stack[stack.length - 1] : null;
+    if (parent) {
+      childrenOf.get(parent.sfiId).push(r);
+      treeSource.byRange++;
+      const declared = r.unit.parentSfiId;
+      if (declared !== null && declared !== undefined && declared !== parent.sfiId) treeSource.disagreed++;
+      else if (declared === parent.sfiId) treeSource.byParentSfiId++;
+    } else roots.push(r);
+    stack.push(r);
+  }
+  for (const r of unranged) {
+    const p = r.unit.parentSfiId;
+    if (p !== null && p !== undefined && byId.has(p) && p !== r.sfiId) {
+      childrenOf.get(p).push(r);
+      treeSource.byParentSfiId++;
+    } else roots.push(r);
+  }
+  for (const list of childrenOf.values()) {
+    list.sort((a, b) => (a.unit.startPosition ?? 0) - (b.unit.startPosition ?? 0) || a.sfiId - b.sfiId);
+  }
+  return { childrenOf, roots, treeSource };
+}
+
+function inferredBase(unit) {
+  if (unit.kind === 'arrow') return 'arrow';
+  if (unit.kind === 'classCtor') return 'ctor';
+  if (unit.kind === 'getter') return 'get';
+  if (unit.kind === 'setter') return 'set';
+  return 'anonymous';
+}
+
+function fileReport() {
+  return {
+    file: null, units: 0, compiledUnits: 0, functionsEmitted: 0, orphans: 0,
+    functionsFailed: 0, functionsClaimedInline: 0, topLevelReturns: 0, emitFailures: [],
+    holes: { total: 0, byWhy: {}, byKind: { expr: 0, stmt: 0, region: 0 } },
+    loops: 0, loopForms: {}, loopIdioms: {}, tries: 0, triesByPrediction: {},
+    finallyShapes: 0, finallyShapeKinds: {}, switches: 0, switchForms: {},
+    ifs: 0, breaks: 0, continues: 0, labels: 0,
+    unstructuredRegions: 0, unstructuredBlocks: 0,
+    droppedStatementsOnRemovedBlocks: 0, droppedStatementBlocks: 0,
+    droppedByRemovedKind: {}, droppedByStatementTag: {},
+    namesReadButNeverWritten: 0, namesDeclared: 0, unwrittenSamples: [],
+    duplicatedValues: 0, unresolvedJoins: 0, unresolvedNames: 0, globalReads: 0,
+    localsRenamed: 0, outerSlotDeclaredLocally: 0, declarations: 0,
+    forcedAsync: 0, forcedGenerator: 0,
+    blocksWithoutStatements: 0, regionKindsNot112: {}, unknownRegionKinds: {},
+    monotonicity: { functions: 0, monotone: 0, inversions: 0 },
+    bytecode: { backEdges: 0, handlerRanges: 0, handlerRangesByPrediction: {}, switchDispatchOpcodes: 0, blocks: 0 },
+  };
+}
+
+function bump(dst, src) {
+  for (const [k, v] of Object.entries(src ?? {})) dst[k] = (dst[k] ?? 0) + v;
+}
+
+/** Fold one function's counters into the file report. */
+function foldReport(file, fn) {
+  file.holes.total += fn.holes.total;
+  bump(file.holes.byWhy, fn.holes.byWhy);
+  bump(file.holes.byKind, fn.holes.byKind);
+  for (const k of ['loops', 'tries', 'finallyShapes', 'switches', 'ifs', 'breaks',
+    'continues', 'labels', 'unstructuredRegions', 'unstructuredBlocks',
+    'unresolvedNames', 'globalReads', 'forcedAsync', 'forcedGenerator',
+    'blocksWithoutStatements', 'loopTestChainsMaterialised', 'loopTestChainStatements',
+    'forInRebuilt', 'forInNotRebuilt', 'catchContextBindings', 'catchContextBindingsAmbiguous',
+    'namesReadTwice',
+    'declarationsWithoutAnInitialiser', 'catchWithoutAParam', 'sharedExprWithNoValue',
+    'loopsWithoutAnInit', 'endlessLoops', 'triesWithoutAFinalizer', 'switchGuardBlocks']) {
+    file[k] = (file[k] ?? 0) + (fn[k] ?? 0);
+  }
+  bump(file.loopForms, fn.loopForms);
+  bump(file.loopIdioms, fn.loopIdioms);
+  bump(file.triesByPrediction, fn.triesByPrediction);
+  bump(file.finallyShapeKinds, fn.finallyShapeKinds);
+  bump(file.switchForms, fn.switchForms);
+  bump(file.regionKindsNot112, fn.regionKindsNot112);
+  bump(file.unknownRegionKinds, fn.unknownRegionKinds);
+}
+
+/**
+ * `violations` counts the SIX invariants of 11.3 only. Check 3c -- a local
+ * name read without ever being written -- is a MEASUREMENT this layer added:
+ * it is how a definition lost upstream becomes visible, and it is reported
+ * separately rather than folded into a number 11.5 says must be zero.
+ */
+function summariseInvariants(perFunction) {
+  const out = {
+    functionsChecked: 0, violations: 0, measurements: 0,
+    byInvariant: {}, byMeasurement: {}, samples: [],
+  };
+  const isMeasurement = (id) => String(id) === '3c';
+  for (const f of perFunction) {
+    if (!f.verification) continue;
+    out.functionsChecked++;
+    for (const c of f.verification.checks) {
+      const key = `${c.id}. ${c.name}`;
+      if (isMeasurement(c.id)) {
+        out.byMeasurement[key] = (out.byMeasurement[key] ?? 0) + c.violations;
+        out.measurements += c.violations;
+        continue;
+      }
+      out.byInvariant[key] = (out.byInvariant[key] ?? 0) + c.violations;
+      out.violations += c.violations;
+      if (c.violations && out.samples.length < 8) {
+        out.samples.push({ sfiId: f.sfiId, name: f.name, invariant: c.id, samples: c.samples });
+      }
+    }
+  }
+  return out;
+}
+
+function fileMetrics(state, r) {
+  const b = r.bytecode;
+  return {
+    m1_loopsPerBackEdge: { numerator: r.loops, denominator: b.backEdges },
+    m2_tryPerHandlerRange: {
+      numerator: r.tries, denominator: b.handlerRanges,
+      byPrediction: r.triesByPrediction, rangesByPrediction: b.handlerRangesByPrediction,
+    },
+    m3_switchPerDispatchOpcode: { numerator: r.switches, denominator: b.switchDispatchOpcodes },
+    m5_freeIdentifiers: { globalReads: r.globalReads, unresolvedNames: r.unresolvedNames },
+    m6_functionsEmittedPerDeserialized: { numerator: r.functionsEmitted, denominator: r.compiledUnits },
+    m7_duplicatedValues: { value: r.duplicatedValues },
+    m9_unresolvedConstants: {
+      value: Object.entries(r.holes.byWhy)
+        .filter(([k]) => k.startsWith('unresolvedConstant'))
+        .reduce((a, [, v]) => a + v, 0),
+    },
+    m10_unstructuredRegions: { value: r.unstructuredRegions },
+  };
+}
+
+const asStatements = (x) => (Array.isArray(x) ? x : (x ? [x] : []));
+
+/**
+ * Emit one unit.
+ *
+ * @param {object} state
+ * @param {object} rec0 the unit record
+ * @param {{role:string, inherited:Set<string>, topLevel?:boolean, classCtor?:boolean}} how
+ * @returns {object[]|object} statements (role 'script') or one node
+ */
+function emitUnit(state, rec0, how) {
+  const { unit } = rec0;
+  if (state.inProgress.has(rec0.sfiId)) {
+    state.report.functionsFailed++;
+    return [noteStmt(`CYCLE: sfi ${rec0.sfiId} is its own ancestor`)];
+  }
+  state.inProgress.add(rec0.sfiId);
+  try {
+    return emitUnitInner(state, rec0, how);
+  } finally {
+    state.inProgress.delete(rec0.sfiId);
+  }
+}
+
+function failedBody(unit, failure) {
+  const why = String(failure?.error ?? 'no recovered/structured pair').replace(/\*\//g, '* /').slice(0, MAX_ERROR);
+  const s = t.throwStatement(t.newExpression(t.identifier('Error'), [
+    t.stringLiteral(`NOT DECOMPILED: ${unit.name || '<anonymous>'} sfi ${unit.sfiId}`),
+  ]));
+  mark(s, `HOLE unitNotRecovered ${why}`);
+  const note = noteStmt(`NOT IN CACHE OR NOT RECOVERED: source [${unit.startPosition ?? '?'},${unit.endPosition ?? '?'})`);
+  return [note, s];
+}
+
+function emitUnitInner(state, rec0, how) {
+  const { unit, rec, sf, failure } = rec0;
+  state.emitted.add(rec0.sfiId);
+  const name = state.emitName.get(rec0.sfiId);
+
+  // ---- a unit with no usable pair still has to appear (11.5). Its children
+  //      do too: a function is not lost because its parent could not be
+  //      recovered, so they are emitted inside the stub body.
+  if (!rec || !sf) {
+    state.report.functionsFailed++;
+    state.report.holes.total++;
+    state.report.holes.byWhy.unitNotRecovered = (state.report.holes.byWhy.unitNotRecovered ?? 0) + 1;
+    state.report.holes.byKind.stmt++;
+    const stubChildren = [];
+    for (const c of state.childrenOf.get(rec0.sfiId) ?? []) {
+      if (state.claimed.has(c.sfiId) || state.emitted.has(c.sfiId)) continue;
+      for (const s of asStatements(emitUnit(state, c, { role: 'declaration', inherited: how.inherited ?? new Set() }))) {
+        stubChildren.push(s);
+      }
+    }
+    const body = t.blockStatement([...stubChildren, ...failedBody(unit, failure)]);
+    state.perFunction.push(perFunctionEntry(unit, null, null, null, { failed: true, error: failure?.error ?? null }));
+    if (how.role === 'script') return body.body;
+    return t.functionDeclaration(t.identifier(name ?? sanitise(unit.name || 'anonymous')),
+      paramsOfUnit(unit), body, !!unit.isGenerator, !!unit.isAsync);
+  }
+
+  const facts = structureFacts(rec.ir.profile ?? sf.ir.profile);
+  const plan = planNames(rec, rec.ir, unit, joinExprs(rec, sf), how.inherited ?? new Set());
+
+  // ---- names for the children, before the body is built: `{e:'fn'}` emits a
+  //      reference to one of them, so the spelling has to exist first.
+  const children = state.childrenOf.get(rec0.sfiId) ?? [];
+  const localTaken = new Set([...plan.declaredNames, ...plan.paramNames]);
+  if (!how.topLevel) for (const g of plan.globalNames ?? []) localTaken.add(g);
+  const childName = new Map();
+  for (const c of children) {
+    let n = state.emitName.get(c.sfiId) ?? sanitise(c.unit.name || 'anonymous');
+    for (let k = 2; localTaken.has(n); k++) n = `${n}$${k}`;
+    localTaken.add(n);
+    childName.set(c.sfiId, n);
+    state.emitName.set(c.sfiId, n);
+  }
+
+  const inlineClaims = [];          // children emitted inline, not as siblings
+  const referenced = new Set();
+
+  const resolveFn = (ctx, e, role) => {
+    const child = state.byId.get(e.sfiId);
+    if (!child) return null;
+    if (role === 'expression') {
+      referenced.add(e.sfiId);
+      const n = childName.get(e.sfiId) ?? state.emitName.get(e.sfiId);
+      if (!n) return null;
+      return t.identifier(n);
+    }
+    // an object literal's method / accessor: inline, so `super` is legal
+    if (state.emitted.has(e.sfiId) || state.claimed.has(e.sfiId)) return null;
+    state.claimed.add(e.sfiId);
+    inlineClaims.push(e.sfiId);
+    const node = emitUnit(state, child, {
+      role: 'expression-inline', inherited: plan.exported, allowSuper: true,
+    });
+    return node;
+  };
+
+  const resolveClass = (ctx, e) => {
+    const child = e.sfiId === null || e.sfiId === undefined ? null : state.byId.get(e.sfiId);
+    const id = e.name ? t.identifier(sanitise(e.name)) : null;
+    const superClass = e.superClass ? expr(ctx, e.superClass) : null;
+    const members = [];
+    if (child && !state.emitted.has(e.sfiId) && !state.claimed.has(e.sfiId)) {
+      state.claimed.add(e.sfiId);
+      inlineClaims.push(e.sfiId);
+      const fn = emitUnit(state, child, { role: 'expression-inline', inherited: plan.exported, allowSuper: true });
+      if (fn && fn.type === 'FunctionExpression') {
+        members.push(t.classMethod('constructor', t.identifier('constructor'), fn.params, fn.body));
+      }
+    }
+    for (const m of e.members ?? []) {
+      const mm = classMember(ctx, m);
+      if (mm) members.push(mm);
+    }
+    const node = t.classExpression(id, superClass, t.classBody(members), []);
+    if (!(e.members ?? []).length) {
+      // docs/RECOVER.md 8.1: the ClassBoilerplate constant is not decoded, so
+      // the member list is empty and that has to be visible, not implied.
+      ctx.countHole('classMembersNotDecoded', 'expr');
+      mark(node, `HOLE classMembersNotDecoded ${e.dynamicArguments ?? 0} dynamic argument(s)`);
+    }
+    return node;
+  };
+
+  const ctx = makeContext({
+    rec, sf, unit, facts, plan, file: state.file, resolveFn, resolveClass, opts: state.opts,
+  });
+  ctx.allowSuper = !!how.allowSuper;
+
+  // ---- the body: T8's tree, T7's statements
+  let body;
+  try {
+    body = regionStatements(ctx, sf.root);
+  } catch (e) {
+    if (state.opts.rethrow) throw e;
+    body = failedBody(unit, { error: `${e.constructor.name}: ${e.message}` });
+    // The marker `failedBody` writes has to be counted on THIS function, not
+    // only on the file: invariant 6 compares the markers in the AST against
+    // the function's own total, and a stub counted file-wide but not here
+    // reported "0 counted, 1 marker" -- the check catching this layer again.
+    ctx.countHole('unitNotRecovered', 'stmt');
+    state.report.functionsFailed++;
+    state.report.emitFailures.push({
+      sfiId: unit.sfiId, name: unit.name ?? null,
+      error: `${e.constructor.name}: ${e.message}`.slice(0, MAX_ERROR),
+      at: String(e.stack ?? '').split('\n')[1]?.trim().slice(0, MAX_FRAME) ?? null,
+    });
+  }
+
+  // ---- docs/STRUCTURE.md 9.5 / 11.3 invariant 3: a `removed` block for which
+  //      T7 still produced statements. Those statements have no slot in the
+  //      tree, so they are not emitted -- and saying so out loud is the whole
+  //      difference between this and dropping them.
+  const dropped = droppedOnRemoved(rec, sf, ctx);
+  if (dropped.total) {
+    state.report.droppedStatementsOnRemovedBlocks += dropped.total;
+    state.report.droppedStatementBlocks += dropped.blocks.length;
+    for (const b of dropped.blocks) {
+      state.report.droppedByRemovedKind[b.kind] = (state.report.droppedByRemovedKind[b.kind] ?? 0) + b.statements;
+      for (const tag of b.tags) {
+        state.report.droppedByStatementTag[tag] = (state.report.droppedByStatementTag[tag] ?? 0) + 1;
+      }
+    }
+    body.push(noteStmt(`DROPPED ${dropped.total} statement(s) of removed block(s) `
+      + dropped.blocks.map((b) => `${b.block}:${b.kind}`).join(' ')));
+  }
+
+  // ---- the prologue: one declaration list, then the nested functions
+  const prologue = declarationPrologue(plan, [...ctx.extraDeclNames]);
+  const nested = [];
+  for (const c of children) {
+    if (state.claimed.has(c.sfiId) || state.emitted.has(c.sfiId)) continue;
+    const node = emitUnit(state, c, { role: 'declaration', inherited: plan.exported, childName });
+    for (const s of asStatements(node)) {
+      if (!referenced.has(c.sfiId)) mark(s, `unreferenced closure (sfi ${c.sfiId})`);
+      nested.push(s);
+    }
+  }
+
+  if (how.role === 'script') {
+    // The top-level unit's body is the FILE's top level, and `return` is a
+    // SyntaxError there. V8 compiles a script to a function that returns the
+    // completion value, so T7's trailing `{s:'return', arg}` is exactly
+    // "evaluate this last"; the closest legal text is the expression on its
+    // own, which V8 then compiles back to the same `Return` of the completion
+    // value. Counted, because it is a change this layer made.
+    for (let i = 0; i < body.length; i++) {
+      const s = body[i];
+      if (!t.isReturnStatement(s)) continue;
+      state.report.topLevelReturns++;
+      body[i] = s.argument
+        ? mark(t.expressionStatement(s.argument), 'script completion value (was `return`)')
+        : mark(t.emptyStatement(), 'script completion value (was a bare `return`)');
+    }
+  }
+
+  const statements = [...prologue, ...nested, ...body];
+  const mono = monotonicity(ctx.positions);
+  for (const p of ctx.positions) state.positions.push(p);
+
+  let node;
+  if (how.role === 'script') {
+    node = null;
+  } else if (unit.kind === 'arrow' && how.role === 'declaration') {
+    const arrow = t.arrowFunctionExpression(paramsOf(plan), t.blockStatement(statements), ctx.isAsync);
+    node = t.variableDeclaration('var', [t.variableDeclarator(t.identifier(name), arrow)]);
+    mark(node, 'arrow function; hoisted to the top of its parent body');
+  } else if (how.role === 'expression-inline') {
+    node = t.functionExpression(null, paramsOf(plan), t.blockStatement(statements), ctx.isGenerator, ctx.isAsync);
+  } else {
+    node = t.functionDeclaration(t.identifier(name), paramsOf(plan), t.blockStatement(statements), ctx.isGenerator, ctx.isAsync);
+  }
+
+  // ---- 11.3, asserted on this function
+  //
+  // The target is this function's own STATEMENTS, not the node it was emitted
+  // as. verify.mjs walks with `walkOwn`, which stops at a nested function so
+  // that one hole in a closure is not counted again in every ancestor -- and
+  // an arrow is emitted as `var f = () => {}`, so the arrow's own body sits
+  // two levels inside its node and `walkOwn` stopped at it. Measured on
+  // `b_357background.jsc`: 54 functions reported "1 hole counted, 0 markers"
+  // while the marker was plainly in the text.
+  const target = t.program(statements);
+  ctx.boundNames = [...plan.paramNames, ...(name ? [name] : [])];
+  const verification = state.opts.verify === false ? null : verifyEmitted({ rec, sf, ast: target, ctx });
+  if (verification) {
+    state.report.duplicatedValues += verification.duplicated.length;
+    state.report.unresolvedJoins += verification.unresolved.length;
+    state.report.namesReadButNeverWritten += verification.readButNeverWritten.length;
+    state.report.namesDeclared += verification.readButNeverWritten.total ?? 0;
+    if (verification.readButNeverWritten.length && state.report.unwrittenSamples.length < 6) {
+      state.report.unwrittenSamples.push({
+        sfiId: unit.sfiId, name: unit.name ?? null,
+        names: verification.readButNeverWritten.slice(0, 6),
+      });
+    }
+  }
+  state.report.localsRenamed += plan.stats.localsRenamed;
+  state.report.outerSlotDeclaredLocally += plan.stats.outerSlotDeclaredLocally;
+  state.report.declarations += plan.stats.declarations;
+  state.report.monotonicity.functions++;
+  if (mono.monotone) state.report.monotonicity.monotone++;
+  state.report.monotonicity.inversions += mono.inversions;
+  foldReport(state.report, ctx.report);
+  const ir = rec.ir;
+  state.report.bytecode.backEdges += ir.loopInfo?.backEdges?.length ?? 0;
+  state.report.bytecode.handlerRanges += ir.handlers?.length ?? 0;
+  state.report.bytecode.blocks += ir.blocks.length;
+  for (const h of ir.handlers ?? []) {
+    const k = h.predictionName ?? String(h.prediction);
+    state.report.bytecode.handlerRangesByPrediction[k] = (state.report.bytecode.handlerRangesByPrediction[k] ?? 0) + 1;
+  }
+  state.report.bytecode.switchDispatchOpcodes += countSwitchDispatch(ir, facts);
+
+  state.perFunction.push(perFunctionEntry(unit, ctx, verification, mono, {
+    name: name ?? '<script>', role: how.role, inlineClaims,
+    code: null, statements: statements.length,
+    patterns: patternSummary(rec),
+  }));
+  return how.role === 'script' ? statements : node;
+}
+
+function countSwitchDispatch(ir, facts) {
+  let n = 0;
+  for (const b of ir.blocks) {
+    const ins = b.instructions[b.instructions.length - 1];
+    if (!ins) continue;
+    if (facts.isSwitch(ins.opcodeValue)) n++;
+  }
+  return n;
+}
+
+function droppedOnRemoved(rec, sf, ctx) {
+  const kinds = [
+    ...(sf.removed.generatorDispatchers ?? []).filter((d) => d.blockRemoved).map((d) => ({ block: d.block, kind: 'generatorDispatchers' })),
+    ...(sf.removed.asyncHandlerBlocks ?? []).map((b) => ({ block: b, kind: 'asyncHandlerBlocks' })),
+    ...(sf.removed.loopTestBlocks ?? []).map((x) => ({ block: x.block, kind: 'loopTestBlocks' })),
+  ];
+  const blocks = [];
+  let total = 0;
+  for (const k of kinds) {
+    const list = rec.stmts.get(k.block);
+    if (!list || !list.length) continue;
+    if (ctx && ctx.blockEmitCounts.has(k.block)) continue;    // emitted anyway
+    // a declarator with no initialiser emits nothing, so nothing is lost
+    const effective = list.filter((s) => s.s !== 'decl'
+      || (s.decls ?? []).some((d) => d.init !== null && d.init !== undefined));
+    if (!effective.length) continue;
+    blocks.push({ ...k, statements: effective.length, tags: effective.map((s) => s.s) });
+    total += effective.length;
+  }
+  return { total, blocks };
+}
+
+function paramsOf(plan) {
+  const out = plan.params.map((p) => t.identifier(p.name));
+  if (plan.restName) out.push(t.restElement(t.identifier(plan.restName)));
+  return out;
+}
+
+function paramsOfUnit(unit) {
+  const out = [];
+  for (let i = 1; i < (unit.parameterCount ?? 1); i++) out.push(t.identifier(`p${i - 1}`));
+  return out;
+}
+
+function classMember(ctx, m) {
+  if (!m || !m.kind) return null;
+  const key = m.computed || (m.key && typeof m.key === 'object')
+    ? expr(ctx, m.key) : t.identifier(sanitise(String(m.key ?? 'member')));
+  if (m.value?.e === 'fn') {
+    const fn = ctx.functionLike(m.value, 'method');
+    if (fn && fn.type === 'FunctionExpression') {
+      const kind = m.kind === 'get' || m.kind === 'set' ? m.kind : 'method';
+      return t.classMethod(kind, key, fn.params, fn.body, !!m.computed, !!m.static);
+    }
+  }
+  return t.classProperty(key, m.value ? expr(ctx, m.value) : null, null, null, !!m.computed, !!m.static);
+}
+
+/** T7's idiom claims, as 11.4's `perFunction[].patterns`. */
+function patternSummary(rec) {
+  const byKind = {};
+  for (const p of rec.patterns ?? []) {
+    const k = `${p.kind}:${p.confidence}`;
+    byKind[k] = (byKind[k] ?? 0) + 1;
+  }
+  return byKind;
+}
+
+function perFunctionEntry(unit, ctx, verification, mono, extra) {
+  const rep = ctx?.report ?? null;
+  return {
+    sfiId: unit.sfiId,
+    bytecodeId: unit.bytecodeId ?? null,
+    name: extra.name ?? unit.name ?? null,
+    sourceName: unit.name ?? null,
+    kind: unit.kind ?? null,
+    isAsync: !!unit.isAsync,
+    isGenerator: !!unit.isGenerator,
+    parentSfiId: unit.parentSfiId ?? null,
+    startPosition: unit.startPosition ?? null,
+    endPosition: unit.endPosition ?? null,
+    code: extra.code ?? null,
+    statements: extra.statements ?? 0,
+    role: extra.role ?? null,
+    failed: !!extra.failed,
+    error: extra.error ?? null,
+    holes: rep ? rep.holes.total : 0,
+    holesByWhy: rep ? rep.holes.byWhy : {},
+    unstructuredRegions: rep ? rep.unstructuredRegions : 0,
+    duplicatedValues: verification ? verification.duplicated.length : 0,
+    unresolvedNames: rep ? rep.unresolvedNames : 0,
+    unresolvedJoins: verification ? verification.unresolved.length : 0,
+    patterns: extra.patterns ?? null,
+    monotonicity: mono ?? null,
+    verification: verification ? { checks: verification.checks, violations: verification.violations } : null,
+  };
+}
+
+export { regionStatements } from './region.mjs';
+export default { emit, EmitError };

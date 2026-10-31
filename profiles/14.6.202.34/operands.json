@@ -1,0 +1,275 @@
+{
+  "v8Version": "14.6.202.34",
+  "operandTypes": {
+    "kNone": {
+      "typeInfo": "kNone",
+      "baseSize": 0,
+      "scalable": false,
+      "signed": true
+    },
+    "kFlag8": {
+      "typeInfo": "kFixedUnsignedByte",
+      "baseSize": 1,
+      "scalable": false,
+      "signed": false
+    },
+    "kFlag16": {
+      "typeInfo": "kFixedUnsignedShort",
+      "baseSize": 2,
+      "scalable": false,
+      "signed": false
+    },
+    "kIntrinsicId": {
+      "typeInfo": "kFixedUnsignedByte",
+      "baseSize": 1,
+      "scalable": false,
+      "signed": false
+    },
+    "kRuntimeId": {
+      "typeInfo": "kFixedUnsignedShort",
+      "baseSize": 2,
+      "scalable": false,
+      "signed": false
+    },
+    "kNativeContextIndex": {
+      "typeInfo": "kFixedUnsignedByte",
+      "baseSize": 1,
+      "scalable": false,
+      "signed": false
+    },
+    "kAbortReason": {
+      "typeInfo": "kFixedUnsignedByte",
+      "baseSize": 1,
+      "scalable": false,
+      "signed": false
+    },
+    "kEmbeddedFeedback": {
+      "typeInfo": "kFixedUnsignedShort",
+      "baseSize": 2,
+      "scalable": false,
+      "signed": false
+    },
+    "kConstantPoolIndex": {
+      "typeInfo": "kScalableUnsignedByte",
+      "baseSize": 1,
+      "scalable": true,
+      "signed": false
+    },
+    "kFeedbackSlot": {
+      "typeInfo": "kScalableUnsignedByte",
+      "baseSize": 1,
+      "scalable": true,
+      "signed": false
+    },
+    "kContextSlot": {
+      "typeInfo": "kScalableUnsignedByte",
+      "baseSize": 1,
+      "scalable": true,
+      "signed": false
+    },
+    "kCoverageSlot": {
+      "typeInfo": "kScalableUnsignedByte",
+      "baseSize": 1,
+      "scalable": true,
+      "signed": false
+    },
+    "kUImm": {
+      "typeInfo": "kScalableUnsignedByte",
+      "baseSize": 1,
+      "scalable": true,
+      "signed": false
+    },
+    "kRegCount": {
+      "typeInfo": "kScalableUnsignedByte",
+      "baseSize": 1,
+      "scalable": true,
+      "signed": false
+    },
+    "kImm": {
+      "typeInfo": "kScalableSignedByte",
+      "baseSize": 1,
+      "scalable": true,
+      "signed": true
+    },
+    "kReg": {
+      "typeInfo": "kScalableSignedByte",
+      "baseSize": 1,
+      "scalable": true,
+      "signed": true
+    },
+    "kRegList": {
+      "typeInfo": "kScalableSignedByte",
+      "baseSize": 1,
+      "scalable": true,
+      "signed": true
+    },
+    "kRegPair": {
+      "typeInfo": "kScalableSignedByte",
+      "baseSize": 1,
+      "scalable": true,
+      "signed": true
+    },
+    "kRegOut": {
+      "typeInfo": "kScalableSignedByte",
+      "baseSize": 1,
+      "scalable": true,
+      "signed": true
+    },
+    "kRegOutList": {
+      "typeInfo": "kScalableSignedByte",
+      "baseSize": 1,
+      "scalable": true,
+      "signed": true
+    },
+    "kRegOutPair": {
+      "typeInfo": "kScalableSignedByte",
+      "baseSize": 1,
+      "scalable": true,
+      "signed": true
+    },
+    "kRegOutTriple": {
+      "typeInfo": "kScalableSignedByte",
+      "baseSize": 1,
+      "scalable": true,
+      "signed": true
+    },
+    "kRegInOut": {
+      "typeInfo": "kScalableSignedByte",
+      "baseSize": 1,
+      "scalable": true,
+      "signed": true
+    }
+  },
+  "operandTypeOrder": [
+    "kNone",
+    "kFlag8",
+    "kFlag16",
+    "kIntrinsicId",
+    "kRuntimeId",
+    "kNativeContextIndex",
+    "kAbortReason",
+    "kEmbeddedFeedback",
+    "kConstantPoolIndex",
+    "kFeedbackSlot",
+    "kContextSlot",
+    "kCoverageSlot",
+    "kUImm",
+    "kRegCount",
+    "kImm",
+    "kReg",
+    "kRegList",
+    "kRegPair",
+    "kRegOut",
+    "kRegOutList",
+    "kRegOutPair",
+    "kRegOutTriple",
+    "kRegInOut"
+  ],
+  "operandTypeInfoClasses": {
+    "kNone": {
+      "scalable": false,
+      "unsigned": false,
+      "baseSize": 0
+    },
+    "kScalableSignedByte": {
+      "scalable": true,
+      "unsigned": false,
+      "baseSize": 1
+    },
+    "kScalableUnsignedByte": {
+      "scalable": true,
+      "unsigned": true,
+      "baseSize": 1
+    },
+    "kFixedUnsignedByte": {
+      "scalable": false,
+      "unsigned": true,
+      "baseSize": 1
+    },
+    "kFixedUnsignedShort": {
+      "scalable": false,
+      "unsigned": true,
+      "baseSize": 2
+    }
+  },
+  "operandSizes": {
+    "kNone": 0,
+    "kByte": 1,
+    "kShort": 2,
+    "kQuad": 4,
+    "kLast": 4
+  },
+  "operandScales": {
+    "kSingle": 1,
+    "kDouble": 2,
+    "kQuadruple": 4
+  },
+  "registerOperandTypes": [
+    "kReg",
+    "kRegList",
+    "kRegPair",
+    "kRegOut",
+    "kRegOutList",
+    "kRegOutPair",
+    "kRegOutTriple",
+    "kRegInOut"
+  ],
+  "registerInputOperandTypes": [
+    "kReg",
+    "kRegList",
+    "kRegPair"
+  ],
+  "registerOutputOperandTypes": [
+    "kRegOut",
+    "kRegOutList",
+    "kRegOutPair",
+    "kRegOutTriple"
+  ],
+  "subLists": {
+    "REGISTER_INPUT_OPERAND_TYPE_LIST": [
+      "kReg",
+      "kRegList",
+      "kRegPair"
+    ],
+    "REGISTER_OUTPUT_OPERAND_TYPE_LIST": [
+      "kRegOut",
+      "kRegOutList",
+      "kRegOutPair",
+      "kRegOutTriple"
+    ],
+    "REGISTER_OPERAND_TYPE_LIST": [
+      "kReg",
+      "kRegList",
+      "kRegPair",
+      "kRegOut",
+      "kRegOutList",
+      "kRegOutPair",
+      "kRegOutTriple",
+      "kRegInOut"
+    ],
+    "UNSIGNED_FIXED_SCALAR_OPERAND_TYPE_LIST": [
+      "kFlag8",
+      "kFlag16",
+      "kIntrinsicId",
+      "kRuntimeId",
+      "kNativeContextIndex",
+      "kAbortReason",
+      "kEmbeddedFeedback"
+    ],
+    "UNSIGNED_SCALABLE_SCALAR_OPERAND_TYPE_LIST": [
+      "kConstantPoolIndex",
+      "kFeedbackSlot",
+      "kContextSlot",
+      "kCoverageSlot",
+      "kUImm",
+      "kRegCount"
+    ],
+    "SIGNED_SCALABLE_SCALAR_OPERAND_TYPE_LIST": [
+      "kImm"
+    ],
+    "INVALID_OPERAND_TYPE_LIST": [
+      "kNone"
+    ]
+  },
+  "sizeRule": "size(type, scale) = scalable ? baseSize * scale : baseSize"
+}

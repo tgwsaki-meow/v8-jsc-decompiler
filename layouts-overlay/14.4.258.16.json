@@ -1,0 +1,4386 @@
+{
+ "$schema": "layouts-overlay.v1",
+ "v8Version": "14.4.258.16",
+ "generator": {
+  "name": "layoutpatch",
+  "version": "1.0.0"
+ },
+ "generatedAt": "2026-10-30T03:50:06.963Z",
+ "why": "an independent second derivation of the build facts in profiles/<tag>/, from the same pinned V8 sources, kept as a cross-check oracle. Nothing reads this file: since the profilegen back-port (ARCHITECTURE.md 9.9) src/cache/overlay.mjs builds the same view out of the profile itself.",
+ "profile": {
+  "dir": "profiles\\14.4.258.16",
+  "taggedSize": 4,
+  "variant": "intl+wasm"
+ },
+ "crossChecks": [
+  {
+   "what": "codeCache.magicBase",
+   "agrees": true,
+   "mine": 3235774464,
+   "profile": 3235774464
+  },
+  {
+   "what": "codeCache.sourceHash",
+   "agrees": true,
+   "mine": {
+    "length": {
+     "offset": 0,
+     "width": 29
+    },
+    "hasWrappedArguments": {
+     "offset": 29,
+     "width": 1
+    },
+    "isModule": {
+     "offset": 30,
+     "width": 1
+    }
+   },
+   "profile": {
+    "length": {
+     "offset": 0,
+     "width": 29
+    },
+    "hasWrappedArguments": {
+     "offset": 29,
+     "width": 1
+    },
+    "isModule": {
+     "offset": 30,
+     "width": 1
+    }
+   }
+  },
+  {
+   "what": "codeCache.checksum.algorithm",
+   "agrees": true,
+   "mine": "adler32",
+   "profile": "adler32"
+  },
+  {
+   "what": "snapshotSpaces",
+   "agrees": true,
+   "mine": {
+    "kReadOnlyHeap": 0,
+    "kOld": 1,
+    "kCode": 2,
+    "kTrusted": 3
+   },
+   "profile": {
+    "kReadOnlyHeap": 0,
+    "kOld": 1,
+    "kCode": 2,
+    "kTrusted": 3
+   }
+  },
+  {
+   "what": "functionKindGroups",
+   "agrees": true,
+   "mine": {
+    "IsArrowFunction": [
+     [
+      11,
+      12
+     ]
+    ],
+    "IsModule": [
+     [
+      1,
+      2
+     ]
+    ],
+    "IsModuleWithTopLevelAwait": [
+     [
+      2,
+      2
+     ]
+    ],
+    "IsAsyncGeneratorFunction": [
+     [
+      16,
+      18
+     ]
+    ],
+    "IsGeneratorFunction": [
+     [
+      16,
+      21
+     ]
+    ],
+    "IsAsyncFunction": [
+     [
+      12,
+      18
+     ]
+    ],
+    "IsConciseMethod": [
+     [
+      14,
+      17
+     ],
+     [
+      20,
+      27
+     ]
+    ],
+    "IsStrictFunctionWithoutPrototype": [
+     [
+      7,
+      12
+     ],
+     [
+      14,
+      17
+     ],
+     [
+      20,
+      27
+     ]
+    ],
+    "IsGetterFunction": [
+     [
+      7,
+      8
+     ]
+    ],
+    "IsSetterFunction": [
+     [
+      9,
+      10
+     ]
+    ],
+    "IsAccessorFunction": [
+     [
+      7,
+      10
+     ]
+    ],
+    "IsDefaultConstructor": [
+     [
+      4,
+      5
+     ]
+    ],
+    "IsBaseConstructor": [
+     [
+      3,
+      4
+     ]
+    ],
+    "IsDerivedConstructor": [
+     [
+      5,
+      6
+     ]
+    ],
+    "IsClassConstructor": [
+     [
+      3,
+      6
+     ]
+    ],
+    "IsClassInitializerFunction": [
+     [
+      24,
+      27
+     ]
+    ],
+    "IsClassInstanceInitializerFunction": [
+     [
+      24,
+      25
+     ]
+    ],
+    "IsClassStaticInitializerFunction": [
+     [
+      26,
+      27
+     ]
+    ],
+    "IsConstructable": [
+     [
+      0,
+      6
+     ]
+    ]
+   },
+   "profile": {
+    "IsArrowFunction": [
+     [
+      11,
+      12
+     ]
+    ],
+    "IsModule": [
+     [
+      1,
+      2
+     ]
+    ],
+    "IsModuleWithTopLevelAwait": [
+     [
+      2,
+      2
+     ]
+    ],
+    "IsAsyncGeneratorFunction": [
+     [
+      16,
+      18
+     ]
+    ],
+    "IsGeneratorFunction": [
+     [
+      16,
+      21
+     ]
+    ],
+    "IsAsyncFunction": [
+     [
+      12,
+      18
+     ]
+    ],
+    "IsConciseMethod": [
+     [
+      14,
+      17
+     ],
+     [
+      20,
+      27
+     ]
+    ],
+    "IsStrictFunctionWithoutPrototype": [
+     [
+      7,
+      12
+     ],
+     [
+      14,
+      17
+     ],
+     [
+      20,
+      27
+     ]
+    ],
+    "IsGetterFunction": [
+     [
+      7,
+      8
+     ]
+    ],
+    "IsSetterFunction": [
+     [
+      9,
+      10
+     ]
+    ],
+    "IsAccessorFunction": [
+     [
+      7,
+      10
+     ]
+    ],
+    "IsDefaultConstructor": [
+     [
+      4,
+      5
+     ]
+    ],
+    "IsBaseConstructor": [
+     [
+      3,
+      4
+     ]
+    ],
+    "IsDerivedConstructor": [
+     [
+      5,
+      6
+     ]
+    ],
+    "IsClassConstructor": [
+     [
+      3,
+      6
+     ]
+    ],
+    "IsClassInitializerFunction": [
+     [
+      24,
+      27
+     ]
+    ],
+    "IsClassInstanceInitializerFunction": [
+     [
+      24,
+      25
+     ]
+    ],
+    "IsClassStaticInitializerFunction": [
+     [
+      26,
+      27
+     ]
+    ],
+    "IsConstructable": [
+     [
+      0,
+      6
+     ]
+    ]
+   }
+  },
+  {
+   "what": "cppLayouts.BigIntBase",
+   "agrees": false,
+   "mine": {
+    "source": "src/objects/bigint.h",
+    "parent": "PrimitiveHeapObject",
+    "bitfieldOffset": 4,
+    "bitfieldSize": 4,
+    "digitsOffset": 8,
+    "digitsAlignment": 4,
+    "digitsPadding": 0,
+    "digitSize": 8,
+    "digitType": "uintptr_t",
+    "fields": {
+     "sign": {
+      "offset": 0,
+      "width": 1
+     },
+     "length": {
+      "offset": 1,
+      "width": 30
+     }
+    },
+    "note": "raw_digits is an UnalignedValueMember<digit_t> flexible array; UnalignedValueMember is alignas(alignof(Tagged_t)) (src/objects/tagged-field.h), so the array starts at the next kTaggedSize boundary after bitfield_"
+   },
+   "profile": {
+    "source": "src/objects/bigint.h",
+    "parent": "PrimitiveHeapObject",
+    "bitfieldOffset": 4,
+    "bitfieldSize": 4,
+    "digitsOffset": 8,
+    "digitsAlignment": 4,
+    "digitsPadding": 0,
+    "digitSize": 8,
+    "digitType": "uintptr_t",
+    "fields": {
+     "sign": {
+      "offset": 0,
+      "width": 1
+     },
+     "length": {
+      "offset": 1,
+      "width": 30
+     }
+    },
+    "note": "raw_digits is a FLEXIBLE_ARRAY_MEMBER of UnalignedValueMember<digit_t>, which is alignas(alignof(Tagged_t)) (src/objects/tagged-field.h), so the array starts at the next kTaggedSize boundary after bitfield_"
+   }
+  },
+  {
+   "what": "cppLayouts.HashTableBase",
+   "agrees": false,
+   "mine": {
+    "numberOfElementsIndex": 0,
+    "numberOfDeletedElementsIndex": 1,
+    "capacityIndex": 2,
+    "prefixStartIndex": 3,
+    "source": "src/objects/hash-table.h",
+    "note": "entries start at prefixStartIndex + Shape::kPrefixSize; Shape constants live with each table and are not extracted here"
+   },
+   "profile": {
+    "source": "src/objects/hash-table.h",
+    "numberOfElementsIndex": 0,
+    "numberOfDeletedElementsIndex": 1,
+    "capacityIndex": 2,
+    "prefixStartIndex": 3,
+    "note": "entries start at prefixStartIndex + Shape::kPrefixSize; the Shape constants live with each table class in C++ and are not extracted here"
+   }
+  },
+  {
+   "what": "cppLayouts.SourcePosition",
+   "agrees": false,
+   "mine": {
+    "source": "src/codegen/source-position.h",
+    "fields": {
+     "isExternal": {
+      "type": "bool",
+      "offset": 0,
+      "width": 1
+     },
+     "externalLine": {
+      "type": "int",
+      "offset": 1,
+      "width": 20
+     },
+     "externalFileId": {
+      "type": "int",
+      "offset": 21,
+      "width": 10
+     },
+     "scriptOffset": {
+      "type": "int",
+      "offset": 1,
+      "width": 30
+     },
+     "inliningId": {
+      "type": "int",
+      "offset": 31,
+      "width": 16
+     }
+    },
+    "scriptOffsetBias": 1,
+    "inliningIdBias": 1,
+    "kNoSourcePosition": -1,
+    "note": "scriptOffset = ScriptOffsetField::decode(raw) - scriptOffsetBias, valid only when isExternal is 0"
+   },
+   "profile": {
+    "source": "src/codegen/source-position.h",
+    "fields": {
+     "isExternal": {
+      "type": "bool",
+      "offset": 0,
+      "width": 1
+     },
+     "externalLine": {
+      "type": "int",
+      "offset": 1,
+      "width": 20
+     },
+     "externalFileId": {
+      "type": "int",
+      "offset": 21,
+      "width": 10
+     },
+     "scriptOffset": {
+      "type": "int",
+      "offset": 1,
+      "width": 30
+     },
+     "inliningId": {
+      "type": "int",
+      "offset": 31,
+      "width": 16
+     }
+    },
+    "scriptOffsetBias": 1,
+    "inliningIdBias": 1,
+    "kNoSourcePosition": -1,
+    "note": "scriptOffset = ScriptOffsetField::decode(raw) - scriptOffsetBias, valid only when isExternal is 0; the bias exists so that kNoSourcePosition (-1) stores as 0"
+   }
+  }
+ ],
+ "classes": {
+  "ScopeInfo": {
+   "name": "ScopeInfo",
+   "source": "src/objects/scope-info.tq",
+   "parent": "HeapObject",
+   "parentSize": 4,
+   "taggedSize": 4,
+   "generatesConsts": {
+    "kMaxInlinedLocalNamesSize": "kScopeInfoMaxInlinedLocalNamesSize",
+    "kDontAdaptArgumentsSentinel": "kDontAdaptArgumentsSentinel",
+    "kMaxCachedArrayIndexLength": "Name::kMaxCachedArrayIndexLength",
+    "kMaxArrayIndexSize": "Name::kMaxArrayIndexSize",
+    "kNofHashBitFields": "Name::HashFieldTypeBits::kSize",
+    "kArrayIndexValueBits": "Name::kArrayIndexValueBits",
+    "kDoesNotContainCachedArrayIndexMask": "Name::kDoesNotContainCachedArrayIndexMask"
+   },
+   "fields": [
+    {
+     "name": "flags",
+     "type": "ScopeFlags",
+     "kind": "bitfield",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 4
+    },
+    {
+     "name": "optional_padding",
+     "type": "uint32",
+     "kind": "int",
+     "size": 4,
+     "sizeHow": "primitive",
+     "conditional": false,
+     "indexed": false,
+     "present": false,
+     "gatedOn": {
+      "sense": "if",
+      "flag": "TAGGED_SIZE_8_BYTES"
+     },
+     "offset": null
+    },
+    {
+     "name": "optional_padding",
+     "type": "void",
+     "kind": "void",
+     "size": 0,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": {
+      "sense": "ifnot",
+      "flag": "TAGGED_SIZE_8_BYTES"
+     },
+     "offset": 8
+    },
+    {
+     "name": "parameter_count",
+     "type": "Smi",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 8
+    },
+    {
+     "name": "context_local_count",
+     "type": "Smi",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 12
+    },
+    {
+     "name": "position_info",
+     "type": "PositionInfo",
+     "kind": "struct",
+     "size": 8,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 16
+    },
+    {
+     "name": "module_variable_count",
+     "type": "Smi",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": true,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "condition": {
+      "expr": "flags.scope_type == ScopeType::MODULE_SCOPE",
+      "ast": {
+       "kind": "binary",
+       "op": "==",
+       "left": {
+        "kind": "member",
+        "object": {
+         "kind": "name",
+         "name": "flags"
+        },
+        "field": "scope_type"
+       },
+       "right": {
+        "kind": "enumRef",
+        "enum": "ScopeType",
+        "member": "MODULE_SCOPE"
+       }
+      }
+     },
+     "offset": 24
+    },
+    {
+     "name": "context_local_names",
+     "type": "String",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": true,
+     "present": true,
+     "gatedOn": null,
+     "count": {
+      "expr": "Convert<intptr>(context_local_count) < kMaxInlinedLocalNamesSize ? context_local_count : 0",
+      "ast": {
+       "kind": "ternary",
+       "cond": {
+        "kind": "binary",
+        "op": "<",
+        "left": {
+         "kind": "name",
+         "name": "context_local_count"
+        },
+        "right": {
+         "kind": "name",
+         "name": "kMaxInlinedLocalNamesSize"
+        }
+       },
+       "then": {
+        "kind": "name",
+        "name": "context_local_count"
+       },
+       "else": {
+        "kind": "literal",
+        "value": 0
+       }
+      }
+     },
+     "elementSize": 4,
+     "offset": null
+    },
+    {
+     "name": "context_local_names_hashtable",
+     "type": "NameToIndexHashTable",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": true,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "condition": {
+      "expr": "kMaxInlinedLocalNamesSize <= Convert<intptr>(context_local_count)",
+      "ast": {
+       "kind": "binary",
+       "op": "<=",
+       "left": {
+        "kind": "name",
+        "name": "kMaxInlinedLocalNamesSize"
+       },
+       "right": {
+        "kind": "name",
+        "name": "context_local_count"
+       }
+      }
+     },
+     "offset": null
+    },
+    {
+     "name": "context_local_infos",
+     "type": "SmiTagged<VariableProperties>",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": true,
+     "present": true,
+     "gatedOn": null,
+     "count": {
+      "expr": "context_local_count",
+      "ast": {
+       "kind": "name",
+       "name": "context_local_count"
+      }
+     },
+     "elementSize": 4,
+     "offset": null
+    },
+    {
+     "name": "saved_class_variable_info",
+     "type": "Smi|Name",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": true,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "condition": {
+      "expr": "flags.has_saved_class_variable",
+      "ast": {
+       "kind": "member",
+       "object": {
+        "kind": "name",
+        "name": "flags"
+       },
+       "field": "has_saved_class_variable"
+      }
+     },
+     "offset": null
+    },
+    {
+     "name": "function_variable_info",
+     "type": "FunctionVariableInfo",
+     "kind": "struct",
+     "size": 8,
+     "sizeHow": "observed-in-profile",
+     "conditional": true,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "condition": {
+      "expr": "flags.function_variable != FromConstexpr<VariableAllocationInfo>(VariableAllocationInfo::NONE)",
+      "ast": {
+       "kind": "binary",
+       "op": "!=",
+       "left": {
+        "kind": "member",
+        "object": {
+         "kind": "name",
+         "name": "flags"
+        },
+        "field": "function_variable"
+       },
+       "right": {
+        "kind": "enumRef",
+        "enum": "VariableAllocationInfo",
+        "member": "NONE"
+       }
+      }
+     },
+     "offset": null
+    },
+    {
+     "name": "inferred_function_name",
+     "type": "String|Undefined",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": true,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "condition": {
+      "expr": "flags.has_inferred_function_name",
+      "ast": {
+       "kind": "member",
+       "object": {
+        "kind": "name",
+        "name": "flags"
+       },
+       "field": "has_inferred_function_name"
+      }
+     },
+     "offset": null
+    },
+    {
+     "name": "outer_scope_info",
+     "type": "ScopeInfo",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": true,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "condition": {
+      "expr": "flags.has_outer_scope_info",
+      "ast": {
+       "kind": "member",
+       "object": {
+        "kind": "name",
+        "name": "flags"
+       },
+       "field": "has_outer_scope_info"
+      }
+     },
+     "offset": null
+    },
+    {
+     "name": "module_info",
+     "type": "SourceTextModuleInfo",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": true,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "condition": {
+      "expr": "flags.scope_type == ScopeType::MODULE_SCOPE",
+      "ast": {
+       "kind": "binary",
+       "op": "==",
+       "left": {
+        "kind": "member",
+        "object": {
+         "kind": "name",
+         "name": "flags"
+        },
+        "field": "scope_type"
+       },
+       "right": {
+        "kind": "enumRef",
+        "enum": "ScopeType",
+        "member": "MODULE_SCOPE"
+       }
+      }
+     },
+     "offset": null
+    },
+    {
+     "name": "module_variables",
+     "type": "ModuleVariable",
+     "kind": "struct",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": true,
+     "present": true,
+     "gatedOn": null,
+     "count": {
+      "expr": "flags.scope_type == ScopeType::MODULE_SCOPE ? module_variable_count : 0",
+      "ast": {
+       "kind": "ternary",
+       "cond": {
+        "kind": "binary",
+        "op": "==",
+        "left": {
+         "kind": "member",
+         "object": {
+          "kind": "name",
+          "name": "flags"
+         },
+         "field": "scope_type"
+        },
+        "right": {
+         "kind": "enumRef",
+         "enum": "ScopeType",
+         "member": "MODULE_SCOPE"
+        }
+       },
+       "then": {
+        "kind": "name",
+        "name": "module_variable_count"
+       },
+       "else": {
+        "kind": "literal",
+        "value": 0
+       }
+      }
+     },
+     "elementSize": 12,
+     "offset": null
+    },
+    {
+     "name": "dependent_code",
+     "type": "DependentCode",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": true,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "condition": {
+      "expr": "flags.sloppy_eval_can_extend_vars",
+      "ast": {
+       "kind": "member",
+       "object": {
+        "kind": "name",
+        "name": "flags"
+       },
+       "field": "sloppy_eval_can_extend_vars"
+      }
+     },
+     "offset": null
+    },
+    {
+     "name": "unused_parameter_bits",
+     "type": "Smi",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": true,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "condition": {
+      "expr": "flags.scope_type == ScopeType::FUNCTION_SCOPE",
+      "ast": {
+       "kind": "binary",
+       "op": "==",
+       "left": {
+        "kind": "member",
+        "object": {
+         "kind": "name",
+         "name": "flags"
+        },
+        "field": "scope_type"
+       },
+       "right": {
+        "kind": "enumRef",
+        "enum": "ScopeType",
+        "member": "FUNCTION_SCOPE"
+       }
+      }
+     },
+     "offset": null
+    }
+   ],
+   "crossCheck": {
+    "issues": [],
+    "added": [],
+    "compared": 17,
+    "profileFieldCount": 17,
+    "overlayFieldCount": 18
+   }
+  },
+  "PreparseData": {
+   "name": "PreparseData",
+   "source": "src/objects/shared-function-info.tq",
+   "parent": "HeapObject",
+   "parentSize": 4,
+   "taggedSize": 4,
+   "generatesConsts": {
+    "kMaxInlinedLocalNamesSize": "kScopeInfoMaxInlinedLocalNamesSize",
+    "kDontAdaptArgumentsSentinel": "kDontAdaptArgumentsSentinel",
+    "kMaxCachedArrayIndexLength": "Name::kMaxCachedArrayIndexLength",
+    "kMaxArrayIndexSize": "Name::kMaxArrayIndexSize",
+    "kNofHashBitFields": "Name::HashFieldTypeBits::kSize",
+    "kArrayIndexValueBits": "Name::kArrayIndexValueBits",
+    "kDoesNotContainCachedArrayIndexMask": "Name::kDoesNotContainCachedArrayIndexMask"
+   },
+   "fields": [
+    {
+     "name": "data_length",
+     "type": "int32",
+     "kind": "int",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 4
+    },
+    {
+     "name": "children_length",
+     "type": "int32",
+     "kind": "int",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 8
+    }
+   ],
+   "crossCheck": {
+    "issues": [],
+    "added": [],
+    "compared": 2,
+    "profileFieldCount": 2,
+    "overlayFieldCount": 2
+   }
+  },
+  "SharedFunctionInfo": {
+   "name": "SharedFunctionInfo",
+   "source": "src/objects/shared-function-info.tq",
+   "parent": "HeapObject",
+   "parentSize": 4,
+   "taggedSize": 4,
+   "generatesConsts": {
+    "kMaxInlinedLocalNamesSize": "kScopeInfoMaxInlinedLocalNamesSize",
+    "kDontAdaptArgumentsSentinel": "kDontAdaptArgumentsSentinel",
+    "kMaxCachedArrayIndexLength": "Name::kMaxCachedArrayIndexLength",
+    "kMaxArrayIndexSize": "Name::kMaxArrayIndexSize",
+    "kNofHashBitFields": "Name::HashFieldTypeBits::kSize",
+    "kArrayIndexValueBits": "Name::kArrayIndexValueBits",
+    "kDoesNotContainCachedArrayIndexMask": "Name::kDoesNotContainCachedArrayIndexMask"
+   },
+   "fields": [
+    {
+     "name": "trusted_function_data",
+     "type": "TrustedPointer<ExposedTrustedObject>",
+     "kind": "trusted",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 4
+    },
+    {
+     "name": "untrusted_function_data",
+     "type": "Object",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 8
+    },
+    {
+     "name": "name_or_scope_info",
+     "type": "String|NoSharedNameSentinel|ScopeInfo",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 12
+    },
+    {
+     "name": "outer_scope_info_or_feedback_metadata",
+     "type": "ScopeInfo|FeedbackMetadata|TheHole",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 16
+    },
+    {
+     "name": "script",
+     "type": "Script|Undefined",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 20
+    },
+    {
+     "name": "length",
+     "type": "uint16",
+     "kind": "int",
+     "size": 2,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 24
+    },
+    {
+     "name": "formal_parameter_count",
+     "type": "uint16",
+     "kind": "int",
+     "size": 2,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 26
+    },
+    {
+     "name": "function_token_offset",
+     "type": "uint16",
+     "kind": "int",
+     "size": 2,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 28
+    },
+    {
+     "name": "expected_nof_properties",
+     "type": "uint8",
+     "kind": "int",
+     "size": 1,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 30
+    },
+    {
+     "name": "flags2",
+     "type": "SharedFunctionInfoFlags2",
+     "kind": "bitfield",
+     "size": 1,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 31
+    },
+    {
+     "name": "flags",
+     "type": "SharedFunctionInfoFlags",
+     "kind": "bitfield",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 32
+    },
+    {
+     "name": "function_literal_id",
+     "type": "int32",
+     "kind": "int",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 36
+    },
+    {
+     "name": "unique_id",
+     "type": "int32",
+     "kind": "int",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 40
+    },
+    {
+     "name": "age",
+     "type": "uint16",
+     "kind": "int",
+     "size": 2,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 44
+    },
+    {
+     "name": "padding",
+     "type": "uint16",
+     "kind": "int",
+     "size": 2,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 46
+    }
+   ],
+   "crossCheck": {
+    "issues": [],
+    "added": [],
+    "compared": 15,
+    "profileFieldCount": 15,
+    "overlayFieldCount": 15
+   }
+  },
+  "UncompiledData": {
+   "name": "UncompiledData",
+   "source": "src/objects/shared-function-info.tq",
+   "parent": "ExposedTrustedObject",
+   "parentSize": 8,
+   "taggedSize": 4,
+   "generatesConsts": {
+    "kMaxInlinedLocalNamesSize": "kScopeInfoMaxInlinedLocalNamesSize",
+    "kDontAdaptArgumentsSentinel": "kDontAdaptArgumentsSentinel",
+    "kMaxCachedArrayIndexLength": "Name::kMaxCachedArrayIndexLength",
+    "kMaxArrayIndexSize": "Name::kMaxArrayIndexSize",
+    "kNofHashBitFields": "Name::HashFieldTypeBits::kSize",
+    "kArrayIndexValueBits": "Name::kArrayIndexValueBits",
+    "kDoesNotContainCachedArrayIndexMask": "Name::kDoesNotContainCachedArrayIndexMask"
+   },
+   "fields": [
+    {
+     "name": "inferred_name",
+     "type": "String",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 8
+    },
+    {
+     "name": "start_position",
+     "type": "int32",
+     "kind": "int",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 12
+    },
+    {
+     "name": "end_position",
+     "type": "int32",
+     "kind": "int",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 16
+    }
+   ],
+   "crossCheck": {
+    "issues": [],
+    "added": [],
+    "compared": 3,
+    "profileFieldCount": 3,
+    "overlayFieldCount": 3
+   }
+  },
+  "UncompiledDataWithoutPreparseData": {
+   "name": "UncompiledDataWithoutPreparseData",
+   "source": "src/objects/shared-function-info.tq",
+   "parent": "UncompiledData",
+   "parentSize": 20,
+   "taggedSize": 4,
+   "generatesConsts": {
+    "kMaxInlinedLocalNamesSize": "kScopeInfoMaxInlinedLocalNamesSize",
+    "kDontAdaptArgumentsSentinel": "kDontAdaptArgumentsSentinel",
+    "kMaxCachedArrayIndexLength": "Name::kMaxCachedArrayIndexLength",
+    "kMaxArrayIndexSize": "Name::kMaxArrayIndexSize",
+    "kNofHashBitFields": "Name::HashFieldTypeBits::kSize",
+    "kArrayIndexValueBits": "Name::kArrayIndexValueBits",
+    "kDoesNotContainCachedArrayIndexMask": "Name::kDoesNotContainCachedArrayIndexMask"
+   },
+   "fields": [],
+   "crossCheck": {
+    "issues": [],
+    "added": [],
+    "compared": 0,
+    "profileFieldCount": 0,
+    "overlayFieldCount": 0
+   }
+  },
+  "UncompiledDataWithPreparseData": {
+   "name": "UncompiledDataWithPreparseData",
+   "source": "src/objects/shared-function-info.tq",
+   "parent": "UncompiledData",
+   "parentSize": 20,
+   "taggedSize": 4,
+   "generatesConsts": {
+    "kMaxInlinedLocalNamesSize": "kScopeInfoMaxInlinedLocalNamesSize",
+    "kDontAdaptArgumentsSentinel": "kDontAdaptArgumentsSentinel",
+    "kMaxCachedArrayIndexLength": "Name::kMaxCachedArrayIndexLength",
+    "kMaxArrayIndexSize": "Name::kMaxArrayIndexSize",
+    "kNofHashBitFields": "Name::HashFieldTypeBits::kSize",
+    "kArrayIndexValueBits": "Name::kArrayIndexValueBits",
+    "kDoesNotContainCachedArrayIndexMask": "Name::kDoesNotContainCachedArrayIndexMask"
+   },
+   "fields": [
+    {
+     "name": "preparse_data",
+     "type": "PreparseData",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 20
+    }
+   ],
+   "crossCheck": {
+    "issues": [],
+    "added": [],
+    "compared": 1,
+    "profileFieldCount": 1,
+    "overlayFieldCount": 1
+   }
+  },
+  "UncompiledDataWithoutPreparseDataWithJob": {
+   "name": "UncompiledDataWithoutPreparseDataWithJob",
+   "source": "src/objects/shared-function-info.tq",
+   "parent": "UncompiledDataWithoutPreparseData",
+   "parentSize": 20,
+   "taggedSize": 4,
+   "generatesConsts": {
+    "kMaxInlinedLocalNamesSize": "kScopeInfoMaxInlinedLocalNamesSize",
+    "kDontAdaptArgumentsSentinel": "kDontAdaptArgumentsSentinel",
+    "kMaxCachedArrayIndexLength": "Name::kMaxCachedArrayIndexLength",
+    "kMaxArrayIndexSize": "Name::kMaxArrayIndexSize",
+    "kNofHashBitFields": "Name::HashFieldTypeBits::kSize",
+    "kArrayIndexValueBits": "Name::kArrayIndexValueBits",
+    "kDoesNotContainCachedArrayIndexMask": "Name::kDoesNotContainCachedArrayIndexMask"
+   },
+   "fields": [
+    {
+     "name": "job",
+     "type": "RawPtr",
+     "kind": "raw",
+     "size": 8,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 20
+    }
+   ],
+   "crossCheck": {
+    "issues": [],
+    "added": [],
+    "compared": 1,
+    "profileFieldCount": 1,
+    "overlayFieldCount": 1
+   }
+  },
+  "UncompiledDataWithPreparseDataAndJob": {
+   "name": "UncompiledDataWithPreparseDataAndJob",
+   "source": "src/objects/shared-function-info.tq",
+   "parent": "UncompiledDataWithPreparseData",
+   "parentSize": 24,
+   "taggedSize": 4,
+   "generatesConsts": {
+    "kMaxInlinedLocalNamesSize": "kScopeInfoMaxInlinedLocalNamesSize",
+    "kDontAdaptArgumentsSentinel": "kDontAdaptArgumentsSentinel",
+    "kMaxCachedArrayIndexLength": "Name::kMaxCachedArrayIndexLength",
+    "kMaxArrayIndexSize": "Name::kMaxArrayIndexSize",
+    "kNofHashBitFields": "Name::HashFieldTypeBits::kSize",
+    "kArrayIndexValueBits": "Name::kArrayIndexValueBits",
+    "kDoesNotContainCachedArrayIndexMask": "Name::kDoesNotContainCachedArrayIndexMask"
+   },
+   "fields": [
+    {
+     "name": "job",
+     "type": "RawPtr",
+     "kind": "raw",
+     "size": 8,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 24
+    }
+   ],
+   "crossCheck": {
+    "issues": [],
+    "added": [],
+    "compared": 1,
+    "profileFieldCount": 1,
+    "overlayFieldCount": 1
+   }
+  },
+  "BytecodeArray": {
+   "name": "BytecodeArray",
+   "source": "src/objects/bytecode-array.tq",
+   "parent": "ExposedTrustedObject",
+   "parentSize": 8,
+   "taggedSize": 4,
+   "generatesConsts": {
+    "kMaxInlinedLocalNamesSize": "kScopeInfoMaxInlinedLocalNamesSize",
+    "kDontAdaptArgumentsSentinel": "kDontAdaptArgumentsSentinel",
+    "kMaxCachedArrayIndexLength": "Name::kMaxCachedArrayIndexLength",
+    "kMaxArrayIndexSize": "Name::kMaxArrayIndexSize",
+    "kNofHashBitFields": "Name::HashFieldTypeBits::kSize",
+    "kArrayIndexValueBits": "Name::kArrayIndexValueBits",
+    "kDoesNotContainCachedArrayIndexMask": "Name::kDoesNotContainCachedArrayIndexMask"
+   },
+   "fields": [
+    {
+     "name": "length",
+     "type": "Smi",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 8
+    },
+    {
+     "name": "wrapper",
+     "type": "BytecodeWrapper",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 12
+    },
+    {
+     "name": "source_position_table",
+     "type": "ProtectedPointer<TrustedByteArray>",
+     "kind": "protected",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 16
+    },
+    {
+     "name": "handler_table",
+     "type": "ProtectedPointer<TrustedByteArray>",
+     "kind": "protected",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 20
+    },
+    {
+     "name": "constant_pool",
+     "type": "ProtectedPointer<TrustedFixedArray>",
+     "kind": "protected",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 24
+    },
+    {
+     "name": "frame_size",
+     "type": "int32",
+     "kind": "int",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 28
+    },
+    {
+     "name": "parameter_size",
+     "type": "uint16",
+     "kind": "int",
+     "size": 2,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 32
+    },
+    {
+     "name": "max_arguments",
+     "type": "uint16",
+     "kind": "int",
+     "size": 2,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 34
+    },
+    {
+     "name": "incoming_new_target_or_generator_register",
+     "type": "int32",
+     "kind": "int",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 36
+    },
+    {
+     "name": "optional_padding",
+     "type": "uint32",
+     "kind": "int",
+     "size": 4,
+     "sizeHow": "primitive",
+     "conditional": false,
+     "indexed": false,
+     "present": false,
+     "gatedOn": {
+      "sense": "if",
+      "flag": "TAGGED_SIZE_8_BYTES"
+     },
+     "offset": null
+    },
+    {
+     "name": "optional_padding",
+     "type": "void",
+     "kind": "void",
+     "size": 0,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": {
+      "sense": "ifnot",
+      "flag": "TAGGED_SIZE_8_BYTES"
+     },
+     "offset": 40
+    },
+    {
+     "name": "bytes",
+     "type": "uint8",
+     "kind": "int",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": true,
+     "present": true,
+     "gatedOn": null,
+     "count": {
+      "expr": "length",
+      "ast": {
+       "kind": "name",
+       "name": "length"
+      }
+     },
+     "elementSize": 1,
+     "offset": 40
+    }
+   ],
+   "crossCheck": {
+    "issues": [],
+    "added": [],
+    "compared": 11,
+    "profileFieldCount": 11,
+    "overlayFieldCount": 12
+   }
+  },
+  "BytecodeWrapper": {
+   "name": "BytecodeWrapper",
+   "source": "src/objects/bytecode-array.tq",
+   "parent": "Struct",
+   "parentSize": 4,
+   "taggedSize": 4,
+   "generatesConsts": {
+    "kMaxInlinedLocalNamesSize": "kScopeInfoMaxInlinedLocalNamesSize",
+    "kDontAdaptArgumentsSentinel": "kDontAdaptArgumentsSentinel",
+    "kMaxCachedArrayIndexLength": "Name::kMaxCachedArrayIndexLength",
+    "kMaxArrayIndexSize": "Name::kMaxArrayIndexSize",
+    "kNofHashBitFields": "Name::HashFieldTypeBits::kSize",
+    "kArrayIndexValueBits": "Name::kArrayIndexValueBits",
+    "kDoesNotContainCachedArrayIndexMask": "Name::kDoesNotContainCachedArrayIndexMask"
+   },
+   "fields": [
+    {
+     "name": "bytecode",
+     "type": "TrustedPointer<BytecodeArray>",
+     "kind": "trusted",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 4
+    }
+   ],
+   "crossCheck": {
+    "issues": [],
+    "added": [],
+    "compared": 1,
+    "profileFieldCount": 1,
+    "overlayFieldCount": 1
+   }
+  },
+  "FixedArrayBase": {
+   "name": "FixedArrayBase",
+   "source": "src/objects/fixed-array.tq",
+   "parent": "HeapObject",
+   "parentSize": 4,
+   "taggedSize": 4,
+   "generatesConsts": {
+    "kMaxInlinedLocalNamesSize": "kScopeInfoMaxInlinedLocalNamesSize",
+    "kDontAdaptArgumentsSentinel": "kDontAdaptArgumentsSentinel",
+    "kMaxCachedArrayIndexLength": "Name::kMaxCachedArrayIndexLength",
+    "kMaxArrayIndexSize": "Name::kMaxArrayIndexSize",
+    "kNofHashBitFields": "Name::HashFieldTypeBits::kSize",
+    "kArrayIndexValueBits": "Name::kArrayIndexValueBits",
+    "kDoesNotContainCachedArrayIndexMask": "Name::kDoesNotContainCachedArrayIndexMask"
+   },
+   "fields": [
+    {
+     "name": "length",
+     "type": "Smi",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 4
+    }
+   ],
+   "crossCheck": {
+    "issues": [],
+    "added": [],
+    "compared": 1,
+    "profileFieldCount": 1,
+    "overlayFieldCount": 1
+   }
+  },
+  "FixedArray": {
+   "name": "FixedArray",
+   "source": "src/objects/fixed-array.tq",
+   "parent": "FixedArrayBase",
+   "parentSize": 8,
+   "taggedSize": 4,
+   "generatesConsts": {
+    "kMaxInlinedLocalNamesSize": "kScopeInfoMaxInlinedLocalNamesSize",
+    "kDontAdaptArgumentsSentinel": "kDontAdaptArgumentsSentinel",
+    "kMaxCachedArrayIndexLength": "Name::kMaxCachedArrayIndexLength",
+    "kMaxArrayIndexSize": "Name::kMaxArrayIndexSize",
+    "kNofHashBitFields": "Name::HashFieldTypeBits::kSize",
+    "kArrayIndexValueBits": "Name::kArrayIndexValueBits",
+    "kDoesNotContainCachedArrayIndexMask": "Name::kDoesNotContainCachedArrayIndexMask"
+   },
+   "fields": [
+    {
+     "name": "objects",
+     "type": "Object",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": true,
+     "present": true,
+     "gatedOn": null,
+     "count": {
+      "expr": "length",
+      "ast": {
+       "kind": "name",
+       "name": "length"
+      }
+     },
+     "elementSize": 4,
+     "offset": 8
+    }
+   ],
+   "crossCheck": {
+    "issues": [],
+    "added": [],
+    "compared": 1,
+    "profileFieldCount": 1,
+    "overlayFieldCount": 1
+   }
+  },
+  "TrustedFixedArray": {
+   "name": "TrustedFixedArray",
+   "source": "src/objects/fixed-array.tq",
+   "parent": "TrustedObject",
+   "parentSize": 4,
+   "taggedSize": 4,
+   "generatesConsts": {
+    "kMaxInlinedLocalNamesSize": "kScopeInfoMaxInlinedLocalNamesSize",
+    "kDontAdaptArgumentsSentinel": "kDontAdaptArgumentsSentinel",
+    "kMaxCachedArrayIndexLength": "Name::kMaxCachedArrayIndexLength",
+    "kMaxArrayIndexSize": "Name::kMaxArrayIndexSize",
+    "kNofHashBitFields": "Name::HashFieldTypeBits::kSize",
+    "kArrayIndexValueBits": "Name::kArrayIndexValueBits",
+    "kDoesNotContainCachedArrayIndexMask": "Name::kDoesNotContainCachedArrayIndexMask"
+   },
+   "fields": [
+    {
+     "name": "length",
+     "type": "Smi",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 4
+    },
+    {
+     "name": "objects",
+     "type": "Object",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": true,
+     "present": true,
+     "gatedOn": null,
+     "count": {
+      "expr": "length",
+      "ast": {
+       "kind": "name",
+       "name": "length"
+      }
+     },
+     "elementSize": 4,
+     "offset": 8
+    }
+   ],
+   "crossCheck": {
+    "issues": [],
+    "added": [],
+    "compared": 2,
+    "profileFieldCount": 2,
+    "overlayFieldCount": 2
+   }
+  },
+  "ProtectedFixedArray": {
+   "name": "ProtectedFixedArray",
+   "source": "src/objects/fixed-array.tq",
+   "parent": "TrustedObject",
+   "parentSize": 4,
+   "taggedSize": 4,
+   "generatesConsts": {
+    "kMaxInlinedLocalNamesSize": "kScopeInfoMaxInlinedLocalNamesSize",
+    "kDontAdaptArgumentsSentinel": "kDontAdaptArgumentsSentinel",
+    "kMaxCachedArrayIndexLength": "Name::kMaxCachedArrayIndexLength",
+    "kMaxArrayIndexSize": "Name::kMaxArrayIndexSize",
+    "kNofHashBitFields": "Name::HashFieldTypeBits::kSize",
+    "kArrayIndexValueBits": "Name::kArrayIndexValueBits",
+    "kDoesNotContainCachedArrayIndexMask": "Name::kDoesNotContainCachedArrayIndexMask"
+   },
+   "fields": [
+    {
+     "name": "length",
+     "type": "Smi",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 4
+    },
+    {
+     "name": "objects",
+     "type": "TrustedObject|Smi",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": true,
+     "present": true,
+     "gatedOn": null,
+     "count": {
+      "expr": "length",
+      "ast": {
+       "kind": "name",
+       "name": "length"
+      }
+     },
+     "elementSize": 4,
+     "offset": 8
+    }
+   ],
+   "crossCheck": {
+    "issues": [],
+    "added": [],
+    "compared": 2,
+    "profileFieldCount": 2,
+    "overlayFieldCount": 2
+   }
+  },
+  "ByteArray": {
+   "name": "ByteArray",
+   "source": "src/objects/fixed-array.tq",
+   "parent": "FixedArrayBase",
+   "parentSize": 8,
+   "taggedSize": 4,
+   "generatesConsts": {
+    "kMaxInlinedLocalNamesSize": "kScopeInfoMaxInlinedLocalNamesSize",
+    "kDontAdaptArgumentsSentinel": "kDontAdaptArgumentsSentinel",
+    "kMaxCachedArrayIndexLength": "Name::kMaxCachedArrayIndexLength",
+    "kMaxArrayIndexSize": "Name::kMaxArrayIndexSize",
+    "kNofHashBitFields": "Name::HashFieldTypeBits::kSize",
+    "kArrayIndexValueBits": "Name::kArrayIndexValueBits",
+    "kDoesNotContainCachedArrayIndexMask": "Name::kDoesNotContainCachedArrayIndexMask"
+   },
+   "fields": [
+    {
+     "name": "values",
+     "type": "uint8",
+     "kind": "int",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": true,
+     "present": true,
+     "gatedOn": null,
+     "count": {
+      "expr": "length",
+      "ast": {
+       "kind": "name",
+       "name": "length"
+      }
+     },
+     "elementSize": 1,
+     "offset": 8
+    }
+   ],
+   "crossCheck": {
+    "issues": [],
+    "added": [],
+    "compared": 1,
+    "profileFieldCount": 1,
+    "overlayFieldCount": 1
+   }
+  },
+  "TrustedByteArray": {
+   "name": "TrustedByteArray",
+   "source": "src/objects/fixed-array.tq",
+   "parent": "TrustedObject",
+   "parentSize": 4,
+   "taggedSize": 4,
+   "generatesConsts": {
+    "kMaxInlinedLocalNamesSize": "kScopeInfoMaxInlinedLocalNamesSize",
+    "kDontAdaptArgumentsSentinel": "kDontAdaptArgumentsSentinel",
+    "kMaxCachedArrayIndexLength": "Name::kMaxCachedArrayIndexLength",
+    "kMaxArrayIndexSize": "Name::kMaxArrayIndexSize",
+    "kNofHashBitFields": "Name::HashFieldTypeBits::kSize",
+    "kArrayIndexValueBits": "Name::kArrayIndexValueBits",
+    "kDoesNotContainCachedArrayIndexMask": "Name::kDoesNotContainCachedArrayIndexMask"
+   },
+   "fields": [
+    {
+     "name": "length",
+     "type": "Smi",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 4
+    },
+    {
+     "name": "values",
+     "type": "uint8",
+     "kind": "int",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": true,
+     "present": true,
+     "gatedOn": null,
+     "count": {
+      "expr": "length",
+      "ast": {
+       "kind": "name",
+       "name": "length"
+      }
+     },
+     "elementSize": 1,
+     "offset": 8
+    }
+   ],
+   "crossCheck": {
+    "issues": [],
+    "added": [],
+    "compared": 2,
+    "profileFieldCount": 2,
+    "overlayFieldCount": 2
+   }
+  },
+  "ObjectBoilerplateDescription": {
+   "name": "ObjectBoilerplateDescription",
+   "source": "src/objects/literal-objects.tq",
+   "parent": "HeapObject",
+   "parentSize": 4,
+   "taggedSize": 4,
+   "generatesConsts": {
+    "kMaxInlinedLocalNamesSize": "kScopeInfoMaxInlinedLocalNamesSize",
+    "kDontAdaptArgumentsSentinel": "kDontAdaptArgumentsSentinel",
+    "kMaxCachedArrayIndexLength": "Name::kMaxCachedArrayIndexLength",
+    "kMaxArrayIndexSize": "Name::kMaxArrayIndexSize",
+    "kNofHashBitFields": "Name::HashFieldTypeBits::kSize",
+    "kArrayIndexValueBits": "Name::kArrayIndexValueBits",
+    "kDoesNotContainCachedArrayIndexMask": "Name::kDoesNotContainCachedArrayIndexMask"
+   },
+   "fields": [
+    {
+     "name": "length",
+     "type": "Smi",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 4
+    },
+    {
+     "name": "backing_store_size",
+     "type": "Smi",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 8
+    },
+    {
+     "name": "flags",
+     "type": "Smi",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 12
+    },
+    {
+     "name": "raw_entries",
+     "type": "Object",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": true,
+     "present": true,
+     "gatedOn": null,
+     "count": {
+      "expr": "length",
+      "ast": {
+       "kind": "name",
+       "name": "length"
+      }
+     },
+     "elementSize": 4,
+     "offset": 16
+    }
+   ],
+   "crossCheck": {
+    "issues": [],
+    "added": [],
+    "compared": 4,
+    "profileFieldCount": 4,
+    "overlayFieldCount": 4
+   }
+  },
+  "ArrayBoilerplateDescription": {
+   "name": "ArrayBoilerplateDescription",
+   "source": "src/objects/literal-objects.tq",
+   "parent": "Struct",
+   "parentSize": 4,
+   "taggedSize": 4,
+   "generatesConsts": {
+    "kMaxInlinedLocalNamesSize": "kScopeInfoMaxInlinedLocalNamesSize",
+    "kDontAdaptArgumentsSentinel": "kDontAdaptArgumentsSentinel",
+    "kMaxCachedArrayIndexLength": "Name::kMaxCachedArrayIndexLength",
+    "kMaxArrayIndexSize": "Name::kMaxArrayIndexSize",
+    "kNofHashBitFields": "Name::HashFieldTypeBits::kSize",
+    "kArrayIndexValueBits": "Name::kArrayIndexValueBits",
+    "kDoesNotContainCachedArrayIndexMask": "Name::kDoesNotContainCachedArrayIndexMask"
+   },
+   "fields": [
+    {
+     "name": "flags",
+     "type": "Smi",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 4
+    },
+    {
+     "name": "constant_elements",
+     "type": "FixedArrayBase",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 8
+    }
+   ],
+   "crossCheck": {
+    "issues": [],
+    "added": [],
+    "compared": 2,
+    "profileFieldCount": 2,
+    "overlayFieldCount": 2
+   }
+  },
+  "RegExpBoilerplateDescription": {
+   "name": "RegExpBoilerplateDescription",
+   "source": "src/objects/literal-objects.tq",
+   "parent": "Struct",
+   "parentSize": 4,
+   "taggedSize": 4,
+   "generatesConsts": {
+    "kMaxInlinedLocalNamesSize": "kScopeInfoMaxInlinedLocalNamesSize",
+    "kDontAdaptArgumentsSentinel": "kDontAdaptArgumentsSentinel",
+    "kMaxCachedArrayIndexLength": "Name::kMaxCachedArrayIndexLength",
+    "kMaxArrayIndexSize": "Name::kMaxArrayIndexSize",
+    "kNofHashBitFields": "Name::HashFieldTypeBits::kSize",
+    "kArrayIndexValueBits": "Name::kArrayIndexValueBits",
+    "kDoesNotContainCachedArrayIndexMask": "Name::kDoesNotContainCachedArrayIndexMask"
+   },
+   "fields": [
+    {
+     "name": "data",
+     "type": "TrustedPointer<RegExpData>",
+     "kind": "trusted",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 4
+    },
+    {
+     "name": "source",
+     "type": "String",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 8
+    },
+    {
+     "name": "flags",
+     "type": "SmiTagged<JSRegExpFlags>",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 12
+    }
+   ],
+   "crossCheck": {
+    "issues": [],
+    "added": [],
+    "compared": 3,
+    "profileFieldCount": 3,
+    "overlayFieldCount": 3
+   }
+  },
+  "TemplateObjectDescription": {
+   "name": "TemplateObjectDescription",
+   "source": "src/objects/template-objects.tq",
+   "parent": "Struct",
+   "parentSize": 4,
+   "taggedSize": 4,
+   "generatesConsts": {
+    "kMaxInlinedLocalNamesSize": "kScopeInfoMaxInlinedLocalNamesSize",
+    "kDontAdaptArgumentsSentinel": "kDontAdaptArgumentsSentinel",
+    "kMaxCachedArrayIndexLength": "Name::kMaxCachedArrayIndexLength",
+    "kMaxArrayIndexSize": "Name::kMaxArrayIndexSize",
+    "kNofHashBitFields": "Name::HashFieldTypeBits::kSize",
+    "kArrayIndexValueBits": "Name::kArrayIndexValueBits",
+    "kDoesNotContainCachedArrayIndexMask": "Name::kDoesNotContainCachedArrayIndexMask"
+   },
+   "fields": [
+    {
+     "name": "raw_strings",
+     "type": "FixedArray",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 4
+    },
+    {
+     "name": "cooked_strings",
+     "type": "FixedArray",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 8
+    }
+   ],
+   "crossCheck": {
+    "issues": [],
+    "added": [],
+    "compared": 2,
+    "profileFieldCount": 2,
+    "overlayFieldCount": 2
+   }
+  },
+  "String": {
+   "name": "String",
+   "source": "src/objects/string.tq",
+   "parent": "Name",
+   "parentSize": 8,
+   "taggedSize": 4,
+   "generatesConsts": {
+    "kMaxInlinedLocalNamesSize": "kScopeInfoMaxInlinedLocalNamesSize",
+    "kDontAdaptArgumentsSentinel": "kDontAdaptArgumentsSentinel",
+    "kMaxCachedArrayIndexLength": "Name::kMaxCachedArrayIndexLength",
+    "kMaxArrayIndexSize": "Name::kMaxArrayIndexSize",
+    "kNofHashBitFields": "Name::HashFieldTypeBits::kSize",
+    "kArrayIndexValueBits": "Name::kArrayIndexValueBits",
+    "kDoesNotContainCachedArrayIndexMask": "Name::kDoesNotContainCachedArrayIndexMask"
+   },
+   "fields": [],
+   "crossCheck": {
+    "issues": [
+     "profile has fields this reader did not find: length"
+    ],
+    "added": [],
+    "compared": 0,
+    "profileFieldCount": 1,
+    "overlayFieldCount": 0
+   }
+  },
+  "ConsString": {
+   "name": "ConsString",
+   "source": "src/objects/string.tq",
+   "parent": "String",
+   "parentSize": 12,
+   "taggedSize": 4,
+   "generatesConsts": {
+    "kMaxInlinedLocalNamesSize": "kScopeInfoMaxInlinedLocalNamesSize",
+    "kDontAdaptArgumentsSentinel": "kDontAdaptArgumentsSentinel",
+    "kMaxCachedArrayIndexLength": "Name::kMaxCachedArrayIndexLength",
+    "kMaxArrayIndexSize": "Name::kMaxArrayIndexSize",
+    "kNofHashBitFields": "Name::HashFieldTypeBits::kSize",
+    "kArrayIndexValueBits": "Name::kArrayIndexValueBits",
+    "kDoesNotContainCachedArrayIndexMask": "Name::kDoesNotContainCachedArrayIndexMask"
+   },
+   "fields": [
+    {
+     "name": "second",
+     "type": "String",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 12
+    }
+   ],
+   "crossCheck": {
+    "issues": [
+     "second: offset 16 vs 12",
+     "profile has fields this reader did not find: first"
+    ],
+    "added": [],
+    "compared": 1,
+    "profileFieldCount": 2,
+    "overlayFieldCount": 1
+   }
+  },
+  "ExternalString": {
+   "name": "ExternalString",
+   "source": "src/objects/string.tq",
+   "parent": "String",
+   "parentSize": 12,
+   "taggedSize": 4,
+   "generatesConsts": {
+    "kMaxInlinedLocalNamesSize": "kScopeInfoMaxInlinedLocalNamesSize",
+    "kDontAdaptArgumentsSentinel": "kDontAdaptArgumentsSentinel",
+    "kMaxCachedArrayIndexLength": "Name::kMaxCachedArrayIndexLength",
+    "kMaxArrayIndexSize": "Name::kMaxArrayIndexSize",
+    "kNofHashBitFields": "Name::HashFieldTypeBits::kSize",
+    "kArrayIndexValueBits": "Name::kArrayIndexValueBits",
+    "kDoesNotContainCachedArrayIndexMask": "Name::kDoesNotContainCachedArrayIndexMask"
+   },
+   "fields": [
+    {
+     "name": "resource",
+     "type": "ExternalPointer",
+     "kind": "external",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 12
+    },
+    {
+     "name": "resource_data",
+     "type": "ExternalPointer",
+     "kind": "external",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 16
+    }
+   ],
+   "crossCheck": {
+    "issues": [],
+    "added": [],
+    "compared": 2,
+    "profileFieldCount": 2,
+    "overlayFieldCount": 2
+   }
+  },
+  "SeqString": {
+   "name": "SeqString",
+   "source": "src/objects/string.tq",
+   "parent": "String",
+   "parentSize": 12,
+   "taggedSize": 4,
+   "generatesConsts": {
+    "kMaxInlinedLocalNamesSize": "kScopeInfoMaxInlinedLocalNamesSize",
+    "kDontAdaptArgumentsSentinel": "kDontAdaptArgumentsSentinel",
+    "kMaxCachedArrayIndexLength": "Name::kMaxCachedArrayIndexLength",
+    "kMaxArrayIndexSize": "Name::kMaxArrayIndexSize",
+    "kNofHashBitFields": "Name::HashFieldTypeBits::kSize",
+    "kArrayIndexValueBits": "Name::kArrayIndexValueBits",
+    "kDoesNotContainCachedArrayIndexMask": "Name::kDoesNotContainCachedArrayIndexMask"
+   },
+   "fields": [],
+   "crossCheck": {
+    "issues": [],
+    "added": [],
+    "compared": 0,
+    "profileFieldCount": 0,
+    "overlayFieldCount": 0
+   }
+  },
+  "SeqOneByteString": {
+   "name": "SeqOneByteString",
+   "source": "src/objects/string.tq",
+   "parent": "SeqString",
+   "parentSize": 12,
+   "taggedSize": 4,
+   "generatesConsts": {
+    "kMaxInlinedLocalNamesSize": "kScopeInfoMaxInlinedLocalNamesSize",
+    "kDontAdaptArgumentsSentinel": "kDontAdaptArgumentsSentinel",
+    "kMaxCachedArrayIndexLength": "Name::kMaxCachedArrayIndexLength",
+    "kMaxArrayIndexSize": "Name::kMaxArrayIndexSize",
+    "kNofHashBitFields": "Name::HashFieldTypeBits::kSize",
+    "kArrayIndexValueBits": "Name::kArrayIndexValueBits",
+    "kDoesNotContainCachedArrayIndexMask": "Name::kDoesNotContainCachedArrayIndexMask"
+   },
+   "fields": [
+    {
+     "name": "chars",
+     "type": "char8",
+     "kind": "int",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": true,
+     "present": true,
+     "gatedOn": null,
+     "count": {
+      "expr": "length",
+      "ast": {
+       "kind": "name",
+       "name": "length"
+      }
+     },
+     "elementSize": 1,
+     "offset": 12
+    }
+   ],
+   "crossCheck": {
+    "issues": [],
+    "added": [],
+    "compared": 1,
+    "profileFieldCount": 1,
+    "overlayFieldCount": 1
+   }
+  },
+  "SeqTwoByteString": {
+   "name": "SeqTwoByteString",
+   "source": "src/objects/string.tq",
+   "parent": "SeqString",
+   "parentSize": 12,
+   "taggedSize": 4,
+   "generatesConsts": {
+    "kMaxInlinedLocalNamesSize": "kScopeInfoMaxInlinedLocalNamesSize",
+    "kDontAdaptArgumentsSentinel": "kDontAdaptArgumentsSentinel",
+    "kMaxCachedArrayIndexLength": "Name::kMaxCachedArrayIndexLength",
+    "kMaxArrayIndexSize": "Name::kMaxArrayIndexSize",
+    "kNofHashBitFields": "Name::HashFieldTypeBits::kSize",
+    "kArrayIndexValueBits": "Name::kArrayIndexValueBits",
+    "kDoesNotContainCachedArrayIndexMask": "Name::kDoesNotContainCachedArrayIndexMask"
+   },
+   "fields": [
+    {
+     "name": "chars",
+     "type": "char16",
+     "kind": "int",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": true,
+     "present": true,
+     "gatedOn": null,
+     "count": {
+      "expr": "length",
+      "ast": {
+       "kind": "name",
+       "name": "length"
+      }
+     },
+     "elementSize": 2,
+     "offset": 12
+    }
+   ],
+   "crossCheck": {
+    "issues": [],
+    "added": [],
+    "compared": 1,
+    "profileFieldCount": 1,
+    "overlayFieldCount": 1
+   }
+  },
+  "SlicedString": {
+   "name": "SlicedString",
+   "source": "src/objects/string.tq",
+   "parent": "String",
+   "parentSize": 12,
+   "taggedSize": 4,
+   "generatesConsts": {
+    "kMaxInlinedLocalNamesSize": "kScopeInfoMaxInlinedLocalNamesSize",
+    "kDontAdaptArgumentsSentinel": "kDontAdaptArgumentsSentinel",
+    "kMaxCachedArrayIndexLength": "Name::kMaxCachedArrayIndexLength",
+    "kMaxArrayIndexSize": "Name::kMaxArrayIndexSize",
+    "kNofHashBitFields": "Name::HashFieldTypeBits::kSize",
+    "kArrayIndexValueBits": "Name::kArrayIndexValueBits",
+    "kDoesNotContainCachedArrayIndexMask": "Name::kDoesNotContainCachedArrayIndexMask"
+   },
+   "fields": [
+    {
+     "name": "parent",
+     "type": "String",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 12
+    },
+    {
+     "name": "offset",
+     "type": "Smi",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 16
+    }
+   ],
+   "crossCheck": {
+    "issues": [],
+    "added": [],
+    "compared": 2,
+    "profileFieldCount": 2,
+    "overlayFieldCount": 2
+   }
+  },
+  "ThinString": {
+   "name": "ThinString",
+   "source": "src/objects/string.tq",
+   "parent": "String",
+   "parentSize": 12,
+   "taggedSize": 4,
+   "generatesConsts": {
+    "kMaxInlinedLocalNamesSize": "kScopeInfoMaxInlinedLocalNamesSize",
+    "kDontAdaptArgumentsSentinel": "kDontAdaptArgumentsSentinel",
+    "kMaxCachedArrayIndexLength": "Name::kMaxCachedArrayIndexLength",
+    "kMaxArrayIndexSize": "Name::kMaxArrayIndexSize",
+    "kNofHashBitFields": "Name::HashFieldTypeBits::kSize",
+    "kArrayIndexValueBits": "Name::kArrayIndexValueBits",
+    "kDoesNotContainCachedArrayIndexMask": "Name::kDoesNotContainCachedArrayIndexMask"
+   },
+   "fields": [
+    {
+     "name": "actual",
+     "type": "String",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 12
+    }
+   ],
+   "crossCheck": {
+    "issues": [],
+    "added": [],
+    "compared": 1,
+    "profileFieldCount": 1,
+    "overlayFieldCount": 1
+   }
+  },
+  "Name": {
+   "name": "Name",
+   "source": "src/objects/name.tq",
+   "parent": "PrimitiveHeapObject",
+   "parentSize": 4,
+   "taggedSize": 4,
+   "generatesConsts": {
+    "kMaxInlinedLocalNamesSize": "kScopeInfoMaxInlinedLocalNamesSize",
+    "kDontAdaptArgumentsSentinel": "kDontAdaptArgumentsSentinel",
+    "kMaxCachedArrayIndexLength": "Name::kMaxCachedArrayIndexLength",
+    "kMaxArrayIndexSize": "Name::kMaxArrayIndexSize",
+    "kNofHashBitFields": "Name::HashFieldTypeBits::kSize",
+    "kArrayIndexValueBits": "Name::kArrayIndexValueBits",
+    "kDoesNotContainCachedArrayIndexMask": "Name::kDoesNotContainCachedArrayIndexMask"
+   },
+   "fields": [
+    {
+     "name": "raw_hash_field",
+     "type": "NameHash",
+     "kind": "bitfield",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 4
+    }
+   ],
+   "crossCheck": {
+    "issues": [],
+    "added": [],
+    "compared": 1,
+    "profileFieldCount": 1,
+    "overlayFieldCount": 1
+   }
+  },
+  "Symbol": {
+   "name": "Symbol",
+   "source": "src/objects/name.tq",
+   "parent": "Name",
+   "parentSize": 8,
+   "taggedSize": 4,
+   "generatesConsts": {
+    "kMaxInlinedLocalNamesSize": "kScopeInfoMaxInlinedLocalNamesSize",
+    "kDontAdaptArgumentsSentinel": "kDontAdaptArgumentsSentinel",
+    "kMaxCachedArrayIndexLength": "Name::kMaxCachedArrayIndexLength",
+    "kMaxArrayIndexSize": "Name::kMaxArrayIndexSize",
+    "kNofHashBitFields": "Name::HashFieldTypeBits::kSize",
+    "kArrayIndexValueBits": "Name::kArrayIndexValueBits",
+    "kDoesNotContainCachedArrayIndexMask": "Name::kDoesNotContainCachedArrayIndexMask"
+   },
+   "fields": [
+    {
+     "name": "flags",
+     "type": "SymbolFlags",
+     "kind": "bitfield",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 8
+    },
+    {
+     "name": "description",
+     "type": "String|Undefined",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 12
+    }
+   ],
+   "crossCheck": {
+    "issues": [],
+    "added": [],
+    "compared": 2,
+    "profileFieldCount": 2,
+    "overlayFieldCount": 2
+   }
+  },
+  "HeapNumber": {
+   "name": "HeapNumber",
+   "source": "src/objects/heap-number.tq",
+   "parent": "PrimitiveHeapObject",
+   "parentSize": 4,
+   "taggedSize": 4,
+   "generatesConsts": {
+    "kMaxInlinedLocalNamesSize": "kScopeInfoMaxInlinedLocalNamesSize",
+    "kDontAdaptArgumentsSentinel": "kDontAdaptArgumentsSentinel",
+    "kMaxCachedArrayIndexLength": "Name::kMaxCachedArrayIndexLength",
+    "kMaxArrayIndexSize": "Name::kMaxArrayIndexSize",
+    "kNofHashBitFields": "Name::HashFieldTypeBits::kSize",
+    "kArrayIndexValueBits": "Name::kArrayIndexValueBits",
+    "kDoesNotContainCachedArrayIndexMask": "Name::kDoesNotContainCachedArrayIndexMask"
+   },
+   "fields": [
+    {
+     "name": "value",
+     "type": "float64",
+     "kind": "float",
+     "size": 8,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 4
+    }
+   ],
+   "crossCheck": {
+    "issues": [],
+    "added": [],
+    "compared": 1,
+    "profileFieldCount": 1,
+    "overlayFieldCount": 1
+   }
+  },
+  "HeapObject": {
+   "name": "HeapObject",
+   "source": "src/objects/heap-object.tq",
+   "parent": "StrongTagged",
+   "parentSize": 0,
+   "taggedSize": 4,
+   "generatesConsts": {
+    "kMaxInlinedLocalNamesSize": "kScopeInfoMaxInlinedLocalNamesSize",
+    "kDontAdaptArgumentsSentinel": "kDontAdaptArgumentsSentinel",
+    "kMaxCachedArrayIndexLength": "Name::kMaxCachedArrayIndexLength",
+    "kMaxArrayIndexSize": "Name::kMaxArrayIndexSize",
+    "kNofHashBitFields": "Name::HashFieldTypeBits::kSize",
+    "kArrayIndexValueBits": "Name::kArrayIndexValueBits",
+    "kDoesNotContainCachedArrayIndexMask": "Name::kDoesNotContainCachedArrayIndexMask"
+   },
+   "fields": [
+    {
+     "name": "map",
+     "type": "Map",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 0
+    }
+   ],
+   "crossCheck": {
+    "issues": [],
+    "added": [],
+    "compared": 1,
+    "profileFieldCount": 1,
+    "overlayFieldCount": 1
+   }
+  },
+  "TrustedObject": {
+   "name": "TrustedObject",
+   "source": "src/objects/trusted-object.tq",
+   "parent": "HeapObject",
+   "parentSize": 4,
+   "taggedSize": 4,
+   "generatesConsts": {
+    "kMaxInlinedLocalNamesSize": "kScopeInfoMaxInlinedLocalNamesSize",
+    "kDontAdaptArgumentsSentinel": "kDontAdaptArgumentsSentinel",
+    "kMaxCachedArrayIndexLength": "Name::kMaxCachedArrayIndexLength",
+    "kMaxArrayIndexSize": "Name::kMaxArrayIndexSize",
+    "kNofHashBitFields": "Name::HashFieldTypeBits::kSize",
+    "kArrayIndexValueBits": "Name::kArrayIndexValueBits",
+    "kDoesNotContainCachedArrayIndexMask": "Name::kDoesNotContainCachedArrayIndexMask"
+   },
+   "fields": [],
+   "crossCheck": {
+    "issues": [],
+    "added": [],
+    "compared": 0,
+    "profileFieldCount": 0,
+    "overlayFieldCount": 0
+   }
+  },
+  "ExposedTrustedObject": {
+   "name": "ExposedTrustedObject",
+   "source": "src/objects/trusted-object.tq",
+   "parent": "TrustedObject",
+   "parentSize": 4,
+   "taggedSize": 4,
+   "generatesConsts": {
+    "kMaxInlinedLocalNamesSize": "kScopeInfoMaxInlinedLocalNamesSize",
+    "kDontAdaptArgumentsSentinel": "kDontAdaptArgumentsSentinel",
+    "kMaxCachedArrayIndexLength": "Name::kMaxCachedArrayIndexLength",
+    "kMaxArrayIndexSize": "Name::kMaxArrayIndexSize",
+    "kNofHashBitFields": "Name::HashFieldTypeBits::kSize",
+    "kArrayIndexValueBits": "Name::kArrayIndexValueBits",
+    "kDoesNotContainCachedArrayIndexMask": "Name::kDoesNotContainCachedArrayIndexMask"
+   },
+   "fields": [
+    {
+     "name": "self_indirect_pointer",
+     "type": "TrustedPointer",
+     "kind": "trusted",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": {
+      "sense": "if",
+      "flag": "V8_ENABLE_SANDBOX"
+     },
+     "offset": 4
+    }
+   ],
+   "crossCheck": {
+    "issues": [],
+    "added": [],
+    "compared": 1,
+    "profileFieldCount": 1,
+    "overlayFieldCount": 1
+   }
+  },
+  "Oddball": {
+   "name": "Oddball",
+   "source": "src/objects/oddball.tq",
+   "parent": "PrimitiveHeapObject",
+   "parentSize": 4,
+   "taggedSize": 4,
+   "generatesConsts": {
+    "kMaxInlinedLocalNamesSize": "kScopeInfoMaxInlinedLocalNamesSize",
+    "kDontAdaptArgumentsSentinel": "kDontAdaptArgumentsSentinel",
+    "kMaxCachedArrayIndexLength": "Name::kMaxCachedArrayIndexLength",
+    "kMaxArrayIndexSize": "Name::kMaxArrayIndexSize",
+    "kNofHashBitFields": "Name::HashFieldTypeBits::kSize",
+    "kArrayIndexValueBits": "Name::kArrayIndexValueBits",
+    "kDoesNotContainCachedArrayIndexMask": "Name::kDoesNotContainCachedArrayIndexMask"
+   },
+   "fields": [
+    {
+     "name": "to_number_raw",
+     "type": "float64",
+     "kind": "float",
+     "size": 8,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 4
+    },
+    {
+     "name": "to_string",
+     "type": "String",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 12
+    },
+    {
+     "name": "to_number",
+     "type": "Number",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 16
+    },
+    {
+     "name": "type_of",
+     "type": "String",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 20
+    },
+    {
+     "name": "kind",
+     "type": "Smi",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 24
+    }
+   ],
+   "crossCheck": {
+    "issues": [],
+    "added": [],
+    "compared": 5,
+    "profileFieldCount": 5,
+    "overlayFieldCount": 5
+   }
+  },
+  "Hole": {
+   "name": "Hole",
+   "source": "src/objects/hole.tq",
+   "parent": "HeapObject",
+   "parentSize": 4,
+   "taggedSize": 4,
+   "generatesConsts": {
+    "kMaxInlinedLocalNamesSize": "kScopeInfoMaxInlinedLocalNamesSize",
+    "kDontAdaptArgumentsSentinel": "kDontAdaptArgumentsSentinel",
+    "kMaxCachedArrayIndexLength": "Name::kMaxCachedArrayIndexLength",
+    "kMaxArrayIndexSize": "Name::kMaxArrayIndexSize",
+    "kNofHashBitFields": "Name::HashFieldTypeBits::kSize",
+    "kArrayIndexValueBits": "Name::kArrayIndexValueBits",
+    "kDoesNotContainCachedArrayIndexMask": "Name::kDoesNotContainCachedArrayIndexMask"
+   },
+   "fields": [],
+   "crossCheck": {
+    "issues": [],
+    "added": [],
+    "compared": 0,
+    "profileFieldCount": 0,
+    "overlayFieldCount": 0
+   }
+  },
+  "Script": {
+   "name": "Script",
+   "source": "src/objects/script.tq",
+   "parent": "Struct",
+   "parentSize": 4,
+   "taggedSize": 4,
+   "generatesConsts": {
+    "kMaxInlinedLocalNamesSize": "kScopeInfoMaxInlinedLocalNamesSize",
+    "kDontAdaptArgumentsSentinel": "kDontAdaptArgumentsSentinel",
+    "kMaxCachedArrayIndexLength": "Name::kMaxCachedArrayIndexLength",
+    "kMaxArrayIndexSize": "Name::kMaxArrayIndexSize",
+    "kNofHashBitFields": "Name::HashFieldTypeBits::kSize",
+    "kArrayIndexValueBits": "Name::kArrayIndexValueBits",
+    "kDoesNotContainCachedArrayIndexMask": "Name::kDoesNotContainCachedArrayIndexMask"
+   },
+   "fields": [
+    {
+     "name": "source",
+     "type": "String|Undefined",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 4
+    },
+    {
+     "name": "name",
+     "type": "Object",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 8
+    },
+    {
+     "name": "line_offset",
+     "type": "Smi",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 12
+    },
+    {
+     "name": "column_offset",
+     "type": "Smi",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 16
+    },
+    {
+     "name": "context_data",
+     "type": "Smi|Undefined|Symbol",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 20
+    },
+    {
+     "name": "script_type",
+     "type": "Smi",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 24
+    },
+    {
+     "name": "line_ends",
+     "type": "FixedArray|Smi",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 28
+    },
+    {
+     "name": "id",
+     "type": "Smi",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 32
+    },
+    {
+     "name": "eval_from_shared_or_wrapped_arguments",
+     "type": "SharedFunctionInfo|FixedArray| Undefined",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 36
+    },
+    {
+     "name": "eval_from_position",
+     "type": "Smi|Foreign",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 40
+    },
+    {
+     "name": "infos",
+     "type": "WeakFixedArray|WeakArrayList",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 44
+    },
+    {
+     "name": "compiled_lazy_function_positions",
+     "type": "ArrayList|Undefined",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 48
+    },
+    {
+     "name": "flags",
+     "type": "SmiTagged<ScriptFlags>",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 52
+    },
+    {
+     "name": "source_url",
+     "type": "String|Undefined",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 56
+    },
+    {
+     "name": "source_mapping_url",
+     "type": "Object",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 60
+    },
+    {
+     "name": "debug_id",
+     "type": "String|Undefined",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 64
+    },
+    {
+     "name": "host_defined_options",
+     "type": "FixedArray",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 68
+    },
+    {
+     "name": "script_or_modules",
+     "type": "ArrayList",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "tagged-default",
+     "conditional": false,
+     "indexed": false,
+     "present": false,
+     "gatedOn": {
+      "sense": "if",
+      "flag": "V8_SCRIPTORMODULE_LEGACY_LIFETIME"
+     },
+     "offset": null
+    },
+    {
+     "name": "source_hash",
+     "type": "String|Undefined",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 72
+    }
+   ],
+   "crossCheck": {
+    "issues": [],
+    "added": [],
+    "compared": 18,
+    "profileFieldCount": 18,
+    "overlayFieldCount": 19
+   }
+  },
+  "Map": {
+   "name": "Map",
+   "source": "src/objects/map.tq",
+   "parent": "HeapObject",
+   "parentSize": 4,
+   "taggedSize": 4,
+   "generatesConsts": {
+    "kMaxInlinedLocalNamesSize": "kScopeInfoMaxInlinedLocalNamesSize",
+    "kDontAdaptArgumentsSentinel": "kDontAdaptArgumentsSentinel",
+    "kMaxCachedArrayIndexLength": "Name::kMaxCachedArrayIndexLength",
+    "kMaxArrayIndexSize": "Name::kMaxArrayIndexSize",
+    "kNofHashBitFields": "Name::HashFieldTypeBits::kSize",
+    "kArrayIndexValueBits": "Name::kArrayIndexValueBits",
+    "kDoesNotContainCachedArrayIndexMask": "Name::kDoesNotContainCachedArrayIndexMask"
+   },
+   "fields": [
+    {
+     "name": "inobject_properties_start_or_constructor_function_index",
+     "type": "uint8",
+     "kind": "int",
+     "size": 1,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 4
+    },
+    {
+     "name": "used_or_unused_instance_size_in_words",
+     "type": "uint8",
+     "kind": "int",
+     "size": 1,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 5
+    },
+    {
+     "name": "visitor_id",
+     "type": "uint8",
+     "kind": "int",
+     "size": 1,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 6
+    },
+    {
+     "name": "instance_type",
+     "type": "InstanceType",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 7
+    },
+    {
+     "name": "bit_field",
+     "type": "MapBitFields1",
+     "kind": "bitfield",
+     "size": 1,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 11
+    },
+    {
+     "name": "bit_field2",
+     "type": "MapBitFields2",
+     "kind": "bitfield",
+     "size": 1,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 12
+    },
+    {
+     "name": "bit_field3",
+     "type": "MapBitFields3",
+     "kind": "bitfield",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 13
+    },
+    {
+     "name": "optional_padding",
+     "type": "uint32",
+     "kind": "int",
+     "size": 4,
+     "sizeHow": "primitive",
+     "conditional": false,
+     "indexed": false,
+     "present": false,
+     "gatedOn": {
+      "sense": "if",
+      "flag": "TAGGED_SIZE_8_BYTES"
+     },
+     "offset": null
+    },
+    {
+     "name": "optional_padding",
+     "type": "void",
+     "kind": "void",
+     "size": 0,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": {
+      "sense": "ifnot",
+      "flag": "TAGGED_SIZE_8_BYTES"
+     },
+     "offset": 17
+    },
+    {
+     "name": "prototype",
+     "type": "JSReceiver|Null",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 17
+    },
+    {
+     "name": "constructor_or_back_pointer_or_native_context",
+     "type": "Object",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 21
+    },
+    {
+     "name": "instance_descriptors",
+     "type": "DescriptorArray |WasmStruct",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": {
+      "sense": "if",
+      "flag": "V8_ENABLE_WEBASSEMBLY"
+     },
+     "offset": 25
+    },
+    {
+     "name": "instance_descriptors",
+     "type": "DescriptorArray",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "tagged-default",
+     "conditional": false,
+     "indexed": false,
+     "present": false,
+     "gatedOn": {
+      "sense": "ifnot",
+      "flag": "V8_ENABLE_WEBASSEMBLY"
+     },
+     "offset": null
+    },
+    {
+     "name": "dependent_code",
+     "type": "DependentCode|Map",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": {
+      "sense": "if",
+      "flag": "V8_ENABLE_WEBASSEMBLY"
+     },
+     "offset": 29
+    },
+    {
+     "name": "dependent_code",
+     "type": "DependentCode",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": false,
+     "gatedOn": {
+      "sense": "ifnot",
+      "flag": "V8_ENABLE_WEBASSEMBLY"
+     },
+     "offset": null
+    },
+    {
+     "name": "prototype_validity_cell",
+     "type": "Zero|Cell",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 33
+    },
+    {
+     "name": "transitions_or_prototype_info",
+     "type": "Map|Weak<Map>|TransitionArray|PrototypeInfo| Zero",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 37
+    }
+   ],
+   "crossCheck": {
+    "issues": [
+     "inobject_properties_start_or_constructor_function_index: offset 5 vs 4",
+     "used_or_unused_instance_size_in_words: offset 6 vs 5",
+     "visitor_id: offset 7 vs 6",
+     "instance_type: offset 8 vs 7",
+     "bit_field: offset 12 vs 11",
+     "bit_field2: offset 13 vs 12",
+     "bit_field3: offset 14 vs 13",
+     "optional_padding: offset 18 vs 17",
+     "prototype: offset 18 vs 17",
+     "constructor_or_back_pointer_or_native_context: offset 22 vs 21",
+     "instance_descriptors: offset 26 vs 25",
+     "dependent_code: offset 30 vs 29",
+     "prototype_validity_cell: offset 34 vs 33",
+     "transitions_or_prototype_info: offset 38 vs 37",
+     "profile has fields this reader did not find: instance_size_in_words"
+    ],
+    "added": [],
+    "compared": 14,
+    "profileFieldCount": 15,
+    "overlayFieldCount": 17
+   }
+  }
+ },
+ "enums": {
+  "FunctionKind": {
+   "name": "FunctionKind",
+   "members": {
+    "kNormalFunction": 0,
+    "kModule": 1,
+    "kModuleWithTopLevelAwait": 2,
+    "kBaseConstructor": 3,
+    "kDefaultBaseConstructor": 4,
+    "kDefaultDerivedConstructor": 5,
+    "kDerivedConstructor": 6,
+    "kGetterFunction": 7,
+    "kStaticGetterFunction": 8,
+    "kSetterFunction": 9,
+    "kStaticSetterFunction": 10,
+    "kArrowFunction": 11,
+    "kAsyncArrowFunction": 12,
+    "kAsyncFunction": 13,
+    "kAsyncConciseMethod": 14,
+    "kStaticAsyncConciseMethod": 15,
+    "kAsyncConciseGeneratorMethod": 16,
+    "kStaticAsyncConciseGeneratorMethod": 17,
+    "kAsyncGeneratorFunction": 18,
+    "kGeneratorFunction": 19,
+    "kConciseGeneratorMethod": 20,
+    "kStaticConciseGeneratorMethod": 21,
+    "kConciseMethod": 22,
+    "kStaticConciseMethod": 23,
+    "kClassMembersInitializerFunction": 24,
+    "kClassMembersInitializerFunctionPrecededByStatic": 25,
+    "kClassStaticInitializerFunction": 26,
+    "kClassStaticInitializerFunctionPrecededByMember": 27,
+    "kInvalid": 28
+   },
+   "aliases": {
+    "kLastFunctionKind": "kClassStaticInitializerFunctionPrecededByMember"
+   }
+  },
+  "FunctionSyntaxKind": {
+   "name": "FunctionSyntaxKind",
+   "members": {
+    "kAnonymousExpression": 0,
+    "kNamedExpression": 1,
+    "kDeclaration": 2,
+    "kAccessorOrMethod": 3,
+    "kWrapped": 4
+   },
+   "aliases": {
+    "kLastFunctionSyntaxKind": "kWrapped"
+   }
+  },
+  "LanguageMode": {
+   "name": "LanguageMode",
+   "members": {
+    "kSloppy": 0,
+    "kStrict": 1
+   },
+   "aliases": {}
+  },
+  "ElementsKind": {
+   "name": "ElementsKind",
+   "members": {
+    "PACKED_SMI_ELEMENTS": 0,
+    "HOLEY_SMI_ELEMENTS": 1,
+    "PACKED_ELEMENTS": 2,
+    "HOLEY_ELEMENTS": 3,
+    "PACKED_DOUBLE_ELEMENTS": 4,
+    "HOLEY_DOUBLE_ELEMENTS": 5,
+    "PACKED_NONEXTENSIBLE_ELEMENTS": 6,
+    "HOLEY_NONEXTENSIBLE_ELEMENTS": 7,
+    "PACKED_SEALED_ELEMENTS": 8,
+    "HOLEY_SEALED_ELEMENTS": 9,
+    "PACKED_FROZEN_ELEMENTS": 10,
+    "HOLEY_FROZEN_ELEMENTS": 11,
+    "SHARED_ARRAY_ELEMENTS": 12,
+    "DICTIONARY_ELEMENTS": 13,
+    "FAST_SLOPPY_ARGUMENTS_ELEMENTS": 14,
+    "SLOW_SLOPPY_ARGUMENTS_ELEMENTS": 15,
+    "FAST_STRING_WRAPPER_ELEMENTS": 16,
+    "SLOW_STRING_WRAPPER_ELEMENTS": 17
+   },
+   "partial": true,
+   "completeUpTo": 17,
+   "stoppedAt": "#define TYPED_ARRAY_ELEMENTS_KIND(Type, type, TYPE, ctype) TYPE##_ELEMENTS,",
+   "source": "src/objects/elements-kind.h",
+   "note": "only the literal prefix before the TYPED_ARRAYS macro expansion is extracted; it covers every kind a literal boilerplate can carry"
+  }
+ },
+ "functionKindGroups": {
+  "IsArrowFunction": [
+   [
+    11,
+    12
+   ]
+  ],
+  "IsModule": [
+   [
+    1,
+    2
+   ]
+  ],
+  "IsModuleWithTopLevelAwait": [
+   [
+    2,
+    2
+   ]
+  ],
+  "IsAsyncGeneratorFunction": [
+   [
+    16,
+    18
+   ]
+  ],
+  "IsGeneratorFunction": [
+   [
+    16,
+    21
+   ]
+  ],
+  "IsAsyncFunction": [
+   [
+    12,
+    18
+   ]
+  ],
+  "IsConciseMethod": [
+   [
+    14,
+    17
+   ],
+   [
+    20,
+    27
+   ]
+  ],
+  "IsStrictFunctionWithoutPrototype": [
+   [
+    7,
+    12
+   ],
+   [
+    14,
+    17
+   ],
+   [
+    20,
+    27
+   ]
+  ],
+  "IsGetterFunction": [
+   [
+    7,
+    8
+   ]
+  ],
+  "IsSetterFunction": [
+   [
+    9,
+    10
+   ]
+  ],
+  "IsAccessorFunction": [
+   [
+    7,
+    10
+   ]
+  ],
+  "IsDefaultConstructor": [
+   [
+    4,
+    5
+   ]
+  ],
+  "IsBaseConstructor": [
+   [
+    3,
+    4
+   ]
+  ],
+  "IsDerivedConstructor": [
+   [
+    5,
+    6
+   ]
+  ],
+  "IsClassConstructor": [
+   [
+    3,
+    6
+   ]
+  ],
+  "IsClassInitializerFunction": [
+   [
+    24,
+    27
+   ]
+  ],
+  "IsClassInstanceInitializerFunction": [
+   [
+    24,
+    25
+   ]
+  ],
+  "IsClassStaticInitializerFunction": [
+   [
+    26,
+    27
+   ]
+  ],
+  "IsConstructable": [
+   [
+    0,
+    6
+   ]
+  ]
+ },
+ "enumDisagreements": [
+  {
+   "enum": "LanguageMode",
+   "member": "kSloppy",
+   "torqueDeclarationOrder": 1,
+   "cppValue": 0
+  },
+  {
+   "enum": "LanguageMode",
+   "member": "kStrict",
+   "torqueDeclarationOrder": 0,
+   "cppValue": 1
+  },
+  {
+   "enum": "ElementsKind",
+   "member": "PACKED_SMI_ELEMENTS",
+   "torqueDeclarationOrder": 1,
+   "cppValue": 0
+  },
+  {
+   "enum": "ElementsKind",
+   "member": "HOLEY_SMI_ELEMENTS",
+   "torqueDeclarationOrder": 2,
+   "cppValue": 1
+  },
+  {
+   "enum": "ElementsKind",
+   "member": "PACKED_ELEMENTS",
+   "torqueDeclarationOrder": 3,
+   "cppValue": 2
+  },
+  {
+   "enum": "ElementsKind",
+   "member": "HOLEY_ELEMENTS",
+   "torqueDeclarationOrder": 4,
+   "cppValue": 3
+  },
+  {
+   "enum": "ElementsKind",
+   "member": "PACKED_DOUBLE_ELEMENTS",
+   "torqueDeclarationOrder": 5,
+   "cppValue": 4
+  },
+  {
+   "enum": "ElementsKind",
+   "member": "HOLEY_DOUBLE_ELEMENTS",
+   "torqueDeclarationOrder": 6,
+   "cppValue": 5
+  },
+  {
+   "enum": "ElementsKind",
+   "member": "DICTIONARY_ELEMENTS",
+   "torqueDeclarationOrder": 8,
+   "cppValue": 13
+  }
+ ],
+ "codeCache": {
+  "magicBase": 3235774464,
+  "sourceHash": {
+   "length": {
+    "offset": 0,
+    "width": 29
+   },
+   "hasWrappedArguments": {
+    "offset": 29,
+    "width": 1
+   },
+   "isModule": {
+    "offset": 30,
+    "width": 1
+   }
+  },
+  "checksum": {
+   "algorithm": "adler32",
+   "seed": 0,
+   "note": "adler32 seeded with 0, not the conventional 1 (src/snapshot/snapshot-utils.cc)",
+   "onlyWrittenWhen": "v8_flags.verify_snapshot_checksum; otherwise the field is 0"
+  }
+ },
+ "snapshotSpaces": {
+  "kReadOnlyHeap": 0,
+  "kOld": 1,
+  "kCode": 2,
+  "kTrusted": 3
+ },
+ "versionHash": {
+  "expression": "hash_combine(major_, minor_, build_, patch_)",
+  "inputs": [
+   "major",
+   "minor",
+   "build",
+   "patch"
+  ],
+  "combine64": {
+   "m": "0xC6A4A7935BD1E995",
+   "r": 47
+  },
+  "note": "Version::Hash() == Hasher::Combine(major, minor, build, patch); see src/utils/version.h and src/base/hashing.h"
+ },
+ "cppLayouts": {
+  "BigIntBase": {
+   "source": "src/objects/bigint.h",
+   "parent": "PrimitiveHeapObject",
+   "bitfieldOffset": 4,
+   "bitfieldSize": 4,
+   "digitsOffset": 8,
+   "digitsAlignment": 4,
+   "digitsPadding": 0,
+   "digitSize": 8,
+   "digitType": "uintptr_t",
+   "fields": {
+    "sign": {
+     "offset": 0,
+     "width": 1
+    },
+    "length": {
+     "offset": 1,
+     "width": 30
+    }
+   },
+   "note": "raw_digits is an UnalignedValueMember<digit_t> flexible array; UnalignedValueMember is alignas(alignof(Tagged_t)) (src/objects/tagged-field.h), so the array starts at the next kTaggedSize boundary after bitfield_"
+  },
+  "HashTableBase": {
+   "numberOfElementsIndex": 0,
+   "numberOfDeletedElementsIndex": 1,
+   "capacityIndex": 2,
+   "prefixStartIndex": 3,
+   "source": "src/objects/hash-table.h",
+   "note": "entries start at prefixStartIndex + Shape::kPrefixSize; Shape constants live with each table and are not extracted here"
+  },
+  "SourcePosition": {
+   "source": "src/codegen/source-position.h",
+   "fields": {
+    "isExternal": {
+     "type": "bool",
+     "offset": 0,
+     "width": 1
+    },
+    "externalLine": {
+     "type": "int",
+     "offset": 1,
+     "width": 20
+    },
+    "externalFileId": {
+     "type": "int",
+     "offset": 21,
+     "width": 10
+    },
+    "scriptOffset": {
+     "type": "int",
+     "offset": 1,
+     "width": 30
+    },
+    "inliningId": {
+     "type": "int",
+     "offset": 31,
+     "width": 16
+    }
+   },
+   "scriptOffsetBias": 1,
+   "inliningIdBias": 1,
+   "kNoSourcePosition": -1,
+   "note": "scriptOffset = ScriptOffsetField::decode(raw) - scriptOffsetBias, valid only when isExternal is 0"
+  }
+ },
+ "diagnostics": {
+  "classesCrossChecked": [
+   "ScopeInfo",
+   "PreparseData",
+   "SharedFunctionInfo",
+   "UncompiledData",
+   "UncompiledDataWithoutPreparseData",
+   "UncompiledDataWithPreparseData",
+   "UncompiledDataWithoutPreparseDataWithJob",
+   "UncompiledDataWithPreparseDataAndJob",
+   "BytecodeArray",
+   "BytecodeWrapper",
+   "FixedArrayBase",
+   "FixedArray",
+   "TrustedFixedArray",
+   "ProtectedFixedArray",
+   "ByteArray",
+   "TrustedByteArray",
+   "ObjectBoilerplateDescription",
+   "ArrayBoilerplateDescription",
+   "RegExpBoilerplateDescription",
+   "TemplateObjectDescription",
+   "String",
+   "ConsString",
+   "ExternalString",
+   "SeqString",
+   "SeqOneByteString",
+   "SeqTwoByteString",
+   "SlicedString",
+   "ThinString",
+   "Name",
+   "Symbol",
+   "HeapNumber",
+   "HeapObject",
+   "TrustedObject",
+   "ExposedTrustedObject",
+   "Oddball",
+   "Hole",
+   "Script",
+   "Map"
+  ],
+  "classesPatched": [],
+  "report": [
+   {
+    "class": "ScopeInfo",
+    "source": "src/objects/scope-info.tq",
+    "lost": [],
+    "crossCheck": {
+     "issues": [],
+     "added": [],
+     "compared": 17,
+     "profileFieldCount": 17,
+     "overlayFieldCount": 18
+    }
+   },
+   {
+    "class": "PreparseData",
+    "source": "src/objects/shared-function-info.tq",
+    "lost": [],
+    "crossCheck": {
+     "issues": [],
+     "added": [],
+     "compared": 2,
+     "profileFieldCount": 2,
+     "overlayFieldCount": 2
+    }
+   },
+   {
+    "class": "SharedFunctionInfo",
+    "source": "src/objects/shared-function-info.tq",
+    "lost": [],
+    "crossCheck": {
+     "issues": [],
+     "added": [],
+     "compared": 15,
+     "profileFieldCount": 15,
+     "overlayFieldCount": 15
+    }
+   },
+   {
+    "class": "UncompiledData",
+    "source": "src/objects/shared-function-info.tq",
+    "lost": [],
+    "crossCheck": {
+     "issues": [],
+     "added": [],
+     "compared": 3,
+     "profileFieldCount": 3,
+     "overlayFieldCount": 3
+    }
+   },
+   {
+    "class": "UncompiledDataWithoutPreparseData",
+    "source": "src/objects/shared-function-info.tq",
+    "lost": [],
+    "crossCheck": {
+     "issues": [],
+     "added": [],
+     "compared": 0,
+     "profileFieldCount": 0,
+     "overlayFieldCount": 0
+    }
+   },
+   {
+    "class": "UncompiledDataWithPreparseData",
+    "source": "src/objects/shared-function-info.tq",
+    "lost": [],
+    "crossCheck": {
+     "issues": [],
+     "added": [],
+     "compared": 1,
+     "profileFieldCount": 1,
+     "overlayFieldCount": 1
+    }
+   },
+   {
+    "class": "UncompiledDataWithoutPreparseDataWithJob",
+    "source": "src/objects/shared-function-info.tq",
+    "lost": [],
+    "crossCheck": {
+     "issues": [],
+     "added": [],
+     "compared": 1,
+     "profileFieldCount": 1,
+     "overlayFieldCount": 1
+    }
+   },
+   {
+    "class": "UncompiledDataWithPreparseDataAndJob",
+    "source": "src/objects/shared-function-info.tq",
+    "lost": [],
+    "crossCheck": {
+     "issues": [],
+     "added": [],
+     "compared": 1,
+     "profileFieldCount": 1,
+     "overlayFieldCount": 1
+    }
+   },
+   {
+    "class": "BytecodeArray",
+    "source": "src/objects/bytecode-array.tq",
+    "lost": [],
+    "crossCheck": {
+     "issues": [],
+     "added": [],
+     "compared": 11,
+     "profileFieldCount": 11,
+     "overlayFieldCount": 12
+    }
+   },
+   {
+    "class": "BytecodeWrapper",
+    "source": "src/objects/bytecode-array.tq",
+    "lost": [],
+    "crossCheck": {
+     "issues": [],
+     "added": [],
+     "compared": 1,
+     "profileFieldCount": 1,
+     "overlayFieldCount": 1
+    }
+   },
+   {
+    "class": "FixedArrayBase",
+    "source": "src/objects/fixed-array.tq",
+    "lost": [],
+    "crossCheck": {
+     "issues": [],
+     "added": [],
+     "compared": 1,
+     "profileFieldCount": 1,
+     "overlayFieldCount": 1
+    }
+   },
+   {
+    "class": "FixedArray",
+    "source": "src/objects/fixed-array.tq",
+    "lost": [],
+    "crossCheck": {
+     "issues": [],
+     "added": [],
+     "compared": 1,
+     "profileFieldCount": 1,
+     "overlayFieldCount": 1
+    }
+   },
+   {
+    "class": "TrustedFixedArray",
+    "source": "src/objects/fixed-array.tq",
+    "lost": [],
+    "crossCheck": {
+     "issues": [],
+     "added": [],
+     "compared": 2,
+     "profileFieldCount": 2,
+     "overlayFieldCount": 2
+    }
+   },
+   {
+    "class": "ProtectedFixedArray",
+    "source": "src/objects/fixed-array.tq",
+    "lost": [],
+    "crossCheck": {
+     "issues": [],
+     "added": [],
+     "compared": 2,
+     "profileFieldCount": 2,
+     "overlayFieldCount": 2
+    }
+   },
+   {
+    "class": "ByteArray",
+    "source": "src/objects/fixed-array.tq",
+    "lost": [],
+    "crossCheck": {
+     "issues": [],
+     "added": [],
+     "compared": 1,
+     "profileFieldCount": 1,
+     "overlayFieldCount": 1
+    }
+   },
+   {
+    "class": "TrustedByteArray",
+    "source": "src/objects/fixed-array.tq",
+    "lost": [],
+    "crossCheck": {
+     "issues": [],
+     "added": [],
+     "compared": 2,
+     "profileFieldCount": 2,
+     "overlayFieldCount": 2
+    }
+   },
+   {
+    "class": "ObjectBoilerplateDescription",
+    "source": "src/objects/literal-objects.tq",
+    "lost": [],
+    "crossCheck": {
+     "issues": [],
+     "added": [],
+     "compared": 4,
+     "profileFieldCount": 4,
+     "overlayFieldCount": 4
+    }
+   },
+   {
+    "class": "ArrayBoilerplateDescription",
+    "source": "src/objects/literal-objects.tq",
+    "lost": [],
+    "crossCheck": {
+     "issues": [],
+     "added": [],
+     "compared": 2,
+     "profileFieldCount": 2,
+     "overlayFieldCount": 2
+    }
+   },
+   {
+    "class": "RegExpBoilerplateDescription",
+    "source": "src/objects/literal-objects.tq",
+    "lost": [],
+    "crossCheck": {
+     "issues": [],
+     "added": [],
+     "compared": 3,
+     "profileFieldCount": 3,
+     "overlayFieldCount": 3
+    }
+   },
+   {
+    "class": "TemplateObjectDescription",
+    "source": "src/objects/template-objects.tq",
+    "lost": [],
+    "crossCheck": {
+     "issues": [],
+     "added": [],
+     "compared": 2,
+     "profileFieldCount": 2,
+     "overlayFieldCount": 2
+    }
+   },
+   {
+    "class": "String",
+    "source": "src/objects/string.tq",
+    "lost": [],
+    "crossCheck": {
+     "issues": [
+      "profile has fields this reader did not find: length"
+     ],
+     "added": [],
+     "compared": 0,
+     "profileFieldCount": 1,
+     "overlayFieldCount": 0
+    }
+   },
+   {
+    "class": "ConsString",
+    "source": "src/objects/string.tq",
+    "lost": [],
+    "crossCheck": {
+     "issues": [
+      "second: offset 16 vs 12",
+      "profile has fields this reader did not find: first"
+     ],
+     "added": [],
+     "compared": 1,
+     "profileFieldCount": 2,
+     "overlayFieldCount": 1
+    }
+   },
+   {
+    "class": "ExternalString",
+    "source": "src/objects/string.tq",
+    "lost": [],
+    "crossCheck": {
+     "issues": [],
+     "added": [],
+     "compared": 2,
+     "profileFieldCount": 2,
+     "overlayFieldCount": 2
+    }
+   },
+   {
+    "class": "SeqString",
+    "source": "src/objects/string.tq",
+    "lost": [],
+    "crossCheck": {
+     "issues": [],
+     "added": [],
+     "compared": 0,
+     "profileFieldCount": 0,
+     "overlayFieldCount": 0
+    }
+   },
+   {
+    "class": "SeqOneByteString",
+    "source": "src/objects/string.tq",
+    "lost": [],
+    "crossCheck": {
+     "issues": [],
+     "added": [],
+     "compared": 1,
+     "profileFieldCount": 1,
+     "overlayFieldCount": 1
+    }
+   },
+   {
+    "class": "SeqTwoByteString",
+    "source": "src/objects/string.tq",
+    "lost": [],
+    "crossCheck": {
+     "issues": [],
+     "added": [],
+     "compared": 1,
+     "profileFieldCount": 1,
+     "overlayFieldCount": 1
+    }
+   },
+   {
+    "class": "SlicedString",
+    "source": "src/objects/string.tq",
+    "lost": [],
+    "crossCheck": {
+     "issues": [],
+     "added": [],
+     "compared": 2,
+     "profileFieldCount": 2,
+     "overlayFieldCount": 2
+    }
+   },
+   {
+    "class": "ThinString",
+    "source": "src/objects/string.tq",
+    "lost": [],
+    "crossCheck": {
+     "issues": [],
+     "added": [],
+     "compared": 1,
+     "profileFieldCount": 1,
+     "overlayFieldCount": 1
+    }
+   },
+   {
+    "class": "Name",
+    "source": "src/objects/name.tq",
+    "lost": [],
+    "crossCheck": {
+     "issues": [],
+     "added": [],
+     "compared": 1,
+     "profileFieldCount": 1,
+     "overlayFieldCount": 1
+    }
+   },
+   {
+    "class": "Symbol",
+    "source": "src/objects/name.tq",
+    "lost": [],
+    "crossCheck": {
+     "issues": [],
+     "added": [],
+     "compared": 2,
+     "profileFieldCount": 2,
+     "overlayFieldCount": 2
+    }
+   },
+   {
+    "class": "HeapNumber",
+    "source": "src/objects/heap-number.tq",
+    "lost": [],
+    "crossCheck": {
+     "issues": [],
+     "added": [],
+     "compared": 1,
+     "profileFieldCount": 1,
+     "overlayFieldCount": 1
+    }
+   },
+   {
+    "class": "HeapObject",
+    "source": "src/objects/heap-object.tq",
+    "lost": [],
+    "crossCheck": {
+     "issues": [],
+     "added": [],
+     "compared": 1,
+     "profileFieldCount": 1,
+     "overlayFieldCount": 1
+    }
+   },
+   {
+    "class": "TrustedObject",
+    "source": "src/objects/trusted-object.tq",
+    "lost": [],
+    "crossCheck": {
+     "issues": [],
+     "added": [],
+     "compared": 0,
+     "profileFieldCount": 0,
+     "overlayFieldCount": 0
+    }
+   },
+   {
+    "class": "ExposedTrustedObject",
+    "source": "src/objects/trusted-object.tq",
+    "lost": [],
+    "crossCheck": {
+     "issues": [],
+     "added": [],
+     "compared": 1,
+     "profileFieldCount": 1,
+     "overlayFieldCount": 1
+    }
+   },
+   {
+    "class": "Oddball",
+    "source": "src/objects/oddball.tq",
+    "lost": [],
+    "crossCheck": {
+     "issues": [],
+     "added": [],
+     "compared": 5,
+     "profileFieldCount": 5,
+     "overlayFieldCount": 5
+    }
+   },
+   {
+    "class": "Hole",
+    "source": "src/objects/hole.tq",
+    "lost": [],
+    "crossCheck": {
+     "issues": [],
+     "added": [],
+     "compared": 0,
+     "profileFieldCount": 0,
+     "overlayFieldCount": 0
+    }
+   },
+   {
+    "class": "Script",
+    "source": "src/objects/script.tq",
+    "lost": [],
+    "crossCheck": {
+     "issues": [],
+     "added": [],
+     "compared": 18,
+     "profileFieldCount": 18,
+     "overlayFieldCount": 19
+    }
+   },
+   {
+    "class": "Map",
+    "source": "src/objects/map.tq",
+    "lost": [],
+    "crossCheck": {
+     "issues": [
+      "inobject_properties_start_or_constructor_function_index: offset 5 vs 4",
+      "used_or_unused_instance_size_in_words: offset 6 vs 5",
+      "visitor_id: offset 7 vs 6",
+      "instance_type: offset 8 vs 7",
+      "bit_field: offset 12 vs 11",
+      "bit_field2: offset 13 vs 12",
+      "bit_field3: offset 14 vs 13",
+      "optional_padding: offset 18 vs 17",
+      "prototype: offset 18 vs 17",
+      "constructor_or_back_pointer_or_native_context: offset 22 vs 21",
+      "instance_descriptors: offset 26 vs 25",
+      "dependent_code: offset 30 vs 29",
+      "prototype_validity_cell: offset 34 vs 33",
+      "transitions_or_prototype_info: offset 38 vs 37",
+      "profile has fields this reader did not find: instance_size_in_words"
+     ],
+     "added": [],
+     "compared": 14,
+     "profileFieldCount": 15,
+     "overlayFieldCount": 17
+    }
+   }
+  ],
+  "typeTableConflicts": [],
+  "predicatesNotUnderstood": [
+   "IsResumableFunction",
+   "IsStatic",
+   "BindsSuper"
+  ]
+ },
+ "sources": [
+  {
+   "path": "src/base/hashing.h",
+   "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.4.258.16/src/base/hashing.h?format=TEXT",
+   "sha256": "5cfd8b05cd096f2785804e10e2620fb5bb01687af3556f61a464e5fe85be4291",
+   "bytes": 12071
+  },
+  {
+   "path": "src/codegen/source-position.h",
+   "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.4.258.16/src/codegen/source-position.h?format=TEXT",
+   "sha256": "44140aeb7bf3894a5c8a5167dbcacd6f9709456f4d784d6e0b810fa50ed8dace",
+   "bytes": 6450
+  },
+  {
+   "path": "src/common/globals.h",
+   "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.4.258.16/src/common/globals.h?format=TEXT",
+   "sha256": "888194871d6758501d03f7981a2e2536a7d6abf536c95cb2f410e7d26c9cb51d",
+   "bytes": 104136
+  },
+  {
+   "path": "src/objects/bigint.h",
+   "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.4.258.16/src/objects/bigint.h?format=TEXT",
+   "sha256": "3686c34e9c0004096ca5861a02f5403729c30492af43096d1567954a7641ee6d",
+   "bytes": 14221
+  },
+  {
+   "path": "src/objects/bytecode-array.tq",
+   "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.4.258.16/src/objects/bytecode-array.tq?format=TEXT",
+   "sha256": "639a83f36c1be917e1ec98414c65a15606c60d5e02d1a5d6bdcc0f62cd56e1a4",
+   "bytes": 1195
+  },
+  {
+   "path": "src/objects/elements-kind.h",
+   "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.4.258.16/src/objects/elements-kind.h?format=TEXT",
+   "sha256": "410e6b49cbc4f0aed2f4f865e8e35e8dfbec3460712ec3dc9017cccad02db853",
+   "bytes": 21711
+  },
+  {
+   "path": "src/objects/fixed-array.tq",
+   "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.4.258.16/src/objects/fixed-array.tq?format=TEXT",
+   "sha256": "9e5572b0540a7031549ee52d1784a9bd103de2cfd7d5450d986126c28498c4e4",
+   "bytes": 7502
+  },
+  {
+   "path": "src/objects/function-kind.h",
+   "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.4.258.16/src/objects/function-kind.h?format=TEXT",
+   "sha256": "30937fb67470aa45ed953bb2fb31f601d36a4b48893dd4a25b0be1c8cdc4d242",
+   "bytes": 9599
+  },
+  {
+   "path": "src/objects/function-syntax-kind.h",
+   "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.4.258.16/src/objects/function-syntax-kind.h?format=TEXT",
+   "sha256": "033b1bd69b96c28304f886de229c89b92310353737af06c427f7a72cfe02aa14",
+   "bytes": 1214
+  },
+  {
+   "path": "src/objects/hash-table.h",
+   "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.4.258.16/src/objects/hash-table.h?format=TEXT",
+   "sha256": "0c03d491bb0cc824dd12decad99c7f79d0e674573e46e9fb955b9c4cb4824d2c",
+   "bytes": 26970
+  },
+  {
+   "path": "src/objects/heap-number.tq",
+   "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.4.258.16/src/objects/heap-number.tq?format=TEXT",
+   "sha256": "295338f5d234a13f1742303fe3abc93bcc39d88d8d44e42ffbf5e0f3cc650db9",
+   "bytes": 477
+  },
+  {
+   "path": "src/objects/heap-object.tq",
+   "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.4.258.16/src/objects/heap-object.tq?format=TEXT",
+   "sha256": "c3bc61ca8cec176be50ff00fde2c2217776df9825fc0ccd1ba46cff05f8f87a2",
+   "bytes": 314
+  },
+  {
+   "path": "src/objects/hole.tq",
+   "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.4.258.16/src/objects/hole.tq?format=TEXT",
+   "sha256": "a6d6309d1b23227d5a5ac1988835dee5c7fcb86fd42af4707006bd9588c88dd8",
+   "bytes": 485
+  },
+  {
+   "path": "src/objects/literal-objects.tq",
+   "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.4.258.16/src/objects/literal-objects.tq?format=TEXT",
+   "sha256": "440b6c69323cf875abc4f82c793a0219c2db70f44b3dc7c0a7b20e45e270345c",
+   "bytes": 1009
+  },
+  {
+   "path": "src/objects/map.tq",
+   "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.4.258.16/src/objects/map.tq?format=TEXT",
+   "sha256": "d564ec29988dc43c702ebe498fde384e219dca2de320259ac3b1e828499bc502",
+   "bytes": 3327
+  },
+  {
+   "path": "src/objects/name.tq",
+   "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.4.258.16/src/objects/name.tq?format=TEXT",
+   "sha256": "558cd67e7df70f4ae1f497ea66b6c4d82c2192ced35276b7f422d0f3f1a393b8",
+   "bytes": 2858
+  },
+  {
+   "path": "src/objects/oddball.tq",
+   "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.4.258.16/src/objects/oddball.tq?format=TEXT",
+   "sha256": "957fd5517808fad258010f637a7f65bb82dd04500928bc0ea5b6db2b07d70582",
+   "bytes": 1000
+  },
+  {
+   "path": "src/objects/scope-info.tq",
+   "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.4.258.16/src/objects/scope-info.tq?format=TEXT",
+   "sha256": "d3589e8b72fb58ae9d6c7722029e8610fc0c89140423d597916bcc54bda708d9",
+   "bytes": 7940
+  },
+  {
+   "path": "src/objects/script.tq",
+   "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.4.258.16/src/objects/script.tq?format=TEXT",
+   "sha256": "68ce0f5ddcf98e7eb726a329065a05ff0f0921f57d57b26934f7806c73b3f584",
+   "bytes": 2752
+  },
+  {
+   "path": "src/objects/shared-function-info.tq",
+   "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.4.258.16/src/objects/shared-function-info.tq?format=TEXT",
+   "sha256": "83d7c7950c73c30010383050eb0f481a67f4f15fa9ef66cc4d087b88d02eefde",
+   "bytes": 8160
+  },
+  {
+   "path": "src/objects/string.tq",
+   "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.4.258.16/src/objects/string.tq?format=TEXT",
+   "sha256": "075483d038c35e130eb70d84b02b87ab4b00b6f39bbad60d006f4ad1ce5eb322",
+   "bytes": 13750
+  },
+  {
+   "path": "src/objects/template-objects.tq",
+   "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.4.258.16/src/objects/template-objects.tq?format=TEXT",
+   "sha256": "c9914281ff001d120896ce675e666bd7357f8241fae918e7b9beb99627e720b8",
+   "bytes": 310
+  },
+  {
+   "path": "src/objects/trusted-object.tq",
+   "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.4.258.16/src/objects/trusted-object.tq?format=TEXT",
+   "sha256": "65babb88d1d58636be59721ecb1a5f0edbf9923a58f46bbd223605d602dde1fa",
+   "bytes": 404
+  },
+  {
+   "path": "src/snapshot/code-serializer.cc",
+   "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.4.258.16/src/snapshot/code-serializer.cc?format=TEXT",
+   "sha256": "c0a4f1c98062ea7599befb61c229cf9162171007d6a88157192941a2f05b229d",
+   "bytes": 37024
+  },
+  {
+   "path": "src/snapshot/references.h",
+   "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.4.258.16/src/snapshot/references.h?format=TEXT",
+   "sha256": "742c1bff38562d819edca95f20140e16e82491808b2e98d0db54f82c355ab16b",
+   "bytes": 4265
+  },
+  {
+   "path": "src/snapshot/snapshot-data.h",
+   "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.4.258.16/src/snapshot/snapshot-data.h?format=TEXT",
+   "sha256": "785b8bab35323092d3e0a9e09e13d7656c8a14b64242260c694869ef969dd009",
+   "bytes": 3346
+  },
+  {
+   "path": "src/snapshot/snapshot-utils.cc",
+   "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.4.258.16/src/snapshot/snapshot-utils.cc?format=TEXT",
+   "sha256": "cdb4b2468fe01a19859945de9b3725750363b98cbdc965f5a0b765837f8f34fb",
+   "bytes": 1110
+  },
+  {
+   "path": "src/utils/version.h",
+   "url": "https://chromium.googlesource.com/v8/v8/+/refs/tags/14.4.258.16/src/utils/version.h?format=TEXT",
+   "sha256": "ccf36430dace7c84c5b1e7c3eeaad7ffb1210f952a8542e599741b6fed77f2cd",
+   "bytes": 1702
+  }
+ ]
+}

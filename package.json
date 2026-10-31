@@ -1,0 +1,37 @@
+{
+  "name": "v8disassembler",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "node tools/ci/run_selftests.mjs",
+    "test:profilegen": "node tools/profilegen/selftest.mjs",
+    "test:frontend": "node tests/t4/selftest.mjs",
+    "test:disasm": "node tools/disasm/selftest.mjs",
+    "test:ir": "node tools/ir/selftest.mjs",
+    "test:recover": "node tools/recover/selftest.mjs",
+    "test:structure": "node tools/structure/selftest.mjs",
+    "test:corpus": "node corpus/check.mjs",
+    "oracle": "node tools/oracle/selftest.mjs",
+    "oracle:frontend": "node tests/t4/acceptance.mjs",
+    "oracle:disasm": "node tools/disasm/oracle_agreement.mjs",
+    "metrics": "node tools/metrics/run.mjs",
+    "profiles": "node tools/profilegen/index.mjs --tag 14.4.258.16 --variant intl+wasm --tagged-size 4 --out profiles/",
+    "shard:plan": "node tools/ci/shard_corpus.mjs --corpus extracted_jsc --shards 12 --plan"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@babel/generator": "^8.0.6",
+    "@babel/types": "^8.0.6",
+    "binaryen": "^132.0.0",
+    "prettier": "^3.9.9"
+  },
+  "devDependencies": {
+    "@babel/parser": "^8.0.8",
+    "@babel/traverse": "^8.0.7",
+    "js-yaml": "^5.5.0"
+  }
+}

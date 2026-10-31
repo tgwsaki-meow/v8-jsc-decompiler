@@ -1,0 +1,118 @@
+{
+  "source": "scratch/audit/BASELINE_AUDIT.md",
+  "date": "2026-10-29",
+  "note": "The baseline column of docs/METRICS.md. Every number carries the section it came from and the sample it was measured on, because several of them are sample-dependent and one of them is mislabelled (see metric 2).",
+  "retiredMetrics": {
+    "outputParseability": {
+      "value": "1039/1039 = 100%",
+      "why": "a property of @babel/generator, not of the decompiler: a valid @babel/types AST cannot print as invalid JavaScript. BASELINE_AUDIT.md 2.5",
+      "doNotReportAsProgress": true
+    },
+    "opcodeCaseCoverage": {
+      "value": "212/212 = 100%",
+      "why": "counts `case` labels in src/dataflow.js, not correct reconstruction: JumpLoop is handled and every loop is still lost. BASELINE_AUDIT.md 4.6",
+      "doNotReportAsProgress": true
+    }
+  },
+  "metrics": {
+    "1": {
+      "name": "loop statements emitted per JumpLoop back-edge",
+      "baseline": "0 / 167",
+      "numerator": 0,
+      "denominator": 167,
+      "unit": "loop statements / back-edges",
+      "section": "5.4 matched table",
+      "sample": "20 size-stratified .jsc + their own decompiled_js output"
+    },
+    "2": {
+      "name": "try statements emitted per handler range",
+      "baseline": "0 / 667",
+      "numerator": 0,
+      "denominator": 667,
+      "unit": "try statements / handler ranges",
+      "section": "5.4 matched table",
+      "sample": "20 size-stratified .jsc + their own decompiled_js output",
+      "caveat": "667 is the count of EXCEPTION OPCODES (Throw / ReThrow / SetPendingMessage), not of handler-table ranges. scratch/audit/loop_matched.mjs counts opcodes; nothing in the baseline counted ranges. The dashboard reports both and keeps them apart."
+    },
+    "3": {
+      "name": "switch statements per switch-dispatch opcode",
+      "baseline": "0 / 160",
+      "numerator": 0,
+      "denominator": 160,
+      "unit": "switch statements / SwitchOnSmiNoFeedback+SwitchOnGeneratorState",
+      "section": "5.4 matched table",
+      "sample": "20 size-stratified .jsc + their own decompiled_js output"
+    },
+    "4": {
+      "name": "O1 opcode-sequence match % (per function, mean and median)",
+      "baseline": "not measured",
+      "section": "5 / ARCHITECTURE.md 5",
+      "sample": "n/a"
+    },
+    "5": {
+      "name": "free identifiers that are real globals",
+      "baseline": "~30%",
+      "value": 29.96,
+      "unit": "% of free references that resolve to a real JS/Node/browser global",
+      "section": "5.3",
+      "sample": "20 smallest parseable decompiled_js outputs, 247 free references, 173 invented = 70.04%"
+    },
+    "6": {
+      "name": "functions emitted / functions deserialized",
+      "baseline": "38.76% aggregate, 96.78% median",
+      "aggregate": 38.76,
+      "median": 96.78,
+      "unit": "%",
+      "section": "3.4",
+      "sample": "the 10 .jsc of the 12-file liveness sample that completed; 5051 / 13030 distinct emitted names"
+    },
+    "7": {
+      "name": "duplicated side-effecting calls (adjacent statement pairs)",
+      "baseline": "12.93%",
+      "numerator": 2787,
+      "denominator": 21550,
+      "value": 12.93,
+      "unit": "% of adjacent statement pairs",
+      "section": "5.5 H1",
+      "sample": "40 decompiled_js outputs in (1 KB, 400 KB]"
+    },
+    "8": {
+      "name": "allocation expressions losing identity",
+      "baseline": "50.27%",
+      "numerator": 2160,
+      "denominator": 4297,
+      "value": 50.27,
+      "unit": "% of allocation expressions duplicated inside one function body",
+      "section": "5.5 H2",
+      "sample": "40 decompiled_js outputs in (1 KB, 400 KB]"
+    },
+    "9": {
+      "name": "unresolved read-only refs",
+      "baseline": "0 expected",
+      "value": 0,
+      "section": "3.6",
+      "sample": "T2 measured 883/883 distinct and 161059/161059 occurrences resolved against profiles/14.4.258.16/ro-heap.json"
+    },
+    "10": {
+      "name": "regions marked UNSTRUCTURED",
+      "baseline": "n/a",
+      "section": "1.2",
+      "sample": "the marker does not exist in the current emitter; `__state` occurs 0 times in all 1039 outputs, so the relooper's irreducible path has zero coverage rather than zero need"
+    },
+    "11": {
+      "name": "throughput, ms per input KB",
+      "baseline": "4 - 5975, no pattern",
+      "min": 4.0,
+      "max": 5975.0,
+      "unit": "ms per input KB",
+      "section": "3.3",
+      "sample": "the 10 completed liveness files; 3.4 KB internal_index.jsc costs 5975 ms/KB and 6 MB b_86background.jsc costs 25 ms/KB"
+    },
+    "12": {
+      "name": "feature-coverage matrix: pass/fail per corpus/features entry",
+      "baseline": "n/a",
+      "section": "5",
+      "sample": "the corpus did not exist at baseline time"
+    }
+  }
+}

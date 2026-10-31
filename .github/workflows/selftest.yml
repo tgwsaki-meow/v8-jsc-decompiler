@@ -1,0 +1,89 @@
+name: self-tests
+
+# Everything here is engine-free and corpus-free: it runs on the committed
+# profiles, on the 270 syntax-feature sources in corpus/features/ that we wrote,
+# and on the 24 .jsc fixtures in tests/t8/fixtures/ that were minted from them.
+# No Tencent input is involved, so this runs on every push.
+#
+# Linux on purpose: the corpus was produced by a Linux x64 build of V8
+# 14.4.258.16, and this host does its development on Windows. Running both
+# catches the places where a path separator or a line ending leaks into a
+# decode.
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: selftest-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  selftest:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: install
+        run: npm ci --no-audit --fund=false
+
+      # ---------------------------------------------------------------- front end
+      - name: profiles are mechanically derivable and internally consistent
+        run: node tools/profilegen/selftest.mjs
+
+      - name: profile loader holds no version literal
+        run: node src/profile/selftest.mjs
+        continue-on-error: true   # only present if T1 shipped it under this name
+
+      - name: cache + heap  (T4)
+        run: node tests/t4/selftest.mjs
+
+      - name: disassembler  (T5)
+        run: node tools/disasm/selftest.mjs
+
+      # ----------------------------------------------------------------- back end
+      - name: IR — CFG, dominators, SSA, effects  (T6)
+        run: node tools/ir/selftest.mjs
+
+      - name: expression recovery  (T7)
+        run: node tools/recover/selftest.mjs
+
+      - name: control-flow structuring  (T8)
+        run: node tools/structure/selftest.mjs
+
+      - name: emitter  (T9)
+        run: node tools/emit/selftest.mjs
+        continue-on-error: true   # W3's last task; remove once it lands
+
+      # -------------------------------------------------------------- corpus/meta
+      - name: the syntax-feature corpus is well formed
+        run: node corpus/check.mjs
+
+      - name: layering — no decompilation layer imports the oracle harness
+        shell: bash
+        run: |
+          set -euo pipefail
+          # ARCHITECTURE.md 11.0. src/verify/ and tools/ are the only places
+          # that may spawn a real V8; nothing on the decompilation path may
+          # depend on them, by construction rather than by accident.
+          bad=0
+          for d in profile listing cache heap load disasm ir recover structure emit cli; do
+            [ -d "src/$d" ] || continue
+            if grep -rn --include='*.mjs' -E "from '(\.\./)+(verify)/|from '(\.\./)+\.\./tools/" "src/$d" ; then
+              echo "::error::src/$d imports from src/verify/ or tools/"
+              bad=1
+            fi
+          done
+          exit $bad

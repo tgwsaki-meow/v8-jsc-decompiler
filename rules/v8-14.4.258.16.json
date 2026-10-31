@@ -1,0 +1,4113 @@
+{
+  "v8_version": "14.4.258.16",
+  "total_opcodes": 212,
+  "header_offsets": {
+    "kMagicNumberOffset": 0,
+    "kVersionHashOffset": 4,
+    "kSourceHashOffset": 8,
+    "kFlagHashOffset": 12,
+    "kReadOnlySnapshotChecksumOffset": 16,
+    "kPayloadLengthOffset": 20,
+    "kChecksumOffset": 24,
+    "kHeaderSize": 32
+  },
+  "operand_properties": {
+    "kReg": {
+      "scalable": true,
+      "signed": true,
+      "base_size": 1
+    },
+    "kRegList": {
+      "scalable": true,
+      "signed": true,
+      "base_size": 1
+    },
+    "kRegPair": {
+      "scalable": true,
+      "signed": true,
+      "base_size": 1
+    },
+    "kRegOut": {
+      "scalable": true,
+      "signed": true,
+      "base_size": 1
+    },
+    "kRegOutList": {
+      "scalable": true,
+      "signed": true,
+      "base_size": 1
+    },
+    "kRegOutPair": {
+      "scalable": true,
+      "signed": true,
+      "base_size": 1
+    },
+    "kRegOutTriple": {
+      "scalable": true,
+      "signed": true,
+      "base_size": 1
+    },
+    "kRegInOut": {
+      "scalable": true,
+      "signed": true,
+      "base_size": 1
+    },
+    "kImm": {
+      "scalable": true,
+      "signed": true,
+      "base_size": 1
+    },
+    "kConstantPoolIndex": {
+      "scalable": true,
+      "signed": false,
+      "base_size": 1
+    },
+    "kFeedbackSlot": {
+      "scalable": true,
+      "signed": false,
+      "base_size": 1
+    },
+    "kContextSlot": {
+      "scalable": true,
+      "signed": false,
+      "base_size": 1
+    },
+    "kCoverageSlot": {
+      "scalable": true,
+      "signed": false,
+      "base_size": 1
+    },
+    "kUImm": {
+      "scalable": true,
+      "signed": false,
+      "base_size": 1
+    },
+    "kRegCount": {
+      "scalable": true,
+      "signed": false,
+      "base_size": 1
+    },
+    "kFlag8": {
+      "scalable": false,
+      "signed": false,
+      "base_size": 1
+    },
+    "kIntrinsicId": {
+      "scalable": false,
+      "signed": false,
+      "base_size": 1
+    },
+    "kNativeContextIndex": {
+      "scalable": false,
+      "signed": false,
+      "base_size": 1
+    },
+    "kAbortReason": {
+      "scalable": false,
+      "signed": false,
+      "base_size": 1
+    },
+    "kFlag16": {
+      "scalable": false,
+      "signed": false,
+      "base_size": 2
+    },
+    "kRuntimeId": {
+      "scalable": false,
+      "signed": false,
+      "base_size": 2
+    }
+  },
+  "opcodes_by_val": {
+    "0": {
+      "name": "Wide",
+      "implicit_register_use": "kNone",
+      "operands": [],
+      "value": 0,
+      "hex": "0x00"
+    },
+    "1": {
+      "name": "ExtraWide",
+      "implicit_register_use": "kNone",
+      "operands": [],
+      "value": 1,
+      "hex": "0x01"
+    },
+    "2": {
+      "name": "DebugBreakWide",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [],
+      "value": 2,
+      "hex": "0x02"
+    },
+    "3": {
+      "name": "DebugBreakExtraWide",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [],
+      "value": 3,
+      "hex": "0x03"
+    },
+    "4": {
+      "name": "DebugBreak0",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [],
+      "value": 4,
+      "hex": "0x04"
+    },
+    "5": {
+      "name": "DebugBreak1",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg"
+      ],
+      "value": 5,
+      "hex": "0x05"
+    },
+    "6": {
+      "name": "DebugBreak2",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kReg"
+      ],
+      "value": 6,
+      "hex": "0x06"
+    },
+    "7": {
+      "name": "DebugBreak3",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kReg",
+        "kReg"
+      ],
+      "value": 7,
+      "hex": "0x07"
+    },
+    "8": {
+      "name": "DebugBreak4",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kReg",
+        "kReg",
+        "kReg"
+      ],
+      "value": 8,
+      "hex": "0x08"
+    },
+    "9": {
+      "name": "DebugBreak5",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kRuntimeId",
+        "kReg",
+        "kReg"
+      ],
+      "value": 9,
+      "hex": "0x09"
+    },
+    "10": {
+      "name": "DebugBreak6",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kRuntimeId",
+        "kReg",
+        "kReg",
+        "kReg"
+      ],
+      "value": 10,
+      "hex": "0x0a"
+    },
+    "11": {
+      "name": "Ldar",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kReg"
+      ],
+      "value": 11,
+      "hex": "0x0b"
+    },
+    "12": {
+      "name": "LdaZero",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [],
+      "value": 12,
+      "hex": "0x0c"
+    },
+    "13": {
+      "name": "LdaSmi",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kImm"
+      ],
+      "value": 13,
+      "hex": "0x0d"
+    },
+    "14": {
+      "name": "LdaUndefined",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [],
+      "value": 14,
+      "hex": "0x0e"
+    },
+    "15": {
+      "name": "LdaNull",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [],
+      "value": 15,
+      "hex": "0x0f"
+    },
+    "16": {
+      "name": "LdaTheHole",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [],
+      "value": 16,
+      "hex": "0x10"
+    },
+    "17": {
+      "name": "LdaTrue",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [],
+      "value": 17,
+      "hex": "0x11"
+    },
+    "18": {
+      "name": "LdaFalse",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [],
+      "value": 18,
+      "hex": "0x12"
+    },
+    "19": {
+      "name": "LdaConstant",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kConstantPoolIndex"
+      ],
+      "value": 19,
+      "hex": "0x13"
+    },
+    "20": {
+      "name": "LdaContextSlotNoCell",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kContextSlot",
+        "kUImm"
+      ],
+      "value": 20,
+      "hex": "0x14"
+    },
+    "21": {
+      "name": "LdaContextSlot",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kContextSlot",
+        "kUImm"
+      ],
+      "value": 21,
+      "hex": "0x15"
+    },
+    "22": {
+      "name": "LdaImmutableContextSlot",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kContextSlot",
+        "kUImm"
+      ],
+      "value": 22,
+      "hex": "0x16"
+    },
+    "23": {
+      "name": "LdaCurrentContextSlotNoCell",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kContextSlot"
+      ],
+      "value": 23,
+      "hex": "0x17"
+    },
+    "24": {
+      "name": "LdaCurrentContextSlot",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kContextSlot"
+      ],
+      "value": 24,
+      "hex": "0x18"
+    },
+    "25": {
+      "name": "LdaImmutableCurrentContextSlot",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kContextSlot"
+      ],
+      "value": 25,
+      "hex": "0x19"
+    },
+    "26": {
+      "name": "Star",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kRegOut"
+      ],
+      "value": 26,
+      "hex": "0x1a"
+    },
+    "27": {
+      "name": "Mov",
+      "implicit_register_use": "kNone",
+      "operands": [
+        "kReg",
+        "kRegOut"
+      ],
+      "value": 27,
+      "hex": "0x1b"
+    },
+    "28": {
+      "name": "PushContext",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kRegOut"
+      ],
+      "value": 28,
+      "hex": "0x1c"
+    },
+    "29": {
+      "name": "PopContext",
+      "implicit_register_use": "kNone",
+      "operands": [
+        "kReg"
+      ],
+      "value": 29,
+      "hex": "0x1d"
+    },
+    "30": {
+      "name": "TestReferenceEqual",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg"
+      ],
+      "value": 30,
+      "hex": "0x1e"
+    },
+    "31": {
+      "name": "TestUndetectable",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [],
+      "value": 31,
+      "hex": "0x1f"
+    },
+    "32": {
+      "name": "TestNull",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [],
+      "value": 32,
+      "hex": "0x20"
+    },
+    "33": {
+      "name": "TestUndefined",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [],
+      "value": 33,
+      "hex": "0x21"
+    },
+    "34": {
+      "name": "TestTypeOf",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kFlag8"
+      ],
+      "value": 34,
+      "hex": "0x22"
+    },
+    "35": {
+      "name": "LdaGlobal",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kConstantPoolIndex",
+        "kFeedbackSlot"
+      ],
+      "value": 35,
+      "hex": "0x23"
+    },
+    "36": {
+      "name": "LdaGlobalInsideTypeof",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kConstantPoolIndex",
+        "kFeedbackSlot"
+      ],
+      "value": 36,
+      "hex": "0x24"
+    },
+    "37": {
+      "name": "StaGlobal",
+      "implicit_register_use": "kReadAndClobberAccumulator",
+      "operands": [
+        "kConstantPoolIndex",
+        "kFeedbackSlot"
+      ],
+      "value": 37,
+      "hex": "0x25"
+    },
+    "38": {
+      "name": "StaContextSlotNoCell",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kReg",
+        "kContextSlot",
+        "kUImm"
+      ],
+      "value": 38,
+      "hex": "0x26"
+    },
+    "39": {
+      "name": "StaCurrentContextSlotNoCell",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kContextSlot"
+      ],
+      "value": 39,
+      "hex": "0x27"
+    },
+    "40": {
+      "name": "StaContextSlot",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kReg",
+        "kContextSlot",
+        "kUImm"
+      ],
+      "value": 40,
+      "hex": "0x28"
+    },
+    "41": {
+      "name": "StaCurrentContextSlot",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kContextSlot"
+      ],
+      "value": 41,
+      "hex": "0x29"
+    },
+    "42": {
+      "name": "LdaLookupSlot",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kConstantPoolIndex"
+      ],
+      "value": 42,
+      "hex": "0x2a"
+    },
+    "43": {
+      "name": "LdaLookupContextSlotNoCell",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kConstantPoolIndex",
+        "kContextSlot",
+        "kUImm"
+      ],
+      "value": 43,
+      "hex": "0x2b"
+    },
+    "44": {
+      "name": "LdaLookupContextSlot",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kConstantPoolIndex",
+        "kContextSlot",
+        "kUImm"
+      ],
+      "value": 44,
+      "hex": "0x2c"
+    },
+    "45": {
+      "name": "LdaLookupGlobalSlot",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kConstantPoolIndex",
+        "kFeedbackSlot",
+        "kUImm"
+      ],
+      "value": 45,
+      "hex": "0x2d"
+    },
+    "46": {
+      "name": "LdaLookupSlotInsideTypeof",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kConstantPoolIndex"
+      ],
+      "value": 46,
+      "hex": "0x2e"
+    },
+    "47": {
+      "name": "LdaLookupContextSlotNoCellInsideTypeof",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kConstantPoolIndex",
+        "kContextSlot",
+        "kUImm"
+      ],
+      "value": 47,
+      "hex": "0x2f"
+    },
+    "48": {
+      "name": "LdaLookupContextSlotInsideTypeof",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kConstantPoolIndex",
+        "kContextSlot",
+        "kUImm"
+      ],
+      "value": 48,
+      "hex": "0x30"
+    },
+    "49": {
+      "name": "LdaLookupGlobalSlotInsideTypeof",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kConstantPoolIndex",
+        "kFeedbackSlot",
+        "kUImm"
+      ],
+      "value": 49,
+      "hex": "0x31"
+    },
+    "50": {
+      "name": "StaLookupSlot",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kConstantPoolIndex",
+        "kFlag8"
+      ],
+      "value": 50,
+      "hex": "0x32"
+    },
+    "51": {
+      "name": "GetNamedProperty",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kConstantPoolIndex",
+        "kFeedbackSlot"
+      ],
+      "value": 51,
+      "hex": "0x33"
+    },
+    "52": {
+      "name": "GetNamedPropertyFromSuper",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kConstantPoolIndex",
+        "kFeedbackSlot"
+      ],
+      "value": 52,
+      "hex": "0x34"
+    },
+    "53": {
+      "name": "GetKeyedProperty",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 53,
+      "hex": "0x35"
+    },
+    "54": {
+      "name": "GetEnumeratedKeyedProperty",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kReg",
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 54,
+      "hex": "0x36"
+    },
+    "55": {
+      "name": "LdaModuleVariable",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kImm",
+        "kUImm"
+      ],
+      "value": 55,
+      "hex": "0x37"
+    },
+    "56": {
+      "name": "StaModuleVariable",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kImm",
+        "kUImm"
+      ],
+      "value": 56,
+      "hex": "0x38"
+    },
+    "57": {
+      "name": "SetNamedProperty",
+      "implicit_register_use": "kReadAndClobberAccumulator",
+      "operands": [
+        "kReg",
+        "kConstantPoolIndex",
+        "kFeedbackSlot"
+      ],
+      "value": 57,
+      "hex": "0x39"
+    },
+    "58": {
+      "name": "DefineNamedOwnProperty",
+      "implicit_register_use": "kReadAndClobberAccumulator",
+      "operands": [
+        "kReg",
+        "kConstantPoolIndex",
+        "kFeedbackSlot"
+      ],
+      "value": 58,
+      "hex": "0x3a"
+    },
+    "59": {
+      "name": "SetKeyedProperty",
+      "implicit_register_use": "kReadAndClobberAccumulator",
+      "operands": [
+        "kReg",
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 59,
+      "hex": "0x3b"
+    },
+    "60": {
+      "name": "DefineKeyedOwnProperty",
+      "implicit_register_use": "kReadAndClobberAccumulator",
+      "operands": [
+        "kReg",
+        "kReg",
+        "kFlag8",
+        "kFeedbackSlot"
+      ],
+      "value": 60,
+      "hex": "0x3c"
+    },
+    "61": {
+      "name": "StaInArrayLiteral",
+      "implicit_register_use": "kReadAndClobberAccumulator",
+      "operands": [
+        "kReg",
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 61,
+      "hex": "0x3d"
+    },
+    "62": {
+      "name": "DefineKeyedOwnPropertyInLiteral",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kReg",
+        "kReg",
+        "kFlag8",
+        "kFeedbackSlot"
+      ],
+      "value": 62,
+      "hex": "0x3e"
+    },
+    "63": {
+      "name": "SetPrototypeProperties",
+      "implicit_register_use": "kReadAndClobberAccumulator",
+      "operands": [
+        "kConstantPoolIndex",
+        "kFeedbackSlot"
+      ],
+      "value": 63,
+      "hex": "0x3f"
+    },
+    "64": {
+      "name": "Add",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 64,
+      "hex": "0x40"
+    },
+    "65": {
+      "name": "Sub",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 65,
+      "hex": "0x41"
+    },
+    "66": {
+      "name": "Mul",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 66,
+      "hex": "0x42"
+    },
+    "67": {
+      "name": "Div",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 67,
+      "hex": "0x43"
+    },
+    "68": {
+      "name": "Mod",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 68,
+      "hex": "0x44"
+    },
+    "69": {
+      "name": "Exp",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 69,
+      "hex": "0x45"
+    },
+    "70": {
+      "name": "BitwiseOr",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 70,
+      "hex": "0x46"
+    },
+    "71": {
+      "name": "BitwiseXor",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 71,
+      "hex": "0x47"
+    },
+    "72": {
+      "name": "BitwiseAnd",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 72,
+      "hex": "0x48"
+    },
+    "73": {
+      "name": "ShiftLeft",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 73,
+      "hex": "0x49"
+    },
+    "74": {
+      "name": "ShiftRight",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 74,
+      "hex": "0x4a"
+    },
+    "75": {
+      "name": "ShiftRightLogical",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 75,
+      "hex": "0x4b"
+    },
+    "76": {
+      "name": "Add_StringConstant_Internalize",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kFeedbackSlot",
+        "kFlag8"
+      ],
+      "value": 76,
+      "hex": "0x4c"
+    },
+    "77": {
+      "name": "AddSmi",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kImm",
+        "kFeedbackSlot"
+      ],
+      "value": 77,
+      "hex": "0x4d"
+    },
+    "78": {
+      "name": "SubSmi",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kImm",
+        "kFeedbackSlot"
+      ],
+      "value": 78,
+      "hex": "0x4e"
+    },
+    "79": {
+      "name": "MulSmi",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kImm",
+        "kFeedbackSlot"
+      ],
+      "value": 79,
+      "hex": "0x4f"
+    },
+    "80": {
+      "name": "DivSmi",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kImm",
+        "kFeedbackSlot"
+      ],
+      "value": 80,
+      "hex": "0x50"
+    },
+    "81": {
+      "name": "ModSmi",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kImm",
+        "kFeedbackSlot"
+      ],
+      "value": 81,
+      "hex": "0x51"
+    },
+    "82": {
+      "name": "ExpSmi",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kImm",
+        "kFeedbackSlot"
+      ],
+      "value": 82,
+      "hex": "0x52"
+    },
+    "83": {
+      "name": "BitwiseOrSmi",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kImm",
+        "kFeedbackSlot"
+      ],
+      "value": 83,
+      "hex": "0x53"
+    },
+    "84": {
+      "name": "BitwiseXorSmi",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kImm",
+        "kFeedbackSlot"
+      ],
+      "value": 84,
+      "hex": "0x54"
+    },
+    "85": {
+      "name": "BitwiseAndSmi",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kImm",
+        "kFeedbackSlot"
+      ],
+      "value": 85,
+      "hex": "0x55"
+    },
+    "86": {
+      "name": "ShiftLeftSmi",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kImm",
+        "kFeedbackSlot"
+      ],
+      "value": 86,
+      "hex": "0x56"
+    },
+    "87": {
+      "name": "ShiftRightSmi",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kImm",
+        "kFeedbackSlot"
+      ],
+      "value": 87,
+      "hex": "0x57"
+    },
+    "88": {
+      "name": "ShiftRightLogicalSmi",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kImm",
+        "kFeedbackSlot"
+      ],
+      "value": 88,
+      "hex": "0x58"
+    },
+    "89": {
+      "name": "Inc",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kFeedbackSlot"
+      ],
+      "value": 89,
+      "hex": "0x59"
+    },
+    "90": {
+      "name": "Dec",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kFeedbackSlot"
+      ],
+      "value": 90,
+      "hex": "0x5a"
+    },
+    "91": {
+      "name": "Negate",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kFeedbackSlot"
+      ],
+      "value": 91,
+      "hex": "0x5b"
+    },
+    "92": {
+      "name": "BitwiseNot",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kFeedbackSlot"
+      ],
+      "value": 92,
+      "hex": "0x5c"
+    },
+    "93": {
+      "name": "ToBooleanLogicalNot",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [],
+      "value": 93,
+      "hex": "0x5d"
+    },
+    "94": {
+      "name": "LogicalNot",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [],
+      "value": 94,
+      "hex": "0x5e"
+    },
+    "95": {
+      "name": "TypeOf",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kFeedbackSlot"
+      ],
+      "value": 95,
+      "hex": "0x5f"
+    },
+    "96": {
+      "name": "DeletePropertyStrict",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg"
+      ],
+      "value": 96,
+      "hex": "0x60"
+    },
+    "97": {
+      "name": "DeletePropertySloppy",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg"
+      ],
+      "value": 97,
+      "hex": "0x61"
+    },
+    "98": {
+      "name": "GetSuperConstructor",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kRegOut"
+      ],
+      "value": 98,
+      "hex": "0x62"
+    },
+    "99": {
+      "name": "FindNonDefaultConstructorOrConstruct",
+      "implicit_register_use": "kNone",
+      "operands": [
+        "kReg",
+        "kReg",
+        "kRegOutPair"
+      ],
+      "value": 99,
+      "hex": "0x63"
+    },
+    "100": {
+      "name": "CallAnyReceiver",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kRegList",
+        "kRegCount",
+        "kFeedbackSlot"
+      ],
+      "value": 100,
+      "hex": "0x64"
+    },
+    "101": {
+      "name": "CallProperty",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kRegList",
+        "kRegCount",
+        "kFeedbackSlot"
+      ],
+      "value": 101,
+      "hex": "0x65"
+    },
+    "102": {
+      "name": "CallProperty0",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 102,
+      "hex": "0x66"
+    },
+    "103": {
+      "name": "CallProperty1",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kReg",
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 103,
+      "hex": "0x67"
+    },
+    "104": {
+      "name": "CallProperty2",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kReg",
+        "kReg",
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 104,
+      "hex": "0x68"
+    },
+    "105": {
+      "name": "CallUndefinedReceiver",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kRegList",
+        "kRegCount",
+        "kFeedbackSlot"
+      ],
+      "value": 105,
+      "hex": "0x69"
+    },
+    "106": {
+      "name": "CallUndefinedReceiver0",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 106,
+      "hex": "0x6a"
+    },
+    "107": {
+      "name": "CallUndefinedReceiver1",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 107,
+      "hex": "0x6b"
+    },
+    "108": {
+      "name": "CallUndefinedReceiver2",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kReg",
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 108,
+      "hex": "0x6c"
+    },
+    "109": {
+      "name": "CallWithSpread",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kRegList",
+        "kRegCount",
+        "kFeedbackSlot"
+      ],
+      "value": 109,
+      "hex": "0x6d"
+    },
+    "110": {
+      "name": "CallRuntime",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kRuntimeId",
+        "kRegList",
+        "kRegCount"
+      ],
+      "value": 110,
+      "hex": "0x6e"
+    },
+    "111": {
+      "name": "CallRuntimeForPair",
+      "implicit_register_use": "kClobberAccumulator",
+      "operands": [
+        "kRuntimeId",
+        "kRegList",
+        "kRegCount",
+        "kRegOutPair"
+      ],
+      "value": 111,
+      "hex": "0x6f"
+    },
+    "112": {
+      "name": "CallJSRuntime",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kNativeContextIndex",
+        "kRegList",
+        "kRegCount"
+      ],
+      "value": 112,
+      "hex": "0x70"
+    },
+    "113": {
+      "name": "InvokeIntrinsic",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kIntrinsicId",
+        "kRegList",
+        "kRegCount"
+      ],
+      "value": 113,
+      "hex": "0x71"
+    },
+    "114": {
+      "name": "Construct",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kRegList",
+        "kRegCount",
+        "kFeedbackSlot"
+      ],
+      "value": 114,
+      "hex": "0x72"
+    },
+    "115": {
+      "name": "ConstructWithSpread",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kRegList",
+        "kRegCount",
+        "kFeedbackSlot"
+      ],
+      "value": 115,
+      "hex": "0x73"
+    },
+    "116": {
+      "name": "ConstructForwardAllArgs",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 116,
+      "hex": "0x74"
+    },
+    "117": {
+      "name": "TestEqual",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 117,
+      "hex": "0x75"
+    },
+    "118": {
+      "name": "TestEqualStrict",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kFlag16"
+      ],
+      "value": 118,
+      "hex": "0x76"
+    },
+    "119": {
+      "name": "TestLessThan",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 119,
+      "hex": "0x77"
+    },
+    "120": {
+      "name": "TestGreaterThan",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 120,
+      "hex": "0x78"
+    },
+    "121": {
+      "name": "TestLessThanOrEqual",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 121,
+      "hex": "0x79"
+    },
+    "122": {
+      "name": "TestGreaterThanOrEqual",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 122,
+      "hex": "0x7a"
+    },
+    "123": {
+      "name": "TestInstanceOf",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 123,
+      "hex": "0x7b"
+    },
+    "124": {
+      "name": "TestIn",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 124,
+      "hex": "0x7c"
+    },
+    "125": {
+      "name": "ToName",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [],
+      "value": 125,
+      "hex": "0x7d"
+    },
+    "126": {
+      "name": "ToNumber",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kFeedbackSlot"
+      ],
+      "value": 126,
+      "hex": "0x7e"
+    },
+    "127": {
+      "name": "ToNumeric",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kFeedbackSlot"
+      ],
+      "value": 127,
+      "hex": "0x7f"
+    },
+    "128": {
+      "name": "ToObject",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kRegOut"
+      ],
+      "value": 128,
+      "hex": "0x80"
+    },
+    "129": {
+      "name": "ToString",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [],
+      "value": 129,
+      "hex": "0x81"
+    },
+    "130": {
+      "name": "ToBoolean",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [],
+      "value": 130,
+      "hex": "0x82"
+    },
+    "131": {
+      "name": "CreateRegExpLiteral",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kConstantPoolIndex",
+        "kFeedbackSlot",
+        "kFlag16"
+      ],
+      "value": 131,
+      "hex": "0x83"
+    },
+    "132": {
+      "name": "CreateArrayLiteral",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kConstantPoolIndex",
+        "kFeedbackSlot",
+        "kFlag8"
+      ],
+      "value": 132,
+      "hex": "0x84"
+    },
+    "133": {
+      "name": "CreateArrayFromIterable",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [],
+      "value": 133,
+      "hex": "0x85"
+    },
+    "134": {
+      "name": "CreateEmptyArrayLiteral",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kFeedbackSlot"
+      ],
+      "value": 134,
+      "hex": "0x86"
+    },
+    "135": {
+      "name": "CreateObjectLiteral",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kConstantPoolIndex",
+        "kFeedbackSlot",
+        "kFlag8"
+      ],
+      "value": 135,
+      "hex": "0x87"
+    },
+    "136": {
+      "name": "CreateEmptyObjectLiteral",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [],
+      "value": 136,
+      "hex": "0x88"
+    },
+    "137": {
+      "name": "CloneObject",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kFlag8",
+        "kFeedbackSlot"
+      ],
+      "value": 137,
+      "hex": "0x89"
+    },
+    "138": {
+      "name": "GetTemplateObject",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kConstantPoolIndex",
+        "kFeedbackSlot"
+      ],
+      "value": 138,
+      "hex": "0x8a"
+    },
+    "139": {
+      "name": "CreateClosure",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kConstantPoolIndex",
+        "kFeedbackSlot",
+        "kFlag8"
+      ],
+      "value": 139,
+      "hex": "0x8b"
+    },
+    "140": {
+      "name": "CreateBlockContext",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kConstantPoolIndex"
+      ],
+      "value": 140,
+      "hex": "0x8c"
+    },
+    "141": {
+      "name": "CreateCatchContext",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kConstantPoolIndex"
+      ],
+      "value": 141,
+      "hex": "0x8d"
+    },
+    "142": {
+      "name": "CreateFunctionContext",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kConstantPoolIndex",
+        "kUImm"
+      ],
+      "value": 142,
+      "hex": "0x8e"
+    },
+    "143": {
+      "name": "CreateFunctionContextWithCells",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kConstantPoolIndex",
+        "kUImm"
+      ],
+      "value": 143,
+      "hex": "0x8f"
+    },
+    "144": {
+      "name": "CreateEvalContext",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kConstantPoolIndex",
+        "kUImm"
+      ],
+      "value": 144,
+      "hex": "0x90"
+    },
+    "145": {
+      "name": "CreateWithContext",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kConstantPoolIndex"
+      ],
+      "value": 145,
+      "hex": "0x91"
+    },
+    "146": {
+      "name": "CreateMappedArguments",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [],
+      "value": 146,
+      "hex": "0x92"
+    },
+    "147": {
+      "name": "CreateUnmappedArguments",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [],
+      "value": 147,
+      "hex": "0x93"
+    },
+    "148": {
+      "name": "CreateRestParameter",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [],
+      "value": 148,
+      "hex": "0x94"
+    },
+    "149": {
+      "name": "JumpLoop",
+      "implicit_register_use": "kClobberAccumulator",
+      "operands": [
+        "kUImm",
+        "kImm",
+        "kFeedbackSlot"
+      ],
+      "value": 149,
+      "hex": "0x95"
+    },
+    "150": {
+      "name": "Jump",
+      "implicit_register_use": "kNone",
+      "operands": [
+        "kUImm"
+      ],
+      "value": 150,
+      "hex": "0x96"
+    },
+    "151": {
+      "name": "JumpConstant",
+      "implicit_register_use": "kNone",
+      "operands": [
+        "kConstantPoolIndex"
+      ],
+      "value": 151,
+      "hex": "0x97"
+    },
+    "152": {
+      "name": "JumpIfNullConstant",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kConstantPoolIndex"
+      ],
+      "value": 152,
+      "hex": "0x98"
+    },
+    "153": {
+      "name": "JumpIfNotNullConstant",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kConstantPoolIndex"
+      ],
+      "value": 153,
+      "hex": "0x99"
+    },
+    "154": {
+      "name": "JumpIfUndefinedConstant",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kConstantPoolIndex"
+      ],
+      "value": 154,
+      "hex": "0x9a"
+    },
+    "155": {
+      "name": "JumpIfNotUndefinedConstant",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kConstantPoolIndex"
+      ],
+      "value": 155,
+      "hex": "0x9b"
+    },
+    "156": {
+      "name": "JumpIfUndefinedOrNullConstant",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kConstantPoolIndex"
+      ],
+      "value": 156,
+      "hex": "0x9c"
+    },
+    "157": {
+      "name": "JumpIfTrueConstant",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kConstantPoolIndex"
+      ],
+      "value": 157,
+      "hex": "0x9d"
+    },
+    "158": {
+      "name": "JumpIfFalseConstant",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kConstantPoolIndex"
+      ],
+      "value": 158,
+      "hex": "0x9e"
+    },
+    "159": {
+      "name": "JumpIfJSReceiverConstant",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kConstantPoolIndex"
+      ],
+      "value": 159,
+      "hex": "0x9f"
+    },
+    "160": {
+      "name": "JumpIfForInDoneConstant",
+      "implicit_register_use": "kNone",
+      "operands": [
+        "kConstantPoolIndex",
+        "kReg",
+        "kReg"
+      ],
+      "value": 160,
+      "hex": "0xa0"
+    },
+    "161": {
+      "name": "JumpIfToBooleanTrueConstant",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kConstantPoolIndex"
+      ],
+      "value": 161,
+      "hex": "0xa1"
+    },
+    "162": {
+      "name": "JumpIfToBooleanFalseConstant",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kConstantPoolIndex"
+      ],
+      "value": 162,
+      "hex": "0xa2"
+    },
+    "163": {
+      "name": "JumpIfToBooleanTrue",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kUImm"
+      ],
+      "value": 163,
+      "hex": "0xa3"
+    },
+    "164": {
+      "name": "JumpIfToBooleanFalse",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kUImm"
+      ],
+      "value": 164,
+      "hex": "0xa4"
+    },
+    "165": {
+      "name": "JumpIfTrue",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kUImm"
+      ],
+      "value": 165,
+      "hex": "0xa5"
+    },
+    "166": {
+      "name": "JumpIfFalse",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kUImm"
+      ],
+      "value": 166,
+      "hex": "0xa6"
+    },
+    "167": {
+      "name": "JumpIfNull",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kUImm"
+      ],
+      "value": 167,
+      "hex": "0xa7"
+    },
+    "168": {
+      "name": "JumpIfNotNull",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kUImm"
+      ],
+      "value": 168,
+      "hex": "0xa8"
+    },
+    "169": {
+      "name": "JumpIfUndefined",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kUImm"
+      ],
+      "value": 169,
+      "hex": "0xa9"
+    },
+    "170": {
+      "name": "JumpIfNotUndefined",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kUImm"
+      ],
+      "value": 170,
+      "hex": "0xaa"
+    },
+    "171": {
+      "name": "JumpIfUndefinedOrNull",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kUImm"
+      ],
+      "value": 171,
+      "hex": "0xab"
+    },
+    "172": {
+      "name": "JumpIfJSReceiver",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kUImm"
+      ],
+      "value": 172,
+      "hex": "0xac"
+    },
+    "173": {
+      "name": "JumpIfForInDone",
+      "implicit_register_use": "kNone",
+      "operands": [
+        "kUImm",
+        "kReg",
+        "kReg"
+      ],
+      "value": 173,
+      "hex": "0xad"
+    },
+    "174": {
+      "name": "SwitchOnSmiNoFeedback",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kConstantPoolIndex",
+        "kUImm",
+        "kImm"
+      ],
+      "value": 174,
+      "hex": "0xae"
+    },
+    "175": {
+      "name": "ForInEnumerate",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kReg"
+      ],
+      "value": 175,
+      "hex": "0xaf"
+    },
+    "176": {
+      "name": "ForInPrepare",
+      "implicit_register_use": "kReadAndClobberAccumulator",
+      "operands": [
+        "kRegOutTriple",
+        "kFeedbackSlot"
+      ],
+      "value": 176,
+      "hex": "0xb0"
+    },
+    "177": {
+      "name": "ForInNext",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kReg",
+        "kRegPair",
+        "kFeedbackSlot"
+      ],
+      "value": 177,
+      "hex": "0xb1"
+    },
+    "178": {
+      "name": "ForInStep",
+      "implicit_register_use": "kNone",
+      "operands": [
+        "kRegInOut"
+      ],
+      "value": 178,
+      "hex": "0xb2"
+    },
+    "179": {
+      "name": "ForOfNext",
+      "implicit_register_use": "kClobberAccumulator",
+      "operands": [
+        "kReg",
+        "kReg",
+        "kRegOutPair",
+        "kFeedbackSlot"
+      ],
+      "value": 179,
+      "hex": "0xb3"
+    },
+    "180": {
+      "name": "SetPendingMessage",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [],
+      "value": 180,
+      "hex": "0xb4"
+    },
+    "181": {
+      "name": "Throw",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [],
+      "value": 181,
+      "hex": "0xb5"
+    },
+    "182": {
+      "name": "ReThrow",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [],
+      "value": 182,
+      "hex": "0xb6"
+    },
+    "183": {
+      "name": "Return",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [],
+      "value": 183,
+      "hex": "0xb7"
+    },
+    "184": {
+      "name": "ThrowReferenceErrorIfHole",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kConstantPoolIndex"
+      ],
+      "value": 184,
+      "hex": "0xb8"
+    },
+    "185": {
+      "name": "ThrowSuperNotCalledIfHole",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [],
+      "value": 185,
+      "hex": "0xb9"
+    },
+    "186": {
+      "name": "ThrowSuperAlreadyCalledIfNotHole",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [],
+      "value": 186,
+      "hex": "0xba"
+    },
+    "187": {
+      "name": "ThrowIfNotSuperConstructor",
+      "implicit_register_use": "kNone",
+      "operands": [
+        "kReg"
+      ],
+      "value": 187,
+      "hex": "0xbb"
+    },
+    "188": {
+      "name": "SwitchOnGeneratorState",
+      "implicit_register_use": "kNone",
+      "operands": [
+        "kReg",
+        "kConstantPoolIndex",
+        "kUImm"
+      ],
+      "value": 188,
+      "hex": "0xbc"
+    },
+    "189": {
+      "name": "SuspendGenerator",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kReg",
+        "kRegList",
+        "kRegCount",
+        "kUImm"
+      ],
+      "value": 189,
+      "hex": "0xbd"
+    },
+    "190": {
+      "name": "ResumeGenerator",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kRegOutList",
+        "kRegCount"
+      ],
+      "value": 190,
+      "hex": "0xbe"
+    },
+    "191": {
+      "name": "GetIterator",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kFeedbackSlot",
+        "kFeedbackSlot"
+      ],
+      "value": 191,
+      "hex": "0xbf"
+    },
+    "192": {
+      "name": "Debugger",
+      "implicit_register_use": "kClobberAccumulator",
+      "operands": [],
+      "value": 192,
+      "hex": "0xc0"
+    },
+    "193": {
+      "name": "IncBlockCounter",
+      "implicit_register_use": "kNone",
+      "operands": [
+        "kCoverageSlot"
+      ],
+      "value": 193,
+      "hex": "0xc1"
+    },
+    "194": {
+      "name": "Abort",
+      "implicit_register_use": "kNone",
+      "operands": [
+        "kAbortReason"
+      ],
+      "value": 194,
+      "hex": "0xc2"
+    },
+    "195": {
+      "name": "Star15",
+      "implicit_register_use": "kReadAccumulatorWriteShortStar",
+      "operands": [],
+      "value": 195,
+      "hex": "0xc3"
+    },
+    "196": {
+      "name": "Star14",
+      "implicit_register_use": "kReadAccumulatorWriteShortStar",
+      "operands": [],
+      "value": 196,
+      "hex": "0xc4"
+    },
+    "197": {
+      "name": "Star13",
+      "implicit_register_use": "kReadAccumulatorWriteShortStar",
+      "operands": [],
+      "value": 197,
+      "hex": "0xc5"
+    },
+    "198": {
+      "name": "Star12",
+      "implicit_register_use": "kReadAccumulatorWriteShortStar",
+      "operands": [],
+      "value": 198,
+      "hex": "0xc6"
+    },
+    "199": {
+      "name": "Star11",
+      "implicit_register_use": "kReadAccumulatorWriteShortStar",
+      "operands": [],
+      "value": 199,
+      "hex": "0xc7"
+    },
+    "200": {
+      "name": "Star10",
+      "implicit_register_use": "kReadAccumulatorWriteShortStar",
+      "operands": [],
+      "value": 200,
+      "hex": "0xc8"
+    },
+    "201": {
+      "name": "Star9",
+      "implicit_register_use": "kReadAccumulatorWriteShortStar",
+      "operands": [],
+      "value": 201,
+      "hex": "0xc9"
+    },
+    "202": {
+      "name": "Star8",
+      "implicit_register_use": "kReadAccumulatorWriteShortStar",
+      "operands": [],
+      "value": 202,
+      "hex": "0xca"
+    },
+    "203": {
+      "name": "Star7",
+      "implicit_register_use": "kReadAccumulatorWriteShortStar",
+      "operands": [],
+      "value": 203,
+      "hex": "0xcb"
+    },
+    "204": {
+      "name": "Star6",
+      "implicit_register_use": "kReadAccumulatorWriteShortStar",
+      "operands": [],
+      "value": 204,
+      "hex": "0xcc"
+    },
+    "205": {
+      "name": "Star5",
+      "implicit_register_use": "kReadAccumulatorWriteShortStar",
+      "operands": [],
+      "value": 205,
+      "hex": "0xcd"
+    },
+    "206": {
+      "name": "Star4",
+      "implicit_register_use": "kReadAccumulatorWriteShortStar",
+      "operands": [],
+      "value": 206,
+      "hex": "0xce"
+    },
+    "207": {
+      "name": "Star3",
+      "implicit_register_use": "kReadAccumulatorWriteShortStar",
+      "operands": [],
+      "value": 207,
+      "hex": "0xcf"
+    },
+    "208": {
+      "name": "Star2",
+      "implicit_register_use": "kReadAccumulatorWriteShortStar",
+      "operands": [],
+      "value": 208,
+      "hex": "0xd0"
+    },
+    "209": {
+      "name": "Star1",
+      "implicit_register_use": "kReadAccumulatorWriteShortStar",
+      "operands": [],
+      "value": 209,
+      "hex": "0xd1"
+    },
+    "210": {
+      "name": "Star0",
+      "implicit_register_use": "kReadAccumulatorWriteShortStar",
+      "operands": [],
+      "value": 210,
+      "hex": "0xd2"
+    },
+    "211": {
+      "name": "Illegal",
+      "implicit_register_use": "kNone",
+      "operands": [],
+      "value": 211,
+      "hex": "0xd3"
+    }
+  },
+  "opcodes_by_name": {
+    "Wide": {
+      "name": "Wide",
+      "implicit_register_use": "kNone",
+      "operands": [],
+      "value": 0,
+      "hex": "0x00"
+    },
+    "ExtraWide": {
+      "name": "ExtraWide",
+      "implicit_register_use": "kNone",
+      "operands": [],
+      "value": 1,
+      "hex": "0x01"
+    },
+    "DebugBreakWide": {
+      "name": "DebugBreakWide",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [],
+      "value": 2,
+      "hex": "0x02"
+    },
+    "DebugBreakExtraWide": {
+      "name": "DebugBreakExtraWide",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [],
+      "value": 3,
+      "hex": "0x03"
+    },
+    "DebugBreak0": {
+      "name": "DebugBreak0",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [],
+      "value": 4,
+      "hex": "0x04"
+    },
+    "DebugBreak1": {
+      "name": "DebugBreak1",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg"
+      ],
+      "value": 5,
+      "hex": "0x05"
+    },
+    "DebugBreak2": {
+      "name": "DebugBreak2",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kReg"
+      ],
+      "value": 6,
+      "hex": "0x06"
+    },
+    "DebugBreak3": {
+      "name": "DebugBreak3",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kReg",
+        "kReg"
+      ],
+      "value": 7,
+      "hex": "0x07"
+    },
+    "DebugBreak4": {
+      "name": "DebugBreak4",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kReg",
+        "kReg",
+        "kReg"
+      ],
+      "value": 8,
+      "hex": "0x08"
+    },
+    "DebugBreak5": {
+      "name": "DebugBreak5",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kRuntimeId",
+        "kReg",
+        "kReg"
+      ],
+      "value": 9,
+      "hex": "0x09"
+    },
+    "DebugBreak6": {
+      "name": "DebugBreak6",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kRuntimeId",
+        "kReg",
+        "kReg",
+        "kReg"
+      ],
+      "value": 10,
+      "hex": "0x0a"
+    },
+    "Ldar": {
+      "name": "Ldar",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kReg"
+      ],
+      "value": 11,
+      "hex": "0x0b"
+    },
+    "LdaZero": {
+      "name": "LdaZero",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [],
+      "value": 12,
+      "hex": "0x0c"
+    },
+    "LdaSmi": {
+      "name": "LdaSmi",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kImm"
+      ],
+      "value": 13,
+      "hex": "0x0d"
+    },
+    "LdaUndefined": {
+      "name": "LdaUndefined",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [],
+      "value": 14,
+      "hex": "0x0e"
+    },
+    "LdaNull": {
+      "name": "LdaNull",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [],
+      "value": 15,
+      "hex": "0x0f"
+    },
+    "LdaTheHole": {
+      "name": "LdaTheHole",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [],
+      "value": 16,
+      "hex": "0x10"
+    },
+    "LdaTrue": {
+      "name": "LdaTrue",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [],
+      "value": 17,
+      "hex": "0x11"
+    },
+    "LdaFalse": {
+      "name": "LdaFalse",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [],
+      "value": 18,
+      "hex": "0x12"
+    },
+    "LdaConstant": {
+      "name": "LdaConstant",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kConstantPoolIndex"
+      ],
+      "value": 19,
+      "hex": "0x13"
+    },
+    "LdaContextSlotNoCell": {
+      "name": "LdaContextSlotNoCell",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kContextSlot",
+        "kUImm"
+      ],
+      "value": 20,
+      "hex": "0x14"
+    },
+    "LdaContextSlot": {
+      "name": "LdaContextSlot",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kContextSlot",
+        "kUImm"
+      ],
+      "value": 21,
+      "hex": "0x15"
+    },
+    "LdaImmutableContextSlot": {
+      "name": "LdaImmutableContextSlot",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kContextSlot",
+        "kUImm"
+      ],
+      "value": 22,
+      "hex": "0x16"
+    },
+    "LdaCurrentContextSlotNoCell": {
+      "name": "LdaCurrentContextSlotNoCell",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kContextSlot"
+      ],
+      "value": 23,
+      "hex": "0x17"
+    },
+    "LdaCurrentContextSlot": {
+      "name": "LdaCurrentContextSlot",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kContextSlot"
+      ],
+      "value": 24,
+      "hex": "0x18"
+    },
+    "LdaImmutableCurrentContextSlot": {
+      "name": "LdaImmutableCurrentContextSlot",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kContextSlot"
+      ],
+      "value": 25,
+      "hex": "0x19"
+    },
+    "Star": {
+      "name": "Star",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kRegOut"
+      ],
+      "value": 26,
+      "hex": "0x1a"
+    },
+    "Mov": {
+      "name": "Mov",
+      "implicit_register_use": "kNone",
+      "operands": [
+        "kReg",
+        "kRegOut"
+      ],
+      "value": 27,
+      "hex": "0x1b"
+    },
+    "PushContext": {
+      "name": "PushContext",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kRegOut"
+      ],
+      "value": 28,
+      "hex": "0x1c"
+    },
+    "PopContext": {
+      "name": "PopContext",
+      "implicit_register_use": "kNone",
+      "operands": [
+        "kReg"
+      ],
+      "value": 29,
+      "hex": "0x1d"
+    },
+    "TestReferenceEqual": {
+      "name": "TestReferenceEqual",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg"
+      ],
+      "value": 30,
+      "hex": "0x1e"
+    },
+    "TestUndetectable": {
+      "name": "TestUndetectable",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [],
+      "value": 31,
+      "hex": "0x1f"
+    },
+    "TestNull": {
+      "name": "TestNull",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [],
+      "value": 32,
+      "hex": "0x20"
+    },
+    "TestUndefined": {
+      "name": "TestUndefined",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [],
+      "value": 33,
+      "hex": "0x21"
+    },
+    "TestTypeOf": {
+      "name": "TestTypeOf",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kFlag8"
+      ],
+      "value": 34,
+      "hex": "0x22"
+    },
+    "LdaGlobal": {
+      "name": "LdaGlobal",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kConstantPoolIndex",
+        "kFeedbackSlot"
+      ],
+      "value": 35,
+      "hex": "0x23"
+    },
+    "LdaGlobalInsideTypeof": {
+      "name": "LdaGlobalInsideTypeof",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kConstantPoolIndex",
+        "kFeedbackSlot"
+      ],
+      "value": 36,
+      "hex": "0x24"
+    },
+    "StaGlobal": {
+      "name": "StaGlobal",
+      "implicit_register_use": "kReadAndClobberAccumulator",
+      "operands": [
+        "kConstantPoolIndex",
+        "kFeedbackSlot"
+      ],
+      "value": 37,
+      "hex": "0x25"
+    },
+    "StaContextSlotNoCell": {
+      "name": "StaContextSlotNoCell",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kReg",
+        "kContextSlot",
+        "kUImm"
+      ],
+      "value": 38,
+      "hex": "0x26"
+    },
+    "StaCurrentContextSlotNoCell": {
+      "name": "StaCurrentContextSlotNoCell",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kContextSlot"
+      ],
+      "value": 39,
+      "hex": "0x27"
+    },
+    "StaContextSlot": {
+      "name": "StaContextSlot",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kReg",
+        "kContextSlot",
+        "kUImm"
+      ],
+      "value": 40,
+      "hex": "0x28"
+    },
+    "StaCurrentContextSlot": {
+      "name": "StaCurrentContextSlot",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kContextSlot"
+      ],
+      "value": 41,
+      "hex": "0x29"
+    },
+    "LdaLookupSlot": {
+      "name": "LdaLookupSlot",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kConstantPoolIndex"
+      ],
+      "value": 42,
+      "hex": "0x2a"
+    },
+    "LdaLookupContextSlotNoCell": {
+      "name": "LdaLookupContextSlotNoCell",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kConstantPoolIndex",
+        "kContextSlot",
+        "kUImm"
+      ],
+      "value": 43,
+      "hex": "0x2b"
+    },
+    "LdaLookupContextSlot": {
+      "name": "LdaLookupContextSlot",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kConstantPoolIndex",
+        "kContextSlot",
+        "kUImm"
+      ],
+      "value": 44,
+      "hex": "0x2c"
+    },
+    "LdaLookupGlobalSlot": {
+      "name": "LdaLookupGlobalSlot",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kConstantPoolIndex",
+        "kFeedbackSlot",
+        "kUImm"
+      ],
+      "value": 45,
+      "hex": "0x2d"
+    },
+    "LdaLookupSlotInsideTypeof": {
+      "name": "LdaLookupSlotInsideTypeof",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kConstantPoolIndex"
+      ],
+      "value": 46,
+      "hex": "0x2e"
+    },
+    "LdaLookupContextSlotNoCellInsideTypeof": {
+      "name": "LdaLookupContextSlotNoCellInsideTypeof",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kConstantPoolIndex",
+        "kContextSlot",
+        "kUImm"
+      ],
+      "value": 47,
+      "hex": "0x2f"
+    },
+    "LdaLookupContextSlotInsideTypeof": {
+      "name": "LdaLookupContextSlotInsideTypeof",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kConstantPoolIndex",
+        "kContextSlot",
+        "kUImm"
+      ],
+      "value": 48,
+      "hex": "0x30"
+    },
+    "LdaLookupGlobalSlotInsideTypeof": {
+      "name": "LdaLookupGlobalSlotInsideTypeof",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kConstantPoolIndex",
+        "kFeedbackSlot",
+        "kUImm"
+      ],
+      "value": 49,
+      "hex": "0x31"
+    },
+    "StaLookupSlot": {
+      "name": "StaLookupSlot",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kConstantPoolIndex",
+        "kFlag8"
+      ],
+      "value": 50,
+      "hex": "0x32"
+    },
+    "GetNamedProperty": {
+      "name": "GetNamedProperty",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kConstantPoolIndex",
+        "kFeedbackSlot"
+      ],
+      "value": 51,
+      "hex": "0x33"
+    },
+    "GetNamedPropertyFromSuper": {
+      "name": "GetNamedPropertyFromSuper",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kConstantPoolIndex",
+        "kFeedbackSlot"
+      ],
+      "value": 52,
+      "hex": "0x34"
+    },
+    "GetKeyedProperty": {
+      "name": "GetKeyedProperty",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 53,
+      "hex": "0x35"
+    },
+    "GetEnumeratedKeyedProperty": {
+      "name": "GetEnumeratedKeyedProperty",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kReg",
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 54,
+      "hex": "0x36"
+    },
+    "LdaModuleVariable": {
+      "name": "LdaModuleVariable",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kImm",
+        "kUImm"
+      ],
+      "value": 55,
+      "hex": "0x37"
+    },
+    "StaModuleVariable": {
+      "name": "StaModuleVariable",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kImm",
+        "kUImm"
+      ],
+      "value": 56,
+      "hex": "0x38"
+    },
+    "SetNamedProperty": {
+      "name": "SetNamedProperty",
+      "implicit_register_use": "kReadAndClobberAccumulator",
+      "operands": [
+        "kReg",
+        "kConstantPoolIndex",
+        "kFeedbackSlot"
+      ],
+      "value": 57,
+      "hex": "0x39"
+    },
+    "DefineNamedOwnProperty": {
+      "name": "DefineNamedOwnProperty",
+      "implicit_register_use": "kReadAndClobberAccumulator",
+      "operands": [
+        "kReg",
+        "kConstantPoolIndex",
+        "kFeedbackSlot"
+      ],
+      "value": 58,
+      "hex": "0x3a"
+    },
+    "SetKeyedProperty": {
+      "name": "SetKeyedProperty",
+      "implicit_register_use": "kReadAndClobberAccumulator",
+      "operands": [
+        "kReg",
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 59,
+      "hex": "0x3b"
+    },
+    "DefineKeyedOwnProperty": {
+      "name": "DefineKeyedOwnProperty",
+      "implicit_register_use": "kReadAndClobberAccumulator",
+      "operands": [
+        "kReg",
+        "kReg",
+        "kFlag8",
+        "kFeedbackSlot"
+      ],
+      "value": 60,
+      "hex": "0x3c"
+    },
+    "StaInArrayLiteral": {
+      "name": "StaInArrayLiteral",
+      "implicit_register_use": "kReadAndClobberAccumulator",
+      "operands": [
+        "kReg",
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 61,
+      "hex": "0x3d"
+    },
+    "DefineKeyedOwnPropertyInLiteral": {
+      "name": "DefineKeyedOwnPropertyInLiteral",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kReg",
+        "kReg",
+        "kFlag8",
+        "kFeedbackSlot"
+      ],
+      "value": 62,
+      "hex": "0x3e"
+    },
+    "SetPrototypeProperties": {
+      "name": "SetPrototypeProperties",
+      "implicit_register_use": "kReadAndClobberAccumulator",
+      "operands": [
+        "kConstantPoolIndex",
+        "kFeedbackSlot"
+      ],
+      "value": 63,
+      "hex": "0x3f"
+    },
+    "Add": {
+      "name": "Add",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 64,
+      "hex": "0x40"
+    },
+    "Sub": {
+      "name": "Sub",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 65,
+      "hex": "0x41"
+    },
+    "Mul": {
+      "name": "Mul",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 66,
+      "hex": "0x42"
+    },
+    "Div": {
+      "name": "Div",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 67,
+      "hex": "0x43"
+    },
+    "Mod": {
+      "name": "Mod",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 68,
+      "hex": "0x44"
+    },
+    "Exp": {
+      "name": "Exp",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 69,
+      "hex": "0x45"
+    },
+    "BitwiseOr": {
+      "name": "BitwiseOr",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 70,
+      "hex": "0x46"
+    },
+    "BitwiseXor": {
+      "name": "BitwiseXor",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 71,
+      "hex": "0x47"
+    },
+    "BitwiseAnd": {
+      "name": "BitwiseAnd",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 72,
+      "hex": "0x48"
+    },
+    "ShiftLeft": {
+      "name": "ShiftLeft",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 73,
+      "hex": "0x49"
+    },
+    "ShiftRight": {
+      "name": "ShiftRight",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 74,
+      "hex": "0x4a"
+    },
+    "ShiftRightLogical": {
+      "name": "ShiftRightLogical",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 75,
+      "hex": "0x4b"
+    },
+    "Add_StringConstant_Internalize": {
+      "name": "Add_StringConstant_Internalize",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kFeedbackSlot",
+        "kFlag8"
+      ],
+      "value": 76,
+      "hex": "0x4c"
+    },
+    "AddSmi": {
+      "name": "AddSmi",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kImm",
+        "kFeedbackSlot"
+      ],
+      "value": 77,
+      "hex": "0x4d"
+    },
+    "SubSmi": {
+      "name": "SubSmi",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kImm",
+        "kFeedbackSlot"
+      ],
+      "value": 78,
+      "hex": "0x4e"
+    },
+    "MulSmi": {
+      "name": "MulSmi",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kImm",
+        "kFeedbackSlot"
+      ],
+      "value": 79,
+      "hex": "0x4f"
+    },
+    "DivSmi": {
+      "name": "DivSmi",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kImm",
+        "kFeedbackSlot"
+      ],
+      "value": 80,
+      "hex": "0x50"
+    },
+    "ModSmi": {
+      "name": "ModSmi",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kImm",
+        "kFeedbackSlot"
+      ],
+      "value": 81,
+      "hex": "0x51"
+    },
+    "ExpSmi": {
+      "name": "ExpSmi",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kImm",
+        "kFeedbackSlot"
+      ],
+      "value": 82,
+      "hex": "0x52"
+    },
+    "BitwiseOrSmi": {
+      "name": "BitwiseOrSmi",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kImm",
+        "kFeedbackSlot"
+      ],
+      "value": 83,
+      "hex": "0x53"
+    },
+    "BitwiseXorSmi": {
+      "name": "BitwiseXorSmi",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kImm",
+        "kFeedbackSlot"
+      ],
+      "value": 84,
+      "hex": "0x54"
+    },
+    "BitwiseAndSmi": {
+      "name": "BitwiseAndSmi",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kImm",
+        "kFeedbackSlot"
+      ],
+      "value": 85,
+      "hex": "0x55"
+    },
+    "ShiftLeftSmi": {
+      "name": "ShiftLeftSmi",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kImm",
+        "kFeedbackSlot"
+      ],
+      "value": 86,
+      "hex": "0x56"
+    },
+    "ShiftRightSmi": {
+      "name": "ShiftRightSmi",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kImm",
+        "kFeedbackSlot"
+      ],
+      "value": 87,
+      "hex": "0x57"
+    },
+    "ShiftRightLogicalSmi": {
+      "name": "ShiftRightLogicalSmi",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kImm",
+        "kFeedbackSlot"
+      ],
+      "value": 88,
+      "hex": "0x58"
+    },
+    "Inc": {
+      "name": "Inc",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kFeedbackSlot"
+      ],
+      "value": 89,
+      "hex": "0x59"
+    },
+    "Dec": {
+      "name": "Dec",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kFeedbackSlot"
+      ],
+      "value": 90,
+      "hex": "0x5a"
+    },
+    "Negate": {
+      "name": "Negate",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kFeedbackSlot"
+      ],
+      "value": 91,
+      "hex": "0x5b"
+    },
+    "BitwiseNot": {
+      "name": "BitwiseNot",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kFeedbackSlot"
+      ],
+      "value": 92,
+      "hex": "0x5c"
+    },
+    "ToBooleanLogicalNot": {
+      "name": "ToBooleanLogicalNot",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [],
+      "value": 93,
+      "hex": "0x5d"
+    },
+    "LogicalNot": {
+      "name": "LogicalNot",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [],
+      "value": 94,
+      "hex": "0x5e"
+    },
+    "TypeOf": {
+      "name": "TypeOf",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kFeedbackSlot"
+      ],
+      "value": 95,
+      "hex": "0x5f"
+    },
+    "DeletePropertyStrict": {
+      "name": "DeletePropertyStrict",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg"
+      ],
+      "value": 96,
+      "hex": "0x60"
+    },
+    "DeletePropertySloppy": {
+      "name": "DeletePropertySloppy",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg"
+      ],
+      "value": 97,
+      "hex": "0x61"
+    },
+    "GetSuperConstructor": {
+      "name": "GetSuperConstructor",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kRegOut"
+      ],
+      "value": 98,
+      "hex": "0x62"
+    },
+    "FindNonDefaultConstructorOrConstruct": {
+      "name": "FindNonDefaultConstructorOrConstruct",
+      "implicit_register_use": "kNone",
+      "operands": [
+        "kReg",
+        "kReg",
+        "kRegOutPair"
+      ],
+      "value": 99,
+      "hex": "0x63"
+    },
+    "CallAnyReceiver": {
+      "name": "CallAnyReceiver",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kRegList",
+        "kRegCount",
+        "kFeedbackSlot"
+      ],
+      "value": 100,
+      "hex": "0x64"
+    },
+    "CallProperty": {
+      "name": "CallProperty",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kRegList",
+        "kRegCount",
+        "kFeedbackSlot"
+      ],
+      "value": 101,
+      "hex": "0x65"
+    },
+    "CallProperty0": {
+      "name": "CallProperty0",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 102,
+      "hex": "0x66"
+    },
+    "CallProperty1": {
+      "name": "CallProperty1",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kReg",
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 103,
+      "hex": "0x67"
+    },
+    "CallProperty2": {
+      "name": "CallProperty2",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kReg",
+        "kReg",
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 104,
+      "hex": "0x68"
+    },
+    "CallUndefinedReceiver": {
+      "name": "CallUndefinedReceiver",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kRegList",
+        "kRegCount",
+        "kFeedbackSlot"
+      ],
+      "value": 105,
+      "hex": "0x69"
+    },
+    "CallUndefinedReceiver0": {
+      "name": "CallUndefinedReceiver0",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 106,
+      "hex": "0x6a"
+    },
+    "CallUndefinedReceiver1": {
+      "name": "CallUndefinedReceiver1",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 107,
+      "hex": "0x6b"
+    },
+    "CallUndefinedReceiver2": {
+      "name": "CallUndefinedReceiver2",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kReg",
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 108,
+      "hex": "0x6c"
+    },
+    "CallWithSpread": {
+      "name": "CallWithSpread",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kRegList",
+        "kRegCount",
+        "kFeedbackSlot"
+      ],
+      "value": 109,
+      "hex": "0x6d"
+    },
+    "CallRuntime": {
+      "name": "CallRuntime",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kRuntimeId",
+        "kRegList",
+        "kRegCount"
+      ],
+      "value": 110,
+      "hex": "0x6e"
+    },
+    "CallRuntimeForPair": {
+      "name": "CallRuntimeForPair",
+      "implicit_register_use": "kClobberAccumulator",
+      "operands": [
+        "kRuntimeId",
+        "kRegList",
+        "kRegCount",
+        "kRegOutPair"
+      ],
+      "value": 111,
+      "hex": "0x6f"
+    },
+    "CallJSRuntime": {
+      "name": "CallJSRuntime",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kNativeContextIndex",
+        "kRegList",
+        "kRegCount"
+      ],
+      "value": 112,
+      "hex": "0x70"
+    },
+    "InvokeIntrinsic": {
+      "name": "InvokeIntrinsic",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kIntrinsicId",
+        "kRegList",
+        "kRegCount"
+      ],
+      "value": 113,
+      "hex": "0x71"
+    },
+    "Construct": {
+      "name": "Construct",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kRegList",
+        "kRegCount",
+        "kFeedbackSlot"
+      ],
+      "value": 114,
+      "hex": "0x72"
+    },
+    "ConstructWithSpread": {
+      "name": "ConstructWithSpread",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kRegList",
+        "kRegCount",
+        "kFeedbackSlot"
+      ],
+      "value": 115,
+      "hex": "0x73"
+    },
+    "ConstructForwardAllArgs": {
+      "name": "ConstructForwardAllArgs",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 116,
+      "hex": "0x74"
+    },
+    "TestEqual": {
+      "name": "TestEqual",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 117,
+      "hex": "0x75"
+    },
+    "TestEqualStrict": {
+      "name": "TestEqualStrict",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kFlag16"
+      ],
+      "value": 118,
+      "hex": "0x76"
+    },
+    "TestLessThan": {
+      "name": "TestLessThan",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 119,
+      "hex": "0x77"
+    },
+    "TestGreaterThan": {
+      "name": "TestGreaterThan",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 120,
+      "hex": "0x78"
+    },
+    "TestLessThanOrEqual": {
+      "name": "TestLessThanOrEqual",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 121,
+      "hex": "0x79"
+    },
+    "TestGreaterThanOrEqual": {
+      "name": "TestGreaterThanOrEqual",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 122,
+      "hex": "0x7a"
+    },
+    "TestInstanceOf": {
+      "name": "TestInstanceOf",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 123,
+      "hex": "0x7b"
+    },
+    "TestIn": {
+      "name": "TestIn",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kFeedbackSlot"
+      ],
+      "value": 124,
+      "hex": "0x7c"
+    },
+    "ToName": {
+      "name": "ToName",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [],
+      "value": 125,
+      "hex": "0x7d"
+    },
+    "ToNumber": {
+      "name": "ToNumber",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kFeedbackSlot"
+      ],
+      "value": 126,
+      "hex": "0x7e"
+    },
+    "ToNumeric": {
+      "name": "ToNumeric",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [
+        "kFeedbackSlot"
+      ],
+      "value": 127,
+      "hex": "0x7f"
+    },
+    "ToObject": {
+      "name": "ToObject",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kRegOut"
+      ],
+      "value": 128,
+      "hex": "0x80"
+    },
+    "ToString": {
+      "name": "ToString",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [],
+      "value": 129,
+      "hex": "0x81"
+    },
+    "ToBoolean": {
+      "name": "ToBoolean",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [],
+      "value": 130,
+      "hex": "0x82"
+    },
+    "CreateRegExpLiteral": {
+      "name": "CreateRegExpLiteral",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kConstantPoolIndex",
+        "kFeedbackSlot",
+        "kFlag16"
+      ],
+      "value": 131,
+      "hex": "0x83"
+    },
+    "CreateArrayLiteral": {
+      "name": "CreateArrayLiteral",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kConstantPoolIndex",
+        "kFeedbackSlot",
+        "kFlag8"
+      ],
+      "value": 132,
+      "hex": "0x84"
+    },
+    "CreateArrayFromIterable": {
+      "name": "CreateArrayFromIterable",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [],
+      "value": 133,
+      "hex": "0x85"
+    },
+    "CreateEmptyArrayLiteral": {
+      "name": "CreateEmptyArrayLiteral",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kFeedbackSlot"
+      ],
+      "value": 134,
+      "hex": "0x86"
+    },
+    "CreateObjectLiteral": {
+      "name": "CreateObjectLiteral",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kConstantPoolIndex",
+        "kFeedbackSlot",
+        "kFlag8"
+      ],
+      "value": 135,
+      "hex": "0x87"
+    },
+    "CreateEmptyObjectLiteral": {
+      "name": "CreateEmptyObjectLiteral",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [],
+      "value": 136,
+      "hex": "0x88"
+    },
+    "CloneObject": {
+      "name": "CloneObject",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kFlag8",
+        "kFeedbackSlot"
+      ],
+      "value": 137,
+      "hex": "0x89"
+    },
+    "GetTemplateObject": {
+      "name": "GetTemplateObject",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kConstantPoolIndex",
+        "kFeedbackSlot"
+      ],
+      "value": 138,
+      "hex": "0x8a"
+    },
+    "CreateClosure": {
+      "name": "CreateClosure",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kConstantPoolIndex",
+        "kFeedbackSlot",
+        "kFlag8"
+      ],
+      "value": 139,
+      "hex": "0x8b"
+    },
+    "CreateBlockContext": {
+      "name": "CreateBlockContext",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kConstantPoolIndex"
+      ],
+      "value": 140,
+      "hex": "0x8c"
+    },
+    "CreateCatchContext": {
+      "name": "CreateCatchContext",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kConstantPoolIndex"
+      ],
+      "value": 141,
+      "hex": "0x8d"
+    },
+    "CreateFunctionContext": {
+      "name": "CreateFunctionContext",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kConstantPoolIndex",
+        "kUImm"
+      ],
+      "value": 142,
+      "hex": "0x8e"
+    },
+    "CreateFunctionContextWithCells": {
+      "name": "CreateFunctionContextWithCells",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kConstantPoolIndex",
+        "kUImm"
+      ],
+      "value": 143,
+      "hex": "0x8f"
+    },
+    "CreateEvalContext": {
+      "name": "CreateEvalContext",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kConstantPoolIndex",
+        "kUImm"
+      ],
+      "value": 144,
+      "hex": "0x90"
+    },
+    "CreateWithContext": {
+      "name": "CreateWithContext",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kConstantPoolIndex"
+      ],
+      "value": 145,
+      "hex": "0x91"
+    },
+    "CreateMappedArguments": {
+      "name": "CreateMappedArguments",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [],
+      "value": 146,
+      "hex": "0x92"
+    },
+    "CreateUnmappedArguments": {
+      "name": "CreateUnmappedArguments",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [],
+      "value": 147,
+      "hex": "0x93"
+    },
+    "CreateRestParameter": {
+      "name": "CreateRestParameter",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [],
+      "value": 148,
+      "hex": "0x94"
+    },
+    "JumpLoop": {
+      "name": "JumpLoop",
+      "implicit_register_use": "kClobberAccumulator",
+      "operands": [
+        "kUImm",
+        "kImm",
+        "kFeedbackSlot"
+      ],
+      "value": 149,
+      "hex": "0x95"
+    },
+    "Jump": {
+      "name": "Jump",
+      "implicit_register_use": "kNone",
+      "operands": [
+        "kUImm"
+      ],
+      "value": 150,
+      "hex": "0x96"
+    },
+    "JumpConstant": {
+      "name": "JumpConstant",
+      "implicit_register_use": "kNone",
+      "operands": [
+        "kConstantPoolIndex"
+      ],
+      "value": 151,
+      "hex": "0x97"
+    },
+    "JumpIfNullConstant": {
+      "name": "JumpIfNullConstant",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kConstantPoolIndex"
+      ],
+      "value": 152,
+      "hex": "0x98"
+    },
+    "JumpIfNotNullConstant": {
+      "name": "JumpIfNotNullConstant",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kConstantPoolIndex"
+      ],
+      "value": 153,
+      "hex": "0x99"
+    },
+    "JumpIfUndefinedConstant": {
+      "name": "JumpIfUndefinedConstant",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kConstantPoolIndex"
+      ],
+      "value": 154,
+      "hex": "0x9a"
+    },
+    "JumpIfNotUndefinedConstant": {
+      "name": "JumpIfNotUndefinedConstant",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kConstantPoolIndex"
+      ],
+      "value": 155,
+      "hex": "0x9b"
+    },
+    "JumpIfUndefinedOrNullConstant": {
+      "name": "JumpIfUndefinedOrNullConstant",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kConstantPoolIndex"
+      ],
+      "value": 156,
+      "hex": "0x9c"
+    },
+    "JumpIfTrueConstant": {
+      "name": "JumpIfTrueConstant",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kConstantPoolIndex"
+      ],
+      "value": 157,
+      "hex": "0x9d"
+    },
+    "JumpIfFalseConstant": {
+      "name": "JumpIfFalseConstant",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kConstantPoolIndex"
+      ],
+      "value": 158,
+      "hex": "0x9e"
+    },
+    "JumpIfJSReceiverConstant": {
+      "name": "JumpIfJSReceiverConstant",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kConstantPoolIndex"
+      ],
+      "value": 159,
+      "hex": "0x9f"
+    },
+    "JumpIfForInDoneConstant": {
+      "name": "JumpIfForInDoneConstant",
+      "implicit_register_use": "kNone",
+      "operands": [
+        "kConstantPoolIndex",
+        "kReg",
+        "kReg"
+      ],
+      "value": 160,
+      "hex": "0xa0"
+    },
+    "JumpIfToBooleanTrueConstant": {
+      "name": "JumpIfToBooleanTrueConstant",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kConstantPoolIndex"
+      ],
+      "value": 161,
+      "hex": "0xa1"
+    },
+    "JumpIfToBooleanFalseConstant": {
+      "name": "JumpIfToBooleanFalseConstant",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kConstantPoolIndex"
+      ],
+      "value": 162,
+      "hex": "0xa2"
+    },
+    "JumpIfToBooleanTrue": {
+      "name": "JumpIfToBooleanTrue",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kUImm"
+      ],
+      "value": 163,
+      "hex": "0xa3"
+    },
+    "JumpIfToBooleanFalse": {
+      "name": "JumpIfToBooleanFalse",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kUImm"
+      ],
+      "value": 164,
+      "hex": "0xa4"
+    },
+    "JumpIfTrue": {
+      "name": "JumpIfTrue",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kUImm"
+      ],
+      "value": 165,
+      "hex": "0xa5"
+    },
+    "JumpIfFalse": {
+      "name": "JumpIfFalse",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kUImm"
+      ],
+      "value": 166,
+      "hex": "0xa6"
+    },
+    "JumpIfNull": {
+      "name": "JumpIfNull",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kUImm"
+      ],
+      "value": 167,
+      "hex": "0xa7"
+    },
+    "JumpIfNotNull": {
+      "name": "JumpIfNotNull",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kUImm"
+      ],
+      "value": 168,
+      "hex": "0xa8"
+    },
+    "JumpIfUndefined": {
+      "name": "JumpIfUndefined",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kUImm"
+      ],
+      "value": 169,
+      "hex": "0xa9"
+    },
+    "JumpIfNotUndefined": {
+      "name": "JumpIfNotUndefined",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kUImm"
+      ],
+      "value": 170,
+      "hex": "0xaa"
+    },
+    "JumpIfUndefinedOrNull": {
+      "name": "JumpIfUndefinedOrNull",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kUImm"
+      ],
+      "value": 171,
+      "hex": "0xab"
+    },
+    "JumpIfJSReceiver": {
+      "name": "JumpIfJSReceiver",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kUImm"
+      ],
+      "value": 172,
+      "hex": "0xac"
+    },
+    "JumpIfForInDone": {
+      "name": "JumpIfForInDone",
+      "implicit_register_use": "kNone",
+      "operands": [
+        "kUImm",
+        "kReg",
+        "kReg"
+      ],
+      "value": 173,
+      "hex": "0xad"
+    },
+    "SwitchOnSmiNoFeedback": {
+      "name": "SwitchOnSmiNoFeedback",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kConstantPoolIndex",
+        "kUImm",
+        "kImm"
+      ],
+      "value": 174,
+      "hex": "0xae"
+    },
+    "ForInEnumerate": {
+      "name": "ForInEnumerate",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kReg"
+      ],
+      "value": 175,
+      "hex": "0xaf"
+    },
+    "ForInPrepare": {
+      "name": "ForInPrepare",
+      "implicit_register_use": "kReadAndClobberAccumulator",
+      "operands": [
+        "kRegOutTriple",
+        "kFeedbackSlot"
+      ],
+      "value": 176,
+      "hex": "0xb0"
+    },
+    "ForInNext": {
+      "name": "ForInNext",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kReg",
+        "kRegPair",
+        "kFeedbackSlot"
+      ],
+      "value": 177,
+      "hex": "0xb1"
+    },
+    "ForInStep": {
+      "name": "ForInStep",
+      "implicit_register_use": "kNone",
+      "operands": [
+        "kRegInOut"
+      ],
+      "value": 178,
+      "hex": "0xb2"
+    },
+    "ForOfNext": {
+      "name": "ForOfNext",
+      "implicit_register_use": "kClobberAccumulator",
+      "operands": [
+        "kReg",
+        "kReg",
+        "kRegOutPair",
+        "kFeedbackSlot"
+      ],
+      "value": 179,
+      "hex": "0xb3"
+    },
+    "SetPendingMessage": {
+      "name": "SetPendingMessage",
+      "implicit_register_use": "kReadWriteAccumulator",
+      "operands": [],
+      "value": 180,
+      "hex": "0xb4"
+    },
+    "Throw": {
+      "name": "Throw",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [],
+      "value": 181,
+      "hex": "0xb5"
+    },
+    "ReThrow": {
+      "name": "ReThrow",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [],
+      "value": 182,
+      "hex": "0xb6"
+    },
+    "Return": {
+      "name": "Return",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [],
+      "value": 183,
+      "hex": "0xb7"
+    },
+    "ThrowReferenceErrorIfHole": {
+      "name": "ThrowReferenceErrorIfHole",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kConstantPoolIndex"
+      ],
+      "value": 184,
+      "hex": "0xb8"
+    },
+    "ThrowSuperNotCalledIfHole": {
+      "name": "ThrowSuperNotCalledIfHole",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [],
+      "value": 185,
+      "hex": "0xb9"
+    },
+    "ThrowSuperAlreadyCalledIfNotHole": {
+      "name": "ThrowSuperAlreadyCalledIfNotHole",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [],
+      "value": 186,
+      "hex": "0xba"
+    },
+    "ThrowIfNotSuperConstructor": {
+      "name": "ThrowIfNotSuperConstructor",
+      "implicit_register_use": "kNone",
+      "operands": [
+        "kReg"
+      ],
+      "value": 187,
+      "hex": "0xbb"
+    },
+    "SwitchOnGeneratorState": {
+      "name": "SwitchOnGeneratorState",
+      "implicit_register_use": "kNone",
+      "operands": [
+        "kReg",
+        "kConstantPoolIndex",
+        "kUImm"
+      ],
+      "value": 188,
+      "hex": "0xbc"
+    },
+    "SuspendGenerator": {
+      "name": "SuspendGenerator",
+      "implicit_register_use": "kReadAccumulator",
+      "operands": [
+        "kReg",
+        "kRegList",
+        "kRegCount",
+        "kUImm"
+      ],
+      "value": 189,
+      "hex": "0xbd"
+    },
+    "ResumeGenerator": {
+      "name": "ResumeGenerator",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kRegOutList",
+        "kRegCount"
+      ],
+      "value": 190,
+      "hex": "0xbe"
+    },
+    "GetIterator": {
+      "name": "GetIterator",
+      "implicit_register_use": "kWriteAccumulator",
+      "operands": [
+        "kReg",
+        "kFeedbackSlot",
+        "kFeedbackSlot"
+      ],
+      "value": 191,
+      "hex": "0xbf"
+    },
+    "Debugger": {
+      "name": "Debugger",
+      "implicit_register_use": "kClobberAccumulator",
+      "operands": [],
+      "value": 192,
+      "hex": "0xc0"
+    },
+    "IncBlockCounter": {
+      "name": "IncBlockCounter",
+      "implicit_register_use": "kNone",
+      "operands": [
+        "kCoverageSlot"
+      ],
+      "value": 193,
+      "hex": "0xc1"
+    },
+    "Abort": {
+      "name": "Abort",
+      "implicit_register_use": "kNone",
+      "operands": [
+        "kAbortReason"
+      ],
+      "value": 194,
+      "hex": "0xc2"
+    },
+    "Star15": {
+      "name": "Star15",
+      "implicit_register_use": "kReadAccumulatorWriteShortStar",
+      "operands": [],
+      "value": 195,
+      "hex": "0xc3"
+    },
+    "Star14": {
+      "name": "Star14",
+      "implicit_register_use": "kReadAccumulatorWriteShortStar",
+      "operands": [],
+      "value": 196,
+      "hex": "0xc4"
+    },
+    "Star13": {
+      "name": "Star13",
+      "implicit_register_use": "kReadAccumulatorWriteShortStar",
+      "operands": [],
+      "value": 197,
+      "hex": "0xc5"
+    },
+    "Star12": {
+      "name": "Star12",
+      "implicit_register_use": "kReadAccumulatorWriteShortStar",
+      "operands": [],
+      "value": 198,
+      "hex": "0xc6"
+    },
+    "Star11": {
+      "name": "Star11",
+      "implicit_register_use": "kReadAccumulatorWriteShortStar",
+      "operands": [],
+      "value": 199,
+      "hex": "0xc7"
+    },
+    "Star10": {
+      "name": "Star10",
+      "implicit_register_use": "kReadAccumulatorWriteShortStar",
+      "operands": [],
+      "value": 200,
+      "hex": "0xc8"
+    },
+    "Star9": {
+      "name": "Star9",
+      "implicit_register_use": "kReadAccumulatorWriteShortStar",
+      "operands": [],
+      "value": 201,
+      "hex": "0xc9"
+    },
+    "Star8": {
+      "name": "Star8",
+      "implicit_register_use": "kReadAccumulatorWriteShortStar",
+      "operands": [],
+      "value": 202,
+      "hex": "0xca"
+    },
+    "Star7": {
+      "name": "Star7",
+      "implicit_register_use": "kReadAccumulatorWriteShortStar",
+      "operands": [],
+      "value": 203,
+      "hex": "0xcb"
+    },
+    "Star6": {
+      "name": "Star6",
+      "implicit_register_use": "kReadAccumulatorWriteShortStar",
+      "operands": [],
+      "value": 204,
+      "hex": "0xcc"
+    },
+    "Star5": {
+      "name": "Star5",
+      "implicit_register_use": "kReadAccumulatorWriteShortStar",
+      "operands": [],
+      "value": 205,
+      "hex": "0xcd"
+    },
+    "Star4": {
+      "name": "Star4",
+      "implicit_register_use": "kReadAccumulatorWriteShortStar",
+      "operands": [],
+      "value": 206,
+      "hex": "0xce"
+    },
+    "Star3": {
+      "name": "Star3",
+      "implicit_register_use": "kReadAccumulatorWriteShortStar",
+      "operands": [],
+      "value": 207,
+      "hex": "0xcf"
+    },
+    "Star2": {
+      "name": "Star2",
+      "implicit_register_use": "kReadAccumulatorWriteShortStar",
+      "operands": [],
+      "value": 208,
+      "hex": "0xd0"
+    },
+    "Star1": {
+      "name": "Star1",
+      "implicit_register_use": "kReadAccumulatorWriteShortStar",
+      "operands": [],
+      "value": 209,
+      "hex": "0xd1"
+    },
+    "Star0": {
+      "name": "Star0",
+      "implicit_register_use": "kReadAccumulatorWriteShortStar",
+      "operands": [],
+      "value": 210,
+      "hex": "0xd2"
+    },
+    "Illegal": {
+      "name": "Illegal",
+      "implicit_register_use": "kNone",
+      "operands": [],
+      "value": 211,
+      "hex": "0xd3"
+    }
+  }
+}

@@ -1,0 +1,5361 @@
+{
+  "v8Version": "14.4.258.16",
+  "count": 594,
+  "runtimeCount": 573,
+  "inlineCount": 21,
+  "families": {
+    "FOR_EACH_INTRINSIC_RETURN_OBJECT": 571,
+    "FOR_EACH_INTRINSIC_RETURN_PAIR": 2
+  },
+  "byId": {
+    "0": {
+      "id": 0,
+      "name": "DebugBreakOnBytecode",
+      "enumName": "kDebugBreakOnBytecode",
+      "nargs": 1,
+      "resultSize": 2,
+      "kind": "runtime"
+    },
+    "1": {
+      "id": 1,
+      "name": "LoadLookupSlotForCall",
+      "enumName": "kLoadLookupSlotForCall",
+      "nargs": 1,
+      "resultSize": 2,
+      "kind": "runtime"
+    },
+    "2": {
+      "id": 2,
+      "name": "ArrayIncludes_Slow",
+      "enumName": "kArrayIncludes_Slow",
+      "nargs": 3,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "3": {
+      "id": 3,
+      "name": "ArrayIndexOf",
+      "enumName": "kArrayIndexOf",
+      "nargs": 3,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "4": {
+      "id": 4,
+      "name": "ArrayIsArray",
+      "enumName": "kArrayIsArray",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "5": {
+      "id": 5,
+      "name": "ArraySpeciesConstructor",
+      "enumName": "kArraySpeciesConstructor",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "6": {
+      "id": 6,
+      "name": "GrowArrayElements",
+      "enumName": "kGrowArrayElements",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "7": {
+      "id": 7,
+      "name": "IsArray",
+      "enumName": "kIsArray",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "8": {
+      "id": 8,
+      "name": "NewArray",
+      "enumName": "kNewArray",
+      "nargs": -1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "9": {
+      "id": 9,
+      "name": "NormalizeElements",
+      "enumName": "kNormalizeElements",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "10": {
+      "id": 10,
+      "name": "TransitionElementsKind",
+      "enumName": "kTransitionElementsKind",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "11": {
+      "id": 11,
+      "name": "TransitionElementsKindWithKind",
+      "enumName": "kTransitionElementsKindWithKind",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "12": {
+      "id": 12,
+      "name": "AtomicsLoad64",
+      "enumName": "kAtomicsLoad64",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "13": {
+      "id": 13,
+      "name": "AtomicsStore64",
+      "enumName": "kAtomicsStore64",
+      "nargs": 3,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "14": {
+      "id": 14,
+      "name": "AtomicsAdd",
+      "enumName": "kAtomicsAdd",
+      "nargs": 3,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "15": {
+      "id": 15,
+      "name": "AtomicsAnd",
+      "enumName": "kAtomicsAnd",
+      "nargs": 3,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "16": {
+      "id": 16,
+      "name": "AtomicsCompareExchange",
+      "enumName": "kAtomicsCompareExchange",
+      "nargs": 4,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "17": {
+      "id": 17,
+      "name": "AtomicsExchange",
+      "enumName": "kAtomicsExchange",
+      "nargs": 3,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "18": {
+      "id": 18,
+      "name": "AtomicsNumWaitersForTesting",
+      "enumName": "kAtomicsNumWaitersForTesting",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "19": {
+      "id": 19,
+      "name": "AtomicsNumUnresolvedAsyncPromisesForTesting",
+      "enumName": "kAtomicsNumUnresolvedAsyncPromisesForTesting",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "20": {
+      "id": 20,
+      "name": "AtomicsOr",
+      "enumName": "kAtomicsOr",
+      "nargs": 3,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "21": {
+      "id": 21,
+      "name": "AtomicsSub",
+      "enumName": "kAtomicsSub",
+      "nargs": 3,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "22": {
+      "id": 22,
+      "name": "AtomicsXor",
+      "enumName": "kAtomicsXor",
+      "nargs": 3,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "23": {
+      "id": 23,
+      "name": "SetAllowAtomicsWait",
+      "enumName": "kSetAllowAtomicsWait",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "24": {
+      "id": 24,
+      "name": "AtomicsLoadSharedStructOrArray",
+      "enumName": "kAtomicsLoadSharedStructOrArray",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "25": {
+      "id": 25,
+      "name": "AtomicsStoreSharedStructOrArray",
+      "enumName": "kAtomicsStoreSharedStructOrArray",
+      "nargs": 3,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "26": {
+      "id": 26,
+      "name": "AtomicsExchangeSharedStructOrArray",
+      "enumName": "kAtomicsExchangeSharedStructOrArray",
+      "nargs": 3,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "27": {
+      "id": 27,
+      "name": "AtomicsCompareExchangeSharedStructOrArray",
+      "enumName": "kAtomicsCompareExchangeSharedStructOrArray",
+      "nargs": 4,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "28": {
+      "id": 28,
+      "name": "AtomicsSynchronizationPrimitiveNumWaitersForTesting",
+      "enumName": "kAtomicsSynchronizationPrimitiveNumWaitersForTesting",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "29": {
+      "id": 29,
+      "name": "BigIntCompareToNumber",
+      "enumName": "kBigIntCompareToNumber",
+      "nargs": 3,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "30": {
+      "id": 30,
+      "name": "BigIntCompareToString",
+      "enumName": "kBigIntCompareToString",
+      "nargs": 3,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "31": {
+      "id": 31,
+      "name": "BigIntEqualToBigInt",
+      "enumName": "kBigIntEqualToBigInt",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "32": {
+      "id": 32,
+      "name": "BigIntEqualToNumber",
+      "enumName": "kBigIntEqualToNumber",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "33": {
+      "id": 33,
+      "name": "BigIntEqualToString",
+      "enumName": "kBigIntEqualToString",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "34": {
+      "id": 34,
+      "name": "BigIntExponentiate",
+      "enumName": "kBigIntExponentiate",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "35": {
+      "id": 35,
+      "name": "BigIntMaxLengthBits",
+      "enumName": "kBigIntMaxLengthBits",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "36": {
+      "id": 36,
+      "name": "BigIntToNumber",
+      "enumName": "kBigIntToNumber",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "37": {
+      "id": 37,
+      "name": "BigIntUnaryOp",
+      "enumName": "kBigIntUnaryOp",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "38": {
+      "id": 38,
+      "name": "ToBigInt",
+      "enumName": "kToBigInt",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "39": {
+      "id": 39,
+      "name": "ToBigIntConvertNumber",
+      "enumName": "kToBigIntConvertNumber",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "40": {
+      "id": 40,
+      "name": "ThrowConstructorNonCallableError",
+      "enumName": "kThrowConstructorNonCallableError",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "41": {
+      "id": 41,
+      "name": "ThrowNotSuperConstructor",
+      "enumName": "kThrowNotSuperConstructor",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "42": {
+      "id": 42,
+      "name": "ThrowStaticPrototypeError",
+      "enumName": "kThrowStaticPrototypeError",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "43": {
+      "id": 43,
+      "name": "ThrowSuperAlreadyCalledError",
+      "enumName": "kThrowSuperAlreadyCalledError",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "44": {
+      "id": 44,
+      "name": "ThrowSuperNotCalled",
+      "enumName": "kThrowSuperNotCalled",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "45": {
+      "id": 45,
+      "name": "ThrowUnsupportedSuperError",
+      "enumName": "kThrowUnsupportedSuperError",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "46": {
+      "id": 46,
+      "name": "DefineClass",
+      "enumName": "kDefineClass",
+      "nargs": -1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "47": {
+      "id": 47,
+      "name": "LoadFromSuper",
+      "enumName": "kLoadFromSuper",
+      "nargs": 3,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "48": {
+      "id": 48,
+      "name": "LoadKeyedFromSuper",
+      "enumName": "kLoadKeyedFromSuper",
+      "nargs": 3,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "49": {
+      "id": 49,
+      "name": "StoreKeyedToSuper",
+      "enumName": "kStoreKeyedToSuper",
+      "nargs": 4,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "50": {
+      "id": 50,
+      "name": "StoreToSuper",
+      "enumName": "kStoreToSuper",
+      "nargs": 4,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "51": {
+      "id": 51,
+      "name": "MapGrow",
+      "enumName": "kMapGrow",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "52": {
+      "id": 52,
+      "name": "MapShrink",
+      "enumName": "kMapShrink",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "53": {
+      "id": 53,
+      "name": "OrderedHashSetGrow",
+      "enumName": "kOrderedHashSetGrow",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "54": {
+      "id": 54,
+      "name": "SetGrow",
+      "enumName": "kSetGrow",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "55": {
+      "id": 55,
+      "name": "SetShrink",
+      "enumName": "kSetShrink",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "56": {
+      "id": 56,
+      "name": "OrderedHashSetShrink",
+      "enumName": "kOrderedHashSetShrink",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "57": {
+      "id": 57,
+      "name": "TheHole",
+      "enumName": "kTheHole",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "58": {
+      "id": 58,
+      "name": "WeakCollectionDelete",
+      "enumName": "kWeakCollectionDelete",
+      "nargs": 3,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "59": {
+      "id": 59,
+      "name": "WeakCollectionSet",
+      "enumName": "kWeakCollectionSet",
+      "nargs": 4,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "60": {
+      "id": 60,
+      "name": "OrderedHashMapGrow",
+      "enumName": "kOrderedHashMapGrow",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "61": {
+      "id": 61,
+      "name": "CompileOptimizedOSR",
+      "enumName": "kCompileOptimizedOSR",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "62": {
+      "id": 62,
+      "name": "CompileOptimizedOSRFromMaglev",
+      "enumName": "kCompileOptimizedOSRFromMaglev",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "63": {
+      "id": 63,
+      "name": "CompileOptimizedOSRFromMaglevInlined",
+      "enumName": "kCompileOptimizedOSRFromMaglevInlined",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "64": {
+      "id": 64,
+      "name": "LogOrTraceOptimizedOSREntry",
+      "enumName": "kLogOrTraceOptimizedOSREntry",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "65": {
+      "id": 65,
+      "name": "CompileLazy",
+      "enumName": "kCompileLazy",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "66": {
+      "id": 66,
+      "name": "CompileBaseline",
+      "enumName": "kCompileBaseline",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "67": {
+      "id": 67,
+      "name": "InstallBaselineCode",
+      "enumName": "kInstallBaselineCode",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "68": {
+      "id": 68,
+      "name": "InstallSFICode",
+      "enumName": "kInstallSFICode",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "69": {
+      "id": 69,
+      "name": "InstantiateAsmJs",
+      "enumName": "kInstantiateAsmJs",
+      "nargs": 4,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "70": {
+      "id": 70,
+      "name": "NotifyDeoptimized",
+      "enumName": "kNotifyDeoptimized",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "71": {
+      "id": 71,
+      "name": "ObserveNode",
+      "enumName": "kObserveNode",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "72": {
+      "id": 72,
+      "name": "ResolvePossiblyDirectEval",
+      "enumName": "kResolvePossiblyDirectEval",
+      "nargs": 6,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "73": {
+      "id": 73,
+      "name": "VerifyType",
+      "enumName": "kVerifyType",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "74": {
+      "id": 74,
+      "name": "CheckTurboshaftTypeOf",
+      "enumName": "kCheckTurboshaftTypeOf",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "75": {
+      "id": 75,
+      "name": "FunctionLogNextExecution",
+      "enumName": "kFunctionLogNextExecution",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "76": {
+      "id": 76,
+      "name": "OptimizeMaglevEager",
+      "enumName": "kOptimizeMaglevEager",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "77": {
+      "id": 77,
+      "name": "StartMaglevOptimizeJob",
+      "enumName": "kStartMaglevOptimizeJob",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "78": {
+      "id": 78,
+      "name": "OptimizeTurbofanEager",
+      "enumName": "kOptimizeTurbofanEager",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "79": {
+      "id": 79,
+      "name": "StartTurbofanOptimizeJob",
+      "enumName": "kStartTurbofanOptimizeJob",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "80": {
+      "id": 80,
+      "name": "MarkLazyDeoptimized",
+      "enumName": "kMarkLazyDeoptimized",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "81": {
+      "id": 81,
+      "name": "DateCurrentTime",
+      "enumName": "kDateCurrentTime",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "82": {
+      "id": 82,
+      "name": "ClearStepping",
+      "enumName": "kClearStepping",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "83": {
+      "id": 83,
+      "name": "CollectGarbage",
+      "enumName": "kCollectGarbage",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "84": {
+      "id": 84,
+      "name": "DebugAsyncFunctionSuspended",
+      "enumName": "kDebugAsyncFunctionSuspended",
+      "nargs": 3,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "85": {
+      "id": 85,
+      "name": "DebugBreakAtEntry",
+      "enumName": "kDebugBreakAtEntry",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "86": {
+      "id": 86,
+      "name": "DebugCollectCoverage",
+      "enumName": "kDebugCollectCoverage",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "87": {
+      "id": 87,
+      "name": "DebugGetLoadedScriptIds",
+      "enumName": "kDebugGetLoadedScriptIds",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "88": {
+      "id": 88,
+      "name": "DebugOnFunctionCall",
+      "enumName": "kDebugOnFunctionCall",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "89": {
+      "id": 89,
+      "name": "DebugPrepareStepInSuspendedGenerator",
+      "enumName": "kDebugPrepareStepInSuspendedGenerator",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "90": {
+      "id": 90,
+      "name": "DebugPromiseThen",
+      "enumName": "kDebugPromiseThen",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "91": {
+      "id": 91,
+      "name": "DebugToggleBlockCoverage",
+      "enumName": "kDebugToggleBlockCoverage",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "92": {
+      "id": 92,
+      "name": "DebugTogglePreciseCoverage",
+      "enumName": "kDebugTogglePreciseCoverage",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "93": {
+      "id": 93,
+      "name": "FunctionGetInferredName",
+      "enumName": "kFunctionGetInferredName",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "94": {
+      "id": 94,
+      "name": "GetBreakLocations",
+      "enumName": "kGetBreakLocations",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "95": {
+      "id": 95,
+      "name": "GetGeneratorScopeCount",
+      "enumName": "kGetGeneratorScopeCount",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "96": {
+      "id": 96,
+      "name": "GetGeneratorScopeDetails",
+      "enumName": "kGetGeneratorScopeDetails",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "97": {
+      "id": 97,
+      "name": "HandleDebuggerStatement",
+      "enumName": "kHandleDebuggerStatement",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "98": {
+      "id": 98,
+      "name": "IsBreakOnException",
+      "enumName": "kIsBreakOnException",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "99": {
+      "id": 99,
+      "name": "LiveEditPatchScript",
+      "enumName": "kLiveEditPatchScript",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "100": {
+      "id": 100,
+      "name": "ProfileCreateSnapshotDataBlob",
+      "enumName": "kProfileCreateSnapshotDataBlob",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "101": {
+      "id": 101,
+      "name": "ScheduleBreak",
+      "enumName": "kScheduleBreak",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "102": {
+      "id": 102,
+      "name": "ScriptLocationFromLine2",
+      "enumName": "kScriptLocationFromLine2",
+      "nargs": 4,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "103": {
+      "id": 103,
+      "name": "SetGeneratorScopeVariableValue",
+      "enumName": "kSetGeneratorScopeVariableValue",
+      "nargs": 4,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "104": {
+      "id": 104,
+      "name": "IncBlockCounter",
+      "enumName": "kIncBlockCounter",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "105": {
+      "id": 105,
+      "name": "ForInEnumerate",
+      "enumName": "kForInEnumerate",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "106": {
+      "id": 106,
+      "name": "ForInHasProperty",
+      "enumName": "kForInHasProperty",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "107": {
+      "id": 107,
+      "name": "Call",
+      "enumName": "kCall",
+      "nargs": -1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "108": {
+      "id": 108,
+      "name": "FunctionGetScriptSource",
+      "enumName": "kFunctionGetScriptSource",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "109": {
+      "id": 109,
+      "name": "FunctionGetScriptId",
+      "enumName": "kFunctionGetScriptId",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "110": {
+      "id": 110,
+      "name": "FunctionGetScriptSourcePosition",
+      "enumName": "kFunctionGetScriptSourcePosition",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "111": {
+      "id": 111,
+      "name": "FunctionGetSourceCode",
+      "enumName": "kFunctionGetSourceCode",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "112": {
+      "id": 112,
+      "name": "FunctionIsAPIFunction",
+      "enumName": "kFunctionIsAPIFunction",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "113": {
+      "id": 113,
+      "name": "AsyncFunctionAwait",
+      "enumName": "kAsyncFunctionAwait",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "114": {
+      "id": 114,
+      "name": "AsyncFunctionEnter",
+      "enumName": "kAsyncFunctionEnter",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "115": {
+      "id": 115,
+      "name": "AsyncFunctionReject",
+      "enumName": "kAsyncFunctionReject",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "116": {
+      "id": 116,
+      "name": "AsyncFunctionResolve",
+      "enumName": "kAsyncFunctionResolve",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "117": {
+      "id": 117,
+      "name": "AsyncGeneratorAwait",
+      "enumName": "kAsyncGeneratorAwait",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "118": {
+      "id": 118,
+      "name": "AsyncGeneratorReject",
+      "enumName": "kAsyncGeneratorReject",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "119": {
+      "id": 119,
+      "name": "AsyncGeneratorResolve",
+      "enumName": "kAsyncGeneratorResolve",
+      "nargs": 3,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "120": {
+      "id": 120,
+      "name": "AsyncGeneratorYieldWithAwait",
+      "enumName": "kAsyncGeneratorYieldWithAwait",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "121": {
+      "id": 121,
+      "name": "CreateJSGeneratorObject",
+      "enumName": "kCreateJSGeneratorObject",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "122": {
+      "id": 122,
+      "name": "GeneratorClose",
+      "enumName": "kGeneratorClose",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "123": {
+      "id": 123,
+      "name": "GeneratorGetFunction",
+      "enumName": "kGeneratorGetFunction",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "124": {
+      "id": 124,
+      "name": "GeneratorGetResumeMode",
+      "enumName": "kGeneratorGetResumeMode",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "125": {
+      "id": 125,
+      "name": "ElementsTransitionAndStoreIC_Miss",
+      "enumName": "kElementsTransitionAndStoreIC_Miss",
+      "nargs": 6,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "126": {
+      "id": 126,
+      "name": "KeyedLoadIC_Miss",
+      "enumName": "kKeyedLoadIC_Miss",
+      "nargs": 4,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "127": {
+      "id": 127,
+      "name": "KeyedStoreIC_Miss",
+      "enumName": "kKeyedStoreIC_Miss",
+      "nargs": 5,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "128": {
+      "id": 128,
+      "name": "DefineKeyedOwnIC_Miss",
+      "enumName": "kDefineKeyedOwnIC_Miss",
+      "nargs": 5,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "129": {
+      "id": 129,
+      "name": "StoreInArrayLiteralIC_Miss",
+      "enumName": "kStoreInArrayLiteralIC_Miss",
+      "nargs": 5,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "130": {
+      "id": 130,
+      "name": "DefineNamedOwnIC_Slow",
+      "enumName": "kDefineNamedOwnIC_Slow",
+      "nargs": 3,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "131": {
+      "id": 131,
+      "name": "KeyedStoreIC_Slow",
+      "enumName": "kKeyedStoreIC_Slow",
+      "nargs": 3,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "132": {
+      "id": 132,
+      "name": "DefineKeyedOwnIC_Slow",
+      "enumName": "kDefineKeyedOwnIC_Slow",
+      "nargs": 3,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "133": {
+      "id": 133,
+      "name": "LoadElementWithInterceptor",
+      "enumName": "kLoadElementWithInterceptor",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "134": {
+      "id": 134,
+      "name": "LoadGlobalIC_Miss",
+      "enumName": "kLoadGlobalIC_Miss",
+      "nargs": 4,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "135": {
+      "id": 135,
+      "name": "LoadGlobalIC_Slow",
+      "enumName": "kLoadGlobalIC_Slow",
+      "nargs": 3,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "136": {
+      "id": 136,
+      "name": "LoadIC_Miss",
+      "enumName": "kLoadIC_Miss",
+      "nargs": 4,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "137": {
+      "id": 137,
+      "name": "LoadIC_Miss_FromBaseline",
+      "enumName": "kLoadIC_Miss_FromBaseline",
+      "nargs": 4,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "138": {
+      "id": 138,
+      "name": "PatchLoadICUninitializedBaseline",
+      "enumName": "kPatchLoadICUninitializedBaseline",
+      "nargs": 4,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "139": {
+      "id": 139,
+      "name": "LoadNoFeedbackIC_Miss",
+      "enumName": "kLoadNoFeedbackIC_Miss",
+      "nargs": 4,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "140": {
+      "id": 140,
+      "name": "LoadWithReceiverIC_Miss",
+      "enumName": "kLoadWithReceiverIC_Miss",
+      "nargs": 5,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "141": {
+      "id": 141,
+      "name": "LoadWithReceiverNoFeedbackIC_Miss",
+      "enumName": "kLoadWithReceiverNoFeedbackIC_Miss",
+      "nargs": 3,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "142": {
+      "id": 142,
+      "name": "LoadPropertyWithInterceptor",
+      "enumName": "kLoadPropertyWithInterceptor",
+      "nargs": 6,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "143": {
+      "id": 143,
+      "name": "StoreCallbackProperty",
+      "enumName": "kStoreCallbackProperty",
+      "nargs": 5,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "144": {
+      "id": 144,
+      "name": "StoreGlobalIC_Miss",
+      "enumName": "kStoreGlobalIC_Miss",
+      "nargs": 4,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "145": {
+      "id": 145,
+      "name": "StoreGlobalICNoFeedback_Miss",
+      "enumName": "kStoreGlobalICNoFeedback_Miss",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "146": {
+      "id": 146,
+      "name": "StoreGlobalIC_Slow",
+      "enumName": "kStoreGlobalIC_Slow",
+      "nargs": 5,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "147": {
+      "id": 147,
+      "name": "StoreIC_Miss",
+      "enumName": "kStoreIC_Miss",
+      "nargs": 5,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "148": {
+      "id": 148,
+      "name": "DefineNamedOwnIC_Miss",
+      "enumName": "kDefineNamedOwnIC_Miss",
+      "nargs": 5,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "149": {
+      "id": 149,
+      "name": "StoreInArrayLiteralIC_Slow",
+      "enumName": "kStoreInArrayLiteralIC_Slow",
+      "nargs": 5,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "150": {
+      "id": 150,
+      "name": "StorePropertyWithInterceptor",
+      "enumName": "kStorePropertyWithInterceptor",
+      "nargs": 4,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "151": {
+      "id": 151,
+      "name": "CloneObjectIC_Slow",
+      "enumName": "kCloneObjectIC_Slow",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "152": {
+      "id": 152,
+      "name": "CloneObjectIC_Miss",
+      "enumName": "kCloneObjectIC_Miss",
+      "nargs": 4,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "153": {
+      "id": 153,
+      "name": "KeyedHasIC_Miss",
+      "enumName": "kKeyedHasIC_Miss",
+      "nargs": 4,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "154": {
+      "id": 154,
+      "name": "HasElementWithInterceptor",
+      "enumName": "kHasElementWithInterceptor",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "155": {
+      "id": 155,
+      "name": "ObjectAssignTryFastcase",
+      "enumName": "kObjectAssignTryFastcase",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "156": {
+      "id": 156,
+      "name": "Throw",
+      "enumName": "kThrow",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "157": {
+      "id": 157,
+      "name": "ThrowTargetNonFunction",
+      "enumName": "kThrowTargetNonFunction",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "158": {
+      "id": 158,
+      "name": "ThrowCalledNonCallable",
+      "enumName": "kThrowCalledNonCallable",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "159": {
+      "id": 159,
+      "name": "ThrowConstructedNonConstructable",
+      "enumName": "kThrowConstructedNonConstructable",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "160": {
+      "id": 160,
+      "name": "ThrowConstructorReturnedNonObject",
+      "enumName": "kThrowConstructorReturnedNonObject",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "161": {
+      "id": 161,
+      "name": "ThrowInvalidStringLength",
+      "enumName": "kThrowInvalidStringLength",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "162": {
+      "id": 162,
+      "name": "ThrowInvalidTypedArrayAlignment",
+      "enumName": "kThrowInvalidTypedArrayAlignment",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "163": {
+      "id": 163,
+      "name": "ThrowIteratorError",
+      "enumName": "kThrowIteratorError",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "164": {
+      "id": 164,
+      "name": "ThrowSpreadArgError",
+      "enumName": "kThrowSpreadArgError",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "165": {
+      "id": 165,
+      "name": "ThrowIteratorResultNotAnObject",
+      "enumName": "kThrowIteratorResultNotAnObject",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "166": {
+      "id": 166,
+      "name": "ThrowNoAccess",
+      "enumName": "kThrowNoAccess",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "167": {
+      "id": 167,
+      "name": "ThrowNotConstructor",
+      "enumName": "kThrowNotConstructor",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "168": {
+      "id": 168,
+      "name": "ThrowPatternAssignmentNonCoercible",
+      "enumName": "kThrowPatternAssignmentNonCoercible",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "169": {
+      "id": 169,
+      "name": "ThrowRangeError",
+      "enumName": "kThrowRangeError",
+      "nargs": -1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "170": {
+      "id": 170,
+      "name": "ThrowReferenceError",
+      "enumName": "kThrowReferenceError",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "171": {
+      "id": 171,
+      "name": "ThrowAccessedUninitializedVariable",
+      "enumName": "kThrowAccessedUninitializedVariable",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "172": {
+      "id": 172,
+      "name": "ThrowStackOverflow",
+      "enumName": "kThrowStackOverflow",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "173": {
+      "id": 173,
+      "name": "ThrowSymbolAsyncIteratorInvalid",
+      "enumName": "kThrowSymbolAsyncIteratorInvalid",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "174": {
+      "id": 174,
+      "name": "ThrowSymbolIteratorInvalid",
+      "enumName": "kThrowSymbolIteratorInvalid",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "175": {
+      "id": 175,
+      "name": "ThrowThrowMethodMissing",
+      "enumName": "kThrowThrowMethodMissing",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "176": {
+      "id": 176,
+      "name": "ThrowTypeError",
+      "enumName": "kThrowTypeError",
+      "nargs": -1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "177": {
+      "id": 177,
+      "name": "ThrowTypeErrorIfStrict",
+      "enumName": "kThrowTypeErrorIfStrict",
+      "nargs": -1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "178": {
+      "id": 178,
+      "name": "ReThrow",
+      "enumName": "kReThrow",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "179": {
+      "id": 179,
+      "name": "ReThrowWithMessage",
+      "enumName": "kReThrowWithMessage",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "180": {
+      "id": 180,
+      "name": "AccessCheck",
+      "enumName": "kAccessCheck",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "181": {
+      "id": 181,
+      "name": "AllocateByteArray",
+      "enumName": "kAllocateByteArray",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "182": {
+      "id": 182,
+      "name": "AllocateInYoungGeneration",
+      "enumName": "kAllocateInYoungGeneration",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "183": {
+      "id": 183,
+      "name": "AllocateInOldGeneration",
+      "enumName": "kAllocateInOldGeneration",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "184": {
+      "id": 184,
+      "name": "AllocateInSharedHeap",
+      "enumName": "kAllocateInSharedHeap",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "185": {
+      "id": 185,
+      "name": "AllowDynamicFunction",
+      "enumName": "kAllowDynamicFunction",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "186": {
+      "id": 186,
+      "name": "CreateAsyncFromSyncIterator",
+      "enumName": "kCreateAsyncFromSyncIterator",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "187": {
+      "id": 187,
+      "name": "CreateListFromArrayLike",
+      "enumName": "kCreateListFromArrayLike",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "188": {
+      "id": 188,
+      "name": "DoubleToStringWithRadix",
+      "enumName": "kDoubleToStringWithRadix",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "189": {
+      "id": 189,
+      "name": "FatalProcessOutOfMemoryInAllocateRaw",
+      "enumName": "kFatalProcessOutOfMemoryInAllocateRaw",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "190": {
+      "id": 190,
+      "name": "FatalProcessOutOfMemoryInvalidArrayLength",
+      "enumName": "kFatalProcessOutOfMemoryInvalidArrayLength",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "191": {
+      "id": 191,
+      "name": "FatalInvalidSize",
+      "enumName": "kFatalInvalidSize",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "192": {
+      "id": 192,
+      "name": "GetAndResetRuntimeCallStats",
+      "enumName": "kGetAndResetRuntimeCallStats",
+      "nargs": -1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "193": {
+      "id": 193,
+      "name": "GetAndResetTurboProfilingData",
+      "enumName": "kGetAndResetTurboProfilingData",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "194": {
+      "id": 194,
+      "name": "GetTemplateObject",
+      "enumName": "kGetTemplateObject",
+      "nargs": 3,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "195": {
+      "id": 195,
+      "name": "IncrementUseCounter",
+      "enumName": "kIncrementUseCounter",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "196": {
+      "id": 196,
+      "name": "InvalidateStringWrapperToPrimitiveProtector",
+      "enumName": "kInvalidateStringWrapperToPrimitiveProtector",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "197": {
+      "id": 197,
+      "name": "BytecodeBudgetInterrupt_Ignition",
+      "enumName": "kBytecodeBudgetInterrupt_Ignition",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "198": {
+      "id": 198,
+      "name": "BytecodeBudgetInterruptWithStackCheck_Ignition",
+      "enumName": "kBytecodeBudgetInterruptWithStackCheck_Ignition",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "199": {
+      "id": 199,
+      "name": "BytecodeBudgetInterrupt_Sparkplug",
+      "enumName": "kBytecodeBudgetInterrupt_Sparkplug",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "200": {
+      "id": 200,
+      "name": "BytecodeBudgetInterruptWithStackCheck_Sparkplug",
+      "enumName": "kBytecodeBudgetInterruptWithStackCheck_Sparkplug",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "201": {
+      "id": 201,
+      "name": "BytecodeBudgetInterrupt_Maglev",
+      "enumName": "kBytecodeBudgetInterrupt_Maglev",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "202": {
+      "id": 202,
+      "name": "BytecodeBudgetInterruptWithStackCheck_Maglev",
+      "enumName": "kBytecodeBudgetInterruptWithStackCheck_Maglev",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "203": {
+      "id": 203,
+      "name": "NotifyContextCellStateWillChange",
+      "enumName": "kNotifyContextCellStateWillChange",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "204": {
+      "id": 204,
+      "name": "NewError",
+      "enumName": "kNewError",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "205": {
+      "id": 205,
+      "name": "NewReferenceError",
+      "enumName": "kNewReferenceError",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "206": {
+      "id": 206,
+      "name": "NewTypeError",
+      "enumName": "kNewTypeError",
+      "nargs": -1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "207": {
+      "id": 207,
+      "name": "OrdinaryHasInstance",
+      "enumName": "kOrdinaryHasInstance",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "208": {
+      "id": 208,
+      "name": "PropagateException",
+      "enumName": "kPropagateException",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "209": {
+      "id": 209,
+      "name": "ReportMessageFromMicrotask",
+      "enumName": "kReportMessageFromMicrotask",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "210": {
+      "id": 210,
+      "name": "RunMicrotaskCallback",
+      "enumName": "kRunMicrotaskCallback",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "211": {
+      "id": 211,
+      "name": "PerformMicrotaskCheckpoint",
+      "enumName": "kPerformMicrotaskCheckpoint",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "212": {
+      "id": 212,
+      "name": "SharedValueBarrierSlow",
+      "enumName": "kSharedValueBarrierSlow",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "213": {
+      "id": 213,
+      "name": "StackGuard",
+      "enumName": "kStackGuard",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "214": {
+      "id": 214,
+      "name": "HandleNoHeapWritesInterrupts",
+      "enumName": "kHandleNoHeapWritesInterrupts",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "215": {
+      "id": 215,
+      "name": "StackGuardWithGap",
+      "enumName": "kStackGuardWithGap",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "216": {
+      "id": 216,
+      "name": "TerminateExecution",
+      "enumName": "kTerminateExecution",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "217": {
+      "id": 217,
+      "name": "Typeof",
+      "enumName": "kTypeof",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "218": {
+      "id": 218,
+      "name": "UnwindAndFindExceptionHandler",
+      "enumName": "kUnwindAndFindExceptionHandler",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "219": {
+      "id": 219,
+      "name": "AddLhsIsStringConstantInternalize",
+      "enumName": "kAddLhsIsStringConstantInternalize",
+      "nargs": 4,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "220": {
+      "id": 220,
+      "name": "AddRhsIsStringConstantInternalize",
+      "enumName": "kAddRhsIsStringConstantInternalize",
+      "nargs": 4,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "221": {
+      "id": 221,
+      "name": "FormatList",
+      "enumName": "kFormatList",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "222": {
+      "id": 222,
+      "name": "FormatListToParts",
+      "enumName": "kFormatListToParts",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "223": {
+      "id": 223,
+      "name": "StringToLowerCaseIntl",
+      "enumName": "kStringToLowerCaseIntl",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "224": {
+      "id": 224,
+      "name": "StringToLocaleLowerCase",
+      "enumName": "kStringToLocaleLowerCase",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "225": {
+      "id": 225,
+      "name": "StringToUpperCaseIntl",
+      "enumName": "kStringToUpperCaseIntl",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "226": {
+      "id": 226,
+      "name": "CreateArrayLiteral",
+      "enumName": "kCreateArrayLiteral",
+      "nargs": 4,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "227": {
+      "id": 227,
+      "name": "CreateObjectLiteral",
+      "enumName": "kCreateObjectLiteral",
+      "nargs": 4,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "228": {
+      "id": 228,
+      "name": "SetPrototypeProperties",
+      "enumName": "kSetPrototypeProperties",
+      "nargs": 4,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "229": {
+      "id": 229,
+      "name": "CreateRegExpLiteral",
+      "enumName": "kCreateRegExpLiteral",
+      "nargs": 4,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "230": {
+      "id": 230,
+      "name": "DynamicImportCall",
+      "enumName": "kDynamicImportCall",
+      "nargs": -1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "231": {
+      "id": 231,
+      "name": "GetImportMetaObject",
+      "enumName": "kGetImportMetaObject",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "232": {
+      "id": 232,
+      "name": "GetModuleNamespace",
+      "enumName": "kGetModuleNamespace",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "233": {
+      "id": 233,
+      "name": "GetModuleNamespaceExport",
+      "enumName": "kGetModuleNamespaceExport",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "234": {
+      "id": 234,
+      "name": "ArrayBufferMaxByteLength",
+      "enumName": "kArrayBufferMaxByteLength",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "235": {
+      "id": 235,
+      "name": "IsSmi",
+      "enumName": "kIsSmi",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "236": {
+      "id": 236,
+      "name": "MaxSmi",
+      "enumName": "kMaxSmi",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "237": {
+      "id": 237,
+      "name": "NumberToStringSlow",
+      "enumName": "kNumberToStringSlow",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "238": {
+      "id": 238,
+      "name": "Float64ToStringSlow",
+      "enumName": "kFloat64ToStringSlow",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "239": {
+      "id": 239,
+      "name": "StringParseFloat",
+      "enumName": "kStringParseFloat",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "240": {
+      "id": 240,
+      "name": "StringParseInt",
+      "enumName": "kStringParseInt",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "241": {
+      "id": 241,
+      "name": "StringToNumber",
+      "enumName": "kStringToNumber",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "242": {
+      "id": 242,
+      "name": "AddAsyncDisposableValue",
+      "enumName": "kAddAsyncDisposableValue",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "243": {
+      "id": 243,
+      "name": "AddDictionaryProperty",
+      "enumName": "kAddDictionaryProperty",
+      "nargs": 3,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "244": {
+      "id": 244,
+      "name": "AddDisposableValue",
+      "enumName": "kAddDisposableValue",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "245": {
+      "id": 245,
+      "name": "AddPrivateBrand",
+      "enumName": "kAddPrivateBrand",
+      "nargs": 4,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "246": {
+      "id": 246,
+      "name": "AllocateHeapNumber",
+      "enumName": "kAllocateHeapNumber",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "247": {
+      "id": 247,
+      "name": "CompleteInobjectSlackTrackingForMap",
+      "enumName": "kCompleteInobjectSlackTrackingForMap",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "248": {
+      "id": 248,
+      "name": "CopyDataProperties",
+      "enumName": "kCopyDataProperties",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "249": {
+      "id": 249,
+      "name": "CopyDataPropertiesWithExcludedPropertiesOnStack",
+      "enumName": "kCopyDataPropertiesWithExcludedPropertiesOnStack",
+      "nargs": -1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "250": {
+      "id": 250,
+      "name": "CreateDataProperty",
+      "enumName": "kCreateDataProperty",
+      "nargs": 3,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "251": {
+      "id": 251,
+      "name": "CreateIterResultObject",
+      "enumName": "kCreateIterResultObject",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "252": {
+      "id": 252,
+      "name": "CreatePrivateAccessors",
+      "enumName": "kCreatePrivateAccessors",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "253": {
+      "id": 253,
+      "name": "DefineAccessorPropertyUnchecked",
+      "enumName": "kDefineAccessorPropertyUnchecked",
+      "nargs": 5,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "254": {
+      "id": 254,
+      "name": "DefineKeyedOwnPropertyInLiteral",
+      "enumName": "kDefineKeyedOwnPropertyInLiteral",
+      "nargs": 6,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "255": {
+      "id": 255,
+      "name": "DefineGetterPropertyUnchecked",
+      "enumName": "kDefineGetterPropertyUnchecked",
+      "nargs": 4,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "256": {
+      "id": 256,
+      "name": "DefineSetterPropertyUnchecked",
+      "enumName": "kDefineSetterPropertyUnchecked",
+      "nargs": 4,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "257": {
+      "id": 257,
+      "name": "DeleteProperty",
+      "enumName": "kDeleteProperty",
+      "nargs": 3,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "258": {
+      "id": 258,
+      "name": "DisposeDisposableStack",
+      "enumName": "kDisposeDisposableStack",
+      "nargs": 5,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "259": {
+      "id": 259,
+      "name": "GetDerivedMap",
+      "enumName": "kGetDerivedMap",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "260": {
+      "id": 260,
+      "name": "GetFunctionName",
+      "enumName": "kGetFunctionName",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "261": {
+      "id": 261,
+      "name": "GetOwnPropertyDescriptorObject",
+      "enumName": "kGetOwnPropertyDescriptorObject",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "262": {
+      "id": 262,
+      "name": "GetOwnPropertyKeys",
+      "enumName": "kGetOwnPropertyKeys",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "263": {
+      "id": 263,
+      "name": "GetPrivateMember",
+      "enumName": "kGetPrivateMember",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "264": {
+      "id": 264,
+      "name": "GetProperty",
+      "enumName": "kGetProperty",
+      "nargs": -1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "265": {
+      "id": 265,
+      "name": "HandleExceptionsInDisposeDisposableStack",
+      "enumName": "kHandleExceptionsInDisposeDisposableStack",
+      "nargs": 3,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "266": {
+      "id": 266,
+      "name": "HasFastPackedElements",
+      "enumName": "kHasFastPackedElements",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "267": {
+      "id": 267,
+      "name": "HasInPrototypeChain",
+      "enumName": "kHasInPrototypeChain",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "268": {
+      "id": 268,
+      "name": "HasProperty",
+      "enumName": "kHasProperty",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "269": {
+      "id": 269,
+      "name": "InitializeDisposableStack",
+      "enumName": "kInitializeDisposableStack",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "270": {
+      "id": 270,
+      "name": "InternalSetPrototype",
+      "enumName": "kInternalSetPrototype",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "271": {
+      "id": 271,
+      "name": "IsJSReceiver",
+      "enumName": "kIsJSReceiver",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "272": {
+      "id": 272,
+      "name": "JSReceiverPreventExtensionsDontThrow",
+      "enumName": "kJSReceiverPreventExtensionsDontThrow",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "273": {
+      "id": 273,
+      "name": "JSReceiverPreventExtensionsThrow",
+      "enumName": "kJSReceiverPreventExtensionsThrow",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "274": {
+      "id": 274,
+      "name": "JSReceiverGetPrototypeOf",
+      "enumName": "kJSReceiverGetPrototypeOf",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "275": {
+      "id": 275,
+      "name": "JSReceiverSetPrototypeOfDontThrow",
+      "enumName": "kJSReceiverSetPrototypeOfDontThrow",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "276": {
+      "id": 276,
+      "name": "JSReceiverSetPrototypeOfThrow",
+      "enumName": "kJSReceiverSetPrototypeOfThrow",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "277": {
+      "id": 277,
+      "name": "LoadPrivateGetter",
+      "enumName": "kLoadPrivateGetter",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "278": {
+      "id": 278,
+      "name": "LoadPrivateSetter",
+      "enumName": "kLoadPrivateSetter",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "279": {
+      "id": 279,
+      "name": "NewObject",
+      "enumName": "kNewObject",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "280": {
+      "id": 280,
+      "name": "ObjectCreate",
+      "enumName": "kObjectCreate",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "281": {
+      "id": 281,
+      "name": "ObjectEntries",
+      "enumName": "kObjectEntries",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "282": {
+      "id": 282,
+      "name": "ObjectEntriesSkipFastPath",
+      "enumName": "kObjectEntriesSkipFastPath",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "283": {
+      "id": 283,
+      "name": "ObjectGetOwnPropertyNames",
+      "enumName": "kObjectGetOwnPropertyNames",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "284": {
+      "id": 284,
+      "name": "ObjectGetOwnPropertyNamesTryFast",
+      "enumName": "kObjectGetOwnPropertyNamesTryFast",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "285": {
+      "id": 285,
+      "name": "ObjectHasOwnProperty",
+      "enumName": "kObjectHasOwnProperty",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "286": {
+      "id": 286,
+      "name": "HasOwnConstDataProperty",
+      "enumName": "kHasOwnConstDataProperty",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "287": {
+      "id": 287,
+      "name": "ObjectIsExtensible",
+      "enumName": "kObjectIsExtensible",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "288": {
+      "id": 288,
+      "name": "ObjectKeys",
+      "enumName": "kObjectKeys",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "289": {
+      "id": 289,
+      "name": "ObjectValues",
+      "enumName": "kObjectValues",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "290": {
+      "id": 290,
+      "name": "ObjectValuesSkipFastPath",
+      "enumName": "kObjectValuesSkipFastPath",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "291": {
+      "id": 291,
+      "name": "OptimizeObjectForAddingMultipleProperties",
+      "enumName": "kOptimizeObjectForAddingMultipleProperties",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "292": {
+      "id": 292,
+      "name": "SetDataProperties",
+      "enumName": "kSetDataProperties",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "293": {
+      "id": 293,
+      "name": "SetFunctionName",
+      "enumName": "kSetFunctionName",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "294": {
+      "id": 294,
+      "name": "SetKeyedProperty",
+      "enumName": "kSetKeyedProperty",
+      "nargs": 3,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "295": {
+      "id": 295,
+      "name": "DefineObjectOwnProperty",
+      "enumName": "kDefineObjectOwnProperty",
+      "nargs": 3,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "296": {
+      "id": 296,
+      "name": "SetNamedProperty",
+      "enumName": "kSetNamedProperty",
+      "nargs": 3,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "297": {
+      "id": 297,
+      "name": "SetOwnPropertyIgnoreAttributes",
+      "enumName": "kSetOwnPropertyIgnoreAttributes",
+      "nargs": 4,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "298": {
+      "id": 298,
+      "name": "ShrinkNameDictionary",
+      "enumName": "kShrinkNameDictionary",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "299": {
+      "id": 299,
+      "name": "ShrinkSwissNameDictionary",
+      "enumName": "kShrinkSwissNameDictionary",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "300": {
+      "id": 300,
+      "name": "ToFastProperties",
+      "enumName": "kToFastProperties",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "301": {
+      "id": 301,
+      "name": "ToLength",
+      "enumName": "kToLength",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "302": {
+      "id": 302,
+      "name": "ToName",
+      "enumName": "kToName",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "303": {
+      "id": 303,
+      "name": "ToNumber",
+      "enumName": "kToNumber",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "304": {
+      "id": 304,
+      "name": "ToNumeric",
+      "enumName": "kToNumeric",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "305": {
+      "id": 305,
+      "name": "ToObject",
+      "enumName": "kToObject",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "306": {
+      "id": 306,
+      "name": "ToString",
+      "enumName": "kToString",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "307": {
+      "id": 307,
+      "name": "TryMigrateInstance",
+      "enumName": "kTryMigrateInstance",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "308": {
+      "id": 308,
+      "name": "TryMigrateInstanceAndMarkMapAsMigrationTarget",
+      "enumName": "kTryMigrateInstanceAndMarkMapAsMigrationTarget",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "309": {
+      "id": 309,
+      "name": "SetPrivateMember",
+      "enumName": "kSetPrivateMember",
+      "nargs": 3,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "310": {
+      "id": 310,
+      "name": "SwissTableAdd",
+      "enumName": "kSwissTableAdd",
+      "nargs": 4,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "311": {
+      "id": 311,
+      "name": "SwissTableAllocate",
+      "enumName": "kSwissTableAllocate",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "312": {
+      "id": 312,
+      "name": "SwissTableDelete",
+      "enumName": "kSwissTableDelete",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "313": {
+      "id": 313,
+      "name": "SwissTableDetailsAt",
+      "enumName": "kSwissTableDetailsAt",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "314": {
+      "id": 314,
+      "name": "SwissTableElementsCount",
+      "enumName": "kSwissTableElementsCount",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "315": {
+      "id": 315,
+      "name": "SwissTableEquals",
+      "enumName": "kSwissTableEquals",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "316": {
+      "id": 316,
+      "name": "SwissTableFindEntry",
+      "enumName": "kSwissTableFindEntry",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "317": {
+      "id": 317,
+      "name": "SwissTableUpdate",
+      "enumName": "kSwissTableUpdate",
+      "nargs": 4,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "318": {
+      "id": 318,
+      "name": "SwissTableValueAt",
+      "enumName": "kSwissTableValueAt",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "319": {
+      "id": 319,
+      "name": "SwissTableKeyAt",
+      "enumName": "kSwissTableKeyAt",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "320": {
+      "id": 320,
+      "name": "Add",
+      "enumName": "kAdd",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "321": {
+      "id": 321,
+      "name": "Equal",
+      "enumName": "kEqual",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "322": {
+      "id": 322,
+      "name": "GreaterThan",
+      "enumName": "kGreaterThan",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "323": {
+      "id": 323,
+      "name": "GreaterThanOrEqual",
+      "enumName": "kGreaterThanOrEqual",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "324": {
+      "id": 324,
+      "name": "LessThan",
+      "enumName": "kLessThan",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "325": {
+      "id": 325,
+      "name": "LessThanOrEqual",
+      "enumName": "kLessThanOrEqual",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "326": {
+      "id": 326,
+      "name": "NotEqual",
+      "enumName": "kNotEqual",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "327": {
+      "id": 327,
+      "name": "StrictEqual",
+      "enumName": "kStrictEqual",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "328": {
+      "id": 328,
+      "name": "StrictNotEqual",
+      "enumName": "kStrictNotEqual",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "329": {
+      "id": 329,
+      "name": "ReferenceEqual",
+      "enumName": "kReferenceEqual",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "330": {
+      "id": 330,
+      "name": "EnqueueMicrotask",
+      "enumName": "kEnqueueMicrotask",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "331": {
+      "id": 331,
+      "name": "PromiseHookAfter",
+      "enumName": "kPromiseHookAfter",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "332": {
+      "id": 332,
+      "name": "PromiseHookBefore",
+      "enumName": "kPromiseHookBefore",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "333": {
+      "id": 333,
+      "name": "PromiseHookInit",
+      "enumName": "kPromiseHookInit",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "334": {
+      "id": 334,
+      "name": "PromiseRejectEventFromStack",
+      "enumName": "kPromiseRejectEventFromStack",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "335": {
+      "id": 335,
+      "name": "PromiseRevokeReject",
+      "enumName": "kPromiseRevokeReject",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "336": {
+      "id": 336,
+      "name": "RejectPromise",
+      "enumName": "kRejectPromise",
+      "nargs": 3,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "337": {
+      "id": 337,
+      "name": "ResolvePromise",
+      "enumName": "kResolvePromise",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "338": {
+      "id": 338,
+      "name": "PromiseRejectAfterResolved",
+      "enumName": "kPromiseRejectAfterResolved",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "339": {
+      "id": 339,
+      "name": "PromiseResolveAfterResolved",
+      "enumName": "kPromiseResolveAfterResolved",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "340": {
+      "id": 340,
+      "name": "ConstructSuppressedError",
+      "enumName": "kConstructSuppressedError",
+      "nargs": 3,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "341": {
+      "id": 341,
+      "name": "ConstructAggregateErrorHelper",
+      "enumName": "kConstructAggregateErrorHelper",
+      "nargs": 4,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "342": {
+      "id": 342,
+      "name": "ConstructInternalAggregateErrorHelper",
+      "enumName": "kConstructInternalAggregateErrorHelper",
+      "nargs": -1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "343": {
+      "id": 343,
+      "name": "CheckProxyGetSetTrapResult",
+      "enumName": "kCheckProxyGetSetTrapResult",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "344": {
+      "id": 344,
+      "name": "CheckProxyHasTrapResult",
+      "enumName": "kCheckProxyHasTrapResult",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "345": {
+      "id": 345,
+      "name": "CheckProxyDeleteTrapResult",
+      "enumName": "kCheckProxyDeleteTrapResult",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "346": {
+      "id": 346,
+      "name": "GetPropertyWithReceiver",
+      "enumName": "kGetPropertyWithReceiver",
+      "nargs": 3,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "347": {
+      "id": 347,
+      "name": "IsJSProxy",
+      "enumName": "kIsJSProxy",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "348": {
+      "id": 348,
+      "name": "JSProxyGetHandler",
+      "enumName": "kJSProxyGetHandler",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "349": {
+      "id": 349,
+      "name": "JSProxyGetTarget",
+      "enumName": "kJSProxyGetTarget",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "350": {
+      "id": 350,
+      "name": "SetPropertyWithReceiver",
+      "enumName": "kSetPropertyWithReceiver",
+      "nargs": 4,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "351": {
+      "id": 351,
+      "name": "RegExpBuildIndices",
+      "enumName": "kRegExpBuildIndices",
+      "nargs": 3,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "352": {
+      "id": 352,
+      "name": "RegExpGrowRegExpMatchInfo",
+      "enumName": "kRegExpGrowRegExpMatchInfo",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "353": {
+      "id": 353,
+      "name": "RegExpExecMultiple",
+      "enumName": "kRegExpExecMultiple",
+      "nargs": 3,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "354": {
+      "id": 354,
+      "name": "RegExpInitializeAndCompile",
+      "enumName": "kRegExpInitializeAndCompile",
+      "nargs": 3,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "355": {
+      "id": 355,
+      "name": "RegExpMatchGlobalAtom",
+      "enumName": "kRegExpMatchGlobalAtom",
+      "nargs": 3,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "356": {
+      "id": 356,
+      "name": "RegExpReplaceRT",
+      "enumName": "kRegExpReplaceRT",
+      "nargs": 3,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "357": {
+      "id": 357,
+      "name": "RegExpSplit",
+      "enumName": "kRegExpSplit",
+      "nargs": 3,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "358": {
+      "id": 358,
+      "name": "RegExpStringFromFlags",
+      "enumName": "kRegExpStringFromFlags",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "359": {
+      "id": 359,
+      "name": "StringReplaceNonGlobalRegExpWithFunction",
+      "enumName": "kStringReplaceNonGlobalRegExpWithFunction",
+      "nargs": 3,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "360": {
+      "id": 360,
+      "name": "StringSplit",
+      "enumName": "kStringSplit",
+      "nargs": 3,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "361": {
+      "id": 361,
+      "name": "RegExpExec",
+      "enumName": "kRegExpExec",
+      "nargs": 4,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "362": {
+      "id": 362,
+      "name": "RegExpExperimentalOneshotExec",
+      "enumName": "kRegExpExperimentalOneshotExec",
+      "nargs": 4,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "363": {
+      "id": 363,
+      "name": "ThrowConstAssignError",
+      "enumName": "kThrowConstAssignError",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "364": {
+      "id": 364,
+      "name": "ThrowUsingAssignError",
+      "enumName": "kThrowUsingAssignError",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "365": {
+      "id": 365,
+      "name": "ThrowAwaitUsingAssignError",
+      "enumName": "kThrowAwaitUsingAssignError",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "366": {
+      "id": 366,
+      "name": "DeclareEvalFunction",
+      "enumName": "kDeclareEvalFunction",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "367": {
+      "id": 367,
+      "name": "DeclareEvalVar",
+      "enumName": "kDeclareEvalVar",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "368": {
+      "id": 368,
+      "name": "DeclareGlobals",
+      "enumName": "kDeclareGlobals",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "369": {
+      "id": 369,
+      "name": "DeclareModuleExports",
+      "enumName": "kDeclareModuleExports",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "370": {
+      "id": 370,
+      "name": "DeleteLookupSlot",
+      "enumName": "kDeleteLookupSlot",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "371": {
+      "id": 371,
+      "name": "LoadLookupSlot",
+      "enumName": "kLoadLookupSlot",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "372": {
+      "id": 372,
+      "name": "LoadLookupSlotInsideTypeof",
+      "enumName": "kLoadLookupSlotInsideTypeof",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "373": {
+      "id": 373,
+      "name": "LoadLookupSlotForCall_Baseline",
+      "enumName": "kLoadLookupSlotForCall_Baseline",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "374": {
+      "id": 374,
+      "name": "NewClosure",
+      "enumName": "kNewClosure",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "375": {
+      "id": 375,
+      "name": "NewClosure_Tenured",
+      "enumName": "kNewClosure_Tenured",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "376": {
+      "id": 376,
+      "name": "NewFunctionContext",
+      "enumName": "kNewFunctionContext",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "377": {
+      "id": 377,
+      "name": "NewRestParameter",
+      "enumName": "kNewRestParameter",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "378": {
+      "id": 378,
+      "name": "NewSloppyArguments",
+      "enumName": "kNewSloppyArguments",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "379": {
+      "id": 379,
+      "name": "NewStrictArguments",
+      "enumName": "kNewStrictArguments",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "380": {
+      "id": 380,
+      "name": "PushBlockContext",
+      "enumName": "kPushBlockContext",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "381": {
+      "id": 381,
+      "name": "PushCatchContext",
+      "enumName": "kPushCatchContext",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "382": {
+      "id": 382,
+      "name": "PushWithContext",
+      "enumName": "kPushWithContext",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "383": {
+      "id": 383,
+      "name": "StoreGlobalNoHoleCheckForReplLetOrConst",
+      "enumName": "kStoreGlobalNoHoleCheckForReplLetOrConst",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "384": {
+      "id": 384,
+      "name": "StoreLookupSlot_Sloppy",
+      "enumName": "kStoreLookupSlot_Sloppy",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "385": {
+      "id": 385,
+      "name": "StoreLookupSlot_SloppyHoisting",
+      "enumName": "kStoreLookupSlot_SloppyHoisting",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "386": {
+      "id": 386,
+      "name": "StoreLookupSlot_Strict",
+      "enumName": "kStoreLookupSlot_Strict",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "387": {
+      "id": 387,
+      "name": "ShadowRealmWrappedFunctionCreate",
+      "enumName": "kShadowRealmWrappedFunctionCreate",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "388": {
+      "id": 388,
+      "name": "ShadowRealmImportValue",
+      "enumName": "kShadowRealmImportValue",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "389": {
+      "id": 389,
+      "name": "ShadowRealmThrow",
+      "enumName": "kShadowRealmThrow",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "390": {
+      "id": 390,
+      "name": "FlattenString",
+      "enumName": "kFlattenString",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "391": {
+      "id": 391,
+      "name": "GetSubstitution",
+      "enumName": "kGetSubstitution",
+      "nargs": 5,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "392": {
+      "id": 392,
+      "name": "InternalizeString",
+      "enumName": "kInternalizeString",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "393": {
+      "id": 393,
+      "name": "StringAdd",
+      "enumName": "kStringAdd",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "394": {
+      "id": 394,
+      "name": "StringAdd_LhsIsStringConstant_Internalize",
+      "enumName": "kStringAdd_LhsIsStringConstant_Internalize",
+      "nargs": 4,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "395": {
+      "id": 395,
+      "name": "StringAdd_RhsIsStringConstant_Internalize",
+      "enumName": "kStringAdd_RhsIsStringConstant_Internalize",
+      "nargs": 4,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "396": {
+      "id": 396,
+      "name": "StringBuilderConcat",
+      "enumName": "kStringBuilderConcat",
+      "nargs": 3,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "397": {
+      "id": 397,
+      "name": "StringCharCodeAt",
+      "enumName": "kStringCharCodeAt",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "398": {
+      "id": 398,
+      "name": "StringCodePointAt",
+      "enumName": "kStringCodePointAt",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "399": {
+      "id": 399,
+      "name": "StringCompare",
+      "enumName": "kStringCompare",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "400": {
+      "id": 400,
+      "name": "StringEqual",
+      "enumName": "kStringEqual",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "401": {
+      "id": 401,
+      "name": "StringEscapeQuotes",
+      "enumName": "kStringEscapeQuotes",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "402": {
+      "id": 402,
+      "name": "StringGreaterThan",
+      "enumName": "kStringGreaterThan",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "403": {
+      "id": 403,
+      "name": "StringGreaterThanOrEqual",
+      "enumName": "kStringGreaterThanOrEqual",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "404": {
+      "id": 404,
+      "name": "StringIsWellFormed",
+      "enumName": "kStringIsWellFormed",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "405": {
+      "id": 405,
+      "name": "StringLastIndexOf",
+      "enumName": "kStringLastIndexOf",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "406": {
+      "id": 406,
+      "name": "StringLessThan",
+      "enumName": "kStringLessThan",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "407": {
+      "id": 407,
+      "name": "StringLessThanOrEqual",
+      "enumName": "kStringLessThanOrEqual",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "408": {
+      "id": 408,
+      "name": "StringMaxLength",
+      "enumName": "kStringMaxLength",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "409": {
+      "id": 409,
+      "name": "StringReplaceOneCharWithString",
+      "enumName": "kStringReplaceOneCharWithString",
+      "nargs": 3,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "410": {
+      "id": 410,
+      "name": "StringSubstring",
+      "enumName": "kStringSubstring",
+      "nargs": 3,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "411": {
+      "id": 411,
+      "name": "StringToArray",
+      "enumName": "kStringToArray",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "412": {
+      "id": 412,
+      "name": "StringToWellFormed",
+      "enumName": "kStringToWellFormed",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "413": {
+      "id": 413,
+      "name": "CreatePrivateNameSymbol",
+      "enumName": "kCreatePrivateNameSymbol",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "414": {
+      "id": 414,
+      "name": "CreatePrivateBrandSymbol",
+      "enumName": "kCreatePrivateBrandSymbol",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "415": {
+      "id": 415,
+      "name": "CreatePrivateSymbol",
+      "enumName": "kCreatePrivateSymbol",
+      "nargs": -1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "416": {
+      "id": 416,
+      "name": "SymbolDescriptiveString",
+      "enumName": "kSymbolDescriptiveString",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "417": {
+      "id": 417,
+      "name": "SymbolIsPrivate",
+      "enumName": "kSymbolIsPrivate",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "418": {
+      "id": 418,
+      "name": "Abort",
+      "enumName": "kAbort",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "419": {
+      "id": 419,
+      "name": "AbortCSADcheck",
+      "enumName": "kAbortCSADcheck",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "420": {
+      "id": 420,
+      "name": "AbortJS",
+      "enumName": "kAbortJS",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "421": {
+      "id": 421,
+      "name": "ActiveTierIsIgnition",
+      "enumName": "kActiveTierIsIgnition",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "422": {
+      "id": 422,
+      "name": "ActiveTierIsSparkplug",
+      "enumName": "kActiveTierIsSparkplug",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "423": {
+      "id": 423,
+      "name": "ActiveTierIsMaglev",
+      "enumName": "kActiveTierIsMaglev",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "424": {
+      "id": 424,
+      "name": "ActiveTierIsTurbofan",
+      "enumName": "kActiveTierIsTurbofan",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "425": {
+      "id": 425,
+      "name": "ArrayBufferDetachForceWasm",
+      "enumName": "kArrayBufferDetachForceWasm",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "426": {
+      "id": 426,
+      "name": "ArrayIteratorProtector",
+      "enumName": "kArrayIteratorProtector",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "427": {
+      "id": 427,
+      "name": "ArraySpeciesProtector",
+      "enumName": "kArraySpeciesProtector",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "428": {
+      "id": 428,
+      "name": "BaselineOsr",
+      "enumName": "kBaselineOsr",
+      "nargs": -1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "429": {
+      "id": 429,
+      "name": "BenchMaglev",
+      "enumName": "kBenchMaglev",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "430": {
+      "id": 430,
+      "name": "BenchTurbofan",
+      "enumName": "kBenchTurbofan",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "431": {
+      "id": 431,
+      "name": "VerifyGetJSBuiltinState",
+      "enumName": "kVerifyGetJSBuiltinState",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "432": {
+      "id": 432,
+      "name": "ClearFunctionFeedback",
+      "enumName": "kClearFunctionFeedback",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "433": {
+      "id": 433,
+      "name": "ClearMegamorphicStubCache",
+      "enumName": "kClearMegamorphicStubCache",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "434": {
+      "id": 434,
+      "name": "CompleteInobjectSlackTracking",
+      "enumName": "kCompleteInobjectSlackTracking",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "435": {
+      "id": 435,
+      "name": "ConstructConsString",
+      "enumName": "kConstructConsString",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "436": {
+      "id": 436,
+      "name": "ConstructDouble",
+      "enumName": "kConstructDouble",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "437": {
+      "id": 437,
+      "name": "ConstructInternalizedString",
+      "enumName": "kConstructInternalizedString",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "438": {
+      "id": 438,
+      "name": "ConstructSlicedString",
+      "enumName": "kConstructSlicedString",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "439": {
+      "id": 439,
+      "name": "ConstructThinString",
+      "enumName": "kConstructThinString",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "440": {
+      "id": 440,
+      "name": "CurrentFrameIsTurbofan",
+      "enumName": "kCurrentFrameIsTurbofan",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "441": {
+      "id": 441,
+      "name": "DebugPrint",
+      "enumName": "kDebugPrint",
+      "nargs": -1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "442": {
+      "id": 442,
+      "name": "DebugPrintCppHeapPointerTable",
+      "enumName": "kDebugPrintCppHeapPointerTable",
+      "nargs": -1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "443": {
+      "id": 443,
+      "name": "DebugPrintCppHeapPointerTableFilterTag",
+      "enumName": "kDebugPrintCppHeapPointerTableFilterTag",
+      "nargs": -1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "444": {
+      "id": 444,
+      "name": "DebugPrintExternalPointerTable",
+      "enumName": "kDebugPrintExternalPointerTable",
+      "nargs": -1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "445": {
+      "id": 445,
+      "name": "DebugPrintExternalPointerTableFilterTag",
+      "enumName": "kDebugPrintExternalPointerTableFilterTag",
+      "nargs": -1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "446": {
+      "id": 446,
+      "name": "DebugPrintGeneric",
+      "enumName": "kDebugPrintGeneric",
+      "nargs": -1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "447": {
+      "id": 447,
+      "name": "DebugPrintFloat",
+      "enumName": "kDebugPrintFloat",
+      "nargs": 5,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "448": {
+      "id": 448,
+      "name": "DebugPrintPtr",
+      "enumName": "kDebugPrintPtr",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "449": {
+      "id": 449,
+      "name": "DebugPrintWord",
+      "enumName": "kDebugPrintWord",
+      "nargs": 5,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "450": {
+      "id": 450,
+      "name": "DebugTrace",
+      "enumName": "kDebugTrace",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "451": {
+      "id": 451,
+      "name": "DeoptimizeFunction",
+      "enumName": "kDeoptimizeFunction",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "452": {
+      "id": 452,
+      "name": "DisableOptimizationFinalization",
+      "enumName": "kDisableOptimizationFinalization",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "453": {
+      "id": 453,
+      "name": "DisallowCodegenFromStrings",
+      "enumName": "kDisallowCodegenFromStrings",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "454": {
+      "id": 454,
+      "name": "DisassembleFunction",
+      "enumName": "kDisassembleFunction",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "455": {
+      "id": 455,
+      "name": "EnableCodeLoggingForTesting",
+      "enumName": "kEnableCodeLoggingForTesting",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "456": {
+      "id": 456,
+      "name": "EnsureFeedbackVectorForFunction",
+      "enumName": "kEnsureFeedbackVectorForFunction",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "457": {
+      "id": 457,
+      "name": "FinalizeOptimization",
+      "enumName": "kFinalizeOptimization",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "458": {
+      "id": 458,
+      "name": "ForceFlush",
+      "enumName": "kForceFlush",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "459": {
+      "id": 459,
+      "name": "MajorGCForCompilerTesting",
+      "enumName": "kMajorGCForCompilerTesting",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "460": {
+      "id": 460,
+      "name": "GetAbstractModuleSource",
+      "enumName": "kGetAbstractModuleSource",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "461": {
+      "id": 461,
+      "name": "GetCallable",
+      "enumName": "kGetCallable",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "462": {
+      "id": 462,
+      "name": "GetFeedback",
+      "enumName": "kGetFeedback",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "463": {
+      "id": 463,
+      "name": "GetFunctionForCurrentFrame",
+      "enumName": "kGetFunctionForCurrentFrame",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "464": {
+      "id": 464,
+      "name": "GetInitializerFunction",
+      "enumName": "kGetInitializerFunction",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "465": {
+      "id": 465,
+      "name": "GetOptimizationStatus",
+      "enumName": "kGetOptimizationStatus",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "466": {
+      "id": 466,
+      "name": "GetUndetectable",
+      "enumName": "kGetUndetectable",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "467": {
+      "id": 467,
+      "name": "GetWeakCollectionSize",
+      "enumName": "kGetWeakCollectionSize",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "468": {
+      "id": 468,
+      "name": "GlobalPrint",
+      "enumName": "kGlobalPrint",
+      "nargs": -1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "469": {
+      "id": 469,
+      "name": "HasCowElements",
+      "enumName": "kHasCowElements",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "470": {
+      "id": 470,
+      "name": "HasDictionaryElements",
+      "enumName": "kHasDictionaryElements",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "471": {
+      "id": 471,
+      "name": "HasDoubleElements",
+      "enumName": "kHasDoubleElements",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "472": {
+      "id": 472,
+      "name": "HasElementsInALargeObjectSpace",
+      "enumName": "kHasElementsInALargeObjectSpace",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "473": {
+      "id": 473,
+      "name": "HasFastElements",
+      "enumName": "kHasFastElements",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "474": {
+      "id": 474,
+      "name": "HasFastProperties",
+      "enumName": "kHasFastProperties",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "475": {
+      "id": 475,
+      "name": "HasFixedBigInt64Elements",
+      "enumName": "kHasFixedBigInt64Elements",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "476": {
+      "id": 476,
+      "name": "HasFixedBigUint64Elements",
+      "enumName": "kHasFixedBigUint64Elements",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "477": {
+      "id": 477,
+      "name": "HasFixedFloat16Elements",
+      "enumName": "kHasFixedFloat16Elements",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "478": {
+      "id": 478,
+      "name": "HasFixedFloat32Elements",
+      "enumName": "kHasFixedFloat32Elements",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "479": {
+      "id": 479,
+      "name": "HasFixedFloat64Elements",
+      "enumName": "kHasFixedFloat64Elements",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "480": {
+      "id": 480,
+      "name": "HasFixedInt16Elements",
+      "enumName": "kHasFixedInt16Elements",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "481": {
+      "id": 481,
+      "name": "HasFixedInt32Elements",
+      "enumName": "kHasFixedInt32Elements",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "482": {
+      "id": 482,
+      "name": "HasFixedInt8Elements",
+      "enumName": "kHasFixedInt8Elements",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "483": {
+      "id": 483,
+      "name": "HasFixedUint16Elements",
+      "enumName": "kHasFixedUint16Elements",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "484": {
+      "id": 484,
+      "name": "HasFixedUint32Elements",
+      "enumName": "kHasFixedUint32Elements",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "485": {
+      "id": 485,
+      "name": "HasFixedUint8ClampedElements",
+      "enumName": "kHasFixedUint8ClampedElements",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "486": {
+      "id": 486,
+      "name": "HasFixedUint8Elements",
+      "enumName": "kHasFixedUint8Elements",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "487": {
+      "id": 487,
+      "name": "HasHoleyElements",
+      "enumName": "kHasHoleyElements",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "488": {
+      "id": 488,
+      "name": "HasObjectElements",
+      "enumName": "kHasObjectElements",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "489": {
+      "id": 489,
+      "name": "HasPackedElements",
+      "enumName": "kHasPackedElements",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "490": {
+      "id": 490,
+      "name": "HasSloppyArgumentsElements",
+      "enumName": "kHasSloppyArgumentsElements",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "491": {
+      "id": 491,
+      "name": "HasSmiElements",
+      "enumName": "kHasSmiElements",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "492": {
+      "id": 492,
+      "name": "HasSmiOrObjectElements",
+      "enumName": "kHasSmiOrObjectElements",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "493": {
+      "id": 493,
+      "name": "HaveSameMap",
+      "enumName": "kHaveSameMap",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "494": {
+      "id": 494,
+      "name": "HeapObjectVerify",
+      "enumName": "kHeapObjectVerify",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "495": {
+      "id": 495,
+      "name": "ICsAreEnabled",
+      "enumName": "kICsAreEnabled",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "496": {
+      "id": 496,
+      "name": "InLargeObjectSpace",
+      "enumName": "kInLargeObjectSpace",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "497": {
+      "id": 497,
+      "name": "InYoungGeneration",
+      "enumName": "kInYoungGeneration",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "498": {
+      "id": 498,
+      "name": "Is64Bit",
+      "enumName": "kIs64Bit",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "499": {
+      "id": 499,
+      "name": "IsAtomicsWaitAllowed",
+      "enumName": "kIsAtomicsWaitAllowed",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "500": {
+      "id": 500,
+      "name": "IsBeingInterpreted",
+      "enumName": "kIsBeingInterpreted",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "501": {
+      "id": 501,
+      "name": "IsConcatSpreadableProtector",
+      "enumName": "kIsConcatSpreadableProtector",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "502": {
+      "id": 502,
+      "name": "IsConcurrentRecompilationSupported",
+      "enumName": "kIsConcurrentRecompilationSupported",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "503": {
+      "id": 503,
+      "name": "IsDictPropertyConstTrackingEnabled",
+      "enumName": "kIsDictPropertyConstTrackingEnabled",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "504": {
+      "id": 504,
+      "name": "IsEfficiencyModeEnabled",
+      "enumName": "kIsEfficiencyModeEnabled",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "505": {
+      "id": 505,
+      "name": "IsInPlaceInternalizableString",
+      "enumName": "kIsInPlaceInternalizableString",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "506": {
+      "id": 506,
+      "name": "IsInternalizedString",
+      "enumName": "kIsInternalizedString",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "507": {
+      "id": 507,
+      "name": "StringToCString",
+      "enumName": "kStringToCString",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "508": {
+      "id": 508,
+      "name": "StringUtf8Value",
+      "enumName": "kStringUtf8Value",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "509": {
+      "id": 509,
+      "name": "IsUndefinedDoubleEnabled",
+      "enumName": "kIsUndefinedDoubleEnabled",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "510": {
+      "id": 510,
+      "name": "IsMaglevEnabled",
+      "enumName": "kIsMaglevEnabled",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "511": {
+      "id": 511,
+      "name": "IsSameHeapObject",
+      "enumName": "kIsSameHeapObject",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "512": {
+      "id": 512,
+      "name": "IsSharedString",
+      "enumName": "kIsSharedString",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "513": {
+      "id": 513,
+      "name": "IsInWritableSharedSpace",
+      "enumName": "kIsInWritableSharedSpace",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "514": {
+      "id": 514,
+      "name": "IsSparkplugEnabled",
+      "enumName": "kIsSparkplugEnabled",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "515": {
+      "id": 515,
+      "name": "IsTurbofanEnabled",
+      "enumName": "kIsTurbofanEnabled",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "516": {
+      "id": 516,
+      "name": "IsWasmTieringPredictable",
+      "enumName": "kIsWasmTieringPredictable",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "517": {
+      "id": 517,
+      "name": "MapIteratorProtector",
+      "enumName": "kMapIteratorProtector",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "518": {
+      "id": 518,
+      "name": "NeverOptimizeFunction",
+      "enumName": "kNeverOptimizeFunction",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "519": {
+      "id": 519,
+      "name": "NewRegExpWithBacktrackLimit",
+      "enumName": "kNewRegExpWithBacktrackLimit",
+      "nargs": 3,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "520": {
+      "id": 520,
+      "name": "NoElementsProtector",
+      "enumName": "kNoElementsProtector",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "521": {
+      "id": 521,
+      "name": "NotifyContextDisposed",
+      "enumName": "kNotifyContextDisposed",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "522": {
+      "id": 522,
+      "name": "SetPriorityBestEffort",
+      "enumName": "kSetPriorityBestEffort",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "523": {
+      "id": 523,
+      "name": "SetPriorityUserVisible",
+      "enumName": "kSetPriorityUserVisible",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "524": {
+      "id": 524,
+      "name": "SetPriorityUserBlocking",
+      "enumName": "kSetPriorityUserBlocking",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "525": {
+      "id": 525,
+      "name": "OptimizeMaglevOnNextCall",
+      "enumName": "kOptimizeMaglevOnNextCall",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "526": {
+      "id": 526,
+      "name": "OptimizeFunctionOnNextCall",
+      "enumName": "kOptimizeFunctionOnNextCall",
+      "nargs": -1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "527": {
+      "id": 527,
+      "name": "OptimizeOsr",
+      "enumName": "kOptimizeOsr",
+      "nargs": -1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "528": {
+      "id": 528,
+      "name": "PrepareFunctionForOptimization",
+      "enumName": "kPrepareFunctionForOptimization",
+      "nargs": -1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "529": {
+      "id": 529,
+      "name": "PretenureAllocationSite",
+      "enumName": "kPretenureAllocationSite",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "530": {
+      "id": 530,
+      "name": "PrintWithNameForAssert",
+      "enumName": "kPrintWithNameForAssert",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "531": {
+      "id": 531,
+      "name": "PromiseSpeciesProtector",
+      "enumName": "kPromiseSpeciesProtector",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "532": {
+      "id": 532,
+      "name": "RegExpSpeciesProtector",
+      "enumName": "kRegExpSpeciesProtector",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "533": {
+      "id": 533,
+      "name": "RegexpHasBytecode",
+      "enumName": "kRegexpHasBytecode",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "534": {
+      "id": 534,
+      "name": "RegexpHasNativeCode",
+      "enumName": "kRegexpHasNativeCode",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "535": {
+      "id": 535,
+      "name": "RegexpIsUnmodified",
+      "enumName": "kRegexpIsUnmodified",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "536": {
+      "id": 536,
+      "name": "RegexpTypeTag",
+      "enumName": "kRegexpTypeTag",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "537": {
+      "id": 537,
+      "name": "RunningInSimulator",
+      "enumName": "kRunningInSimulator",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "538": {
+      "id": 538,
+      "name": "RuntimeEvaluateREPL",
+      "enumName": "kRuntimeEvaluateREPL",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "539": {
+      "id": 539,
+      "name": "ScheduleGCInStackCheck",
+      "enumName": "kScheduleGCInStackCheck",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "540": {
+      "id": 540,
+      "name": "SerializeDeserializeNow",
+      "enumName": "kSerializeDeserializeNow",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "541": {
+      "id": 541,
+      "name": "SetAllocationTimeout",
+      "enumName": "kSetAllocationTimeout",
+      "nargs": -1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "542": {
+      "id": 542,
+      "name": "SetBatterySaverMode",
+      "enumName": "kSetBatterySaverMode",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "543": {
+      "id": 543,
+      "name": "SetForceSlowPath",
+      "enumName": "kSetForceSlowPath",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "544": {
+      "id": 544,
+      "name": "SetIteratorProtector",
+      "enumName": "kSetIteratorProtector",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "545": {
+      "id": 545,
+      "name": "SharedGC",
+      "enumName": "kSharedGC",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "546": {
+      "id": 546,
+      "name": "ShareObject",
+      "enumName": "kShareObject",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "547": {
+      "id": 547,
+      "name": "SimulateNewspaceFull",
+      "enumName": "kSimulateNewspaceFull",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "548": {
+      "id": 548,
+      "name": "StringIsFlat",
+      "enumName": "kStringIsFlat",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "549": {
+      "id": 549,
+      "name": "StringIteratorProtector",
+      "enumName": "kStringIteratorProtector",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "550": {
+      "id": 550,
+      "name": "StringWrapperToPrimitiveProtector",
+      "enumName": "kStringWrapperToPrimitiveProtector",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "551": {
+      "id": 551,
+      "name": "SystemBreak",
+      "enumName": "kSystemBreak",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "552": {
+      "id": 552,
+      "name": "TakeHeapSnapshot",
+      "enumName": "kTakeHeapSnapshot",
+      "nargs": -1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "553": {
+      "id": 553,
+      "name": "TraceEnter",
+      "enumName": "kTraceEnter",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "554": {
+      "id": 554,
+      "name": "TraceExit",
+      "enumName": "kTraceExit",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "555": {
+      "id": 555,
+      "name": "TurbofanStaticAssert",
+      "enumName": "kTurbofanStaticAssert",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "556": {
+      "id": 556,
+      "name": "TypedArraySpeciesProtector",
+      "enumName": "kTypedArraySpeciesProtector",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "557": {
+      "id": 557,
+      "name": "WaitForBackgroundOptimization",
+      "enumName": "kWaitForBackgroundOptimization",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "558": {
+      "id": 558,
+      "name": "DeoptimizeNow",
+      "enumName": "kDeoptimizeNow",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "559": {
+      "id": 559,
+      "name": "LeakHole",
+      "enumName": "kLeakHole",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "560": {
+      "id": 560,
+      "name": "GetHoleNaNLower",
+      "enumName": "kGetHoleNaNLower",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "561": {
+      "id": 561,
+      "name": "GetHoleNaNUpper",
+      "enumName": "kGetHoleNaNUpper",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "562": {
+      "id": 562,
+      "name": "GetHoleNaN",
+      "enumName": "kGetHoleNaN",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "563": {
+      "id": 563,
+      "name": "GetUndefinedNaN",
+      "enumName": "kGetUndefinedNaN",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "564": {
+      "id": 564,
+      "name": "ArrayBufferDetach",
+      "enumName": "kArrayBufferDetach",
+      "nargs": -1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "565": {
+      "id": 565,
+      "name": "ArrayBufferSetDetachKey",
+      "enumName": "kArrayBufferSetDetachKey",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "566": {
+      "id": 566,
+      "name": "GrowableSharedArrayBufferByteLength",
+      "enumName": "kGrowableSharedArrayBufferByteLength",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "567": {
+      "id": 567,
+      "name": "TypedArrayCopyElements",
+      "enumName": "kTypedArrayCopyElements",
+      "nargs": 3,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "568": {
+      "id": 568,
+      "name": "TypedArrayGetBuffer",
+      "enumName": "kTypedArrayGetBuffer",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "569": {
+      "id": 569,
+      "name": "TypedArraySet",
+      "enumName": "kTypedArraySet",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "570": {
+      "id": 570,
+      "name": "TypedArraySortFast",
+      "enumName": "kTypedArraySortFast",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "571": {
+      "id": 571,
+      "name": "JSFinalizationRegistryRegisterWeakCellWithUnregisterToken",
+      "enumName": "kJSFinalizationRegistryRegisterWeakCellWithUnregisterToken",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "572": {
+      "id": 572,
+      "name": "JSWeakRefAddToKeptObjects",
+      "enumName": "kJSWeakRefAddToKeptObjects",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "runtime"
+    },
+    "573": {
+      "id": 573,
+      "name": "InlineIncBlockCounter",
+      "enumName": "kInlineIncBlockCounter",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "inline"
+    },
+    "574": {
+      "id": 574,
+      "name": "InlineAsyncFunctionAwait",
+      "enumName": "kInlineAsyncFunctionAwait",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "inline"
+    },
+    "575": {
+      "id": 575,
+      "name": "InlineAsyncFunctionEnter",
+      "enumName": "kInlineAsyncFunctionEnter",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "inline"
+    },
+    "576": {
+      "id": 576,
+      "name": "InlineAsyncFunctionReject",
+      "enumName": "kInlineAsyncFunctionReject",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "inline"
+    },
+    "577": {
+      "id": 577,
+      "name": "InlineAsyncFunctionResolve",
+      "enumName": "kInlineAsyncFunctionResolve",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "inline"
+    },
+    "578": {
+      "id": 578,
+      "name": "InlineAsyncGeneratorAwait",
+      "enumName": "kInlineAsyncGeneratorAwait",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "inline"
+    },
+    "579": {
+      "id": 579,
+      "name": "InlineAsyncGeneratorReject",
+      "enumName": "kInlineAsyncGeneratorReject",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "inline"
+    },
+    "580": {
+      "id": 580,
+      "name": "InlineAsyncGeneratorResolve",
+      "enumName": "kInlineAsyncGeneratorResolve",
+      "nargs": 3,
+      "resultSize": 1,
+      "kind": "inline"
+    },
+    "581": {
+      "id": 581,
+      "name": "InlineAsyncGeneratorYieldWithAwait",
+      "enumName": "kInlineAsyncGeneratorYieldWithAwait",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "inline"
+    },
+    "582": {
+      "id": 582,
+      "name": "InlineCreateJSGeneratorObject",
+      "enumName": "kInlineCreateJSGeneratorObject",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "inline"
+    },
+    "583": {
+      "id": 583,
+      "name": "InlineGeneratorClose",
+      "enumName": "kInlineGeneratorClose",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "inline"
+    },
+    "584": {
+      "id": 584,
+      "name": "InlineGeneratorGetResumeMode",
+      "enumName": "kInlineGeneratorGetResumeMode",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "inline"
+    },
+    "585": {
+      "id": 585,
+      "name": "InlineCreateAsyncFromSyncIterator",
+      "enumName": "kInlineCreateAsyncFromSyncIterator",
+      "nargs": 1,
+      "resultSize": 1,
+      "kind": "inline"
+    },
+    "586": {
+      "id": 586,
+      "name": "InlineAddLhsIsStringConstantInternalize",
+      "enumName": "kInlineAddLhsIsStringConstantInternalize",
+      "nargs": 4,
+      "resultSize": 1,
+      "kind": "inline"
+    },
+    "587": {
+      "id": 587,
+      "name": "InlineAddRhsIsStringConstantInternalize",
+      "enumName": "kInlineAddRhsIsStringConstantInternalize",
+      "nargs": 4,
+      "resultSize": 1,
+      "kind": "inline"
+    },
+    "588": {
+      "id": 588,
+      "name": "InlineGetImportMetaObject",
+      "enumName": "kInlineGetImportMetaObject",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "inline"
+    },
+    "589": {
+      "id": 589,
+      "name": "InlineCopyDataProperties",
+      "enumName": "kInlineCopyDataProperties",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "inline"
+    },
+    "590": {
+      "id": 590,
+      "name": "InlineCopyDataPropertiesWithExcludedPropertiesOnStack",
+      "enumName": "kInlineCopyDataPropertiesWithExcludedPropertiesOnStack",
+      "nargs": -1,
+      "resultSize": 1,
+      "kind": "inline"
+    },
+    "591": {
+      "id": 591,
+      "name": "InlineCreateDataProperty",
+      "enumName": "kInlineCreateDataProperty",
+      "nargs": 3,
+      "resultSize": 1,
+      "kind": "inline"
+    },
+    "592": {
+      "id": 592,
+      "name": "InlineCreateIterResultObject",
+      "enumName": "kInlineCreateIterResultObject",
+      "nargs": 2,
+      "resultSize": 1,
+      "kind": "inline"
+    },
+    "593": {
+      "id": 593,
+      "name": "InlineDeoptimizeNow",
+      "enumName": "kInlineDeoptimizeNow",
+      "nargs": 0,
+      "resultSize": 1,
+      "kind": "inline"
+    }
+  },
+  "byName": {
+    "DebugBreakOnBytecode": 0,
+    "LoadLookupSlotForCall": 1,
+    "ArrayIncludes_Slow": 2,
+    "ArrayIndexOf": 3,
+    "ArrayIsArray": 4,
+    "ArraySpeciesConstructor": 5,
+    "GrowArrayElements": 6,
+    "IsArray": 7,
+    "NewArray": 8,
+    "NormalizeElements": 9,
+    "TransitionElementsKind": 10,
+    "TransitionElementsKindWithKind": 11,
+    "AtomicsLoad64": 12,
+    "AtomicsStore64": 13,
+    "AtomicsAdd": 14,
+    "AtomicsAnd": 15,
+    "AtomicsCompareExchange": 16,
+    "AtomicsExchange": 17,
+    "AtomicsNumWaitersForTesting": 18,
+    "AtomicsNumUnresolvedAsyncPromisesForTesting": 19,
+    "AtomicsOr": 20,
+    "AtomicsSub": 21,
+    "AtomicsXor": 22,
+    "SetAllowAtomicsWait": 23,
+    "AtomicsLoadSharedStructOrArray": 24,
+    "AtomicsStoreSharedStructOrArray": 25,
+    "AtomicsExchangeSharedStructOrArray": 26,
+    "AtomicsCompareExchangeSharedStructOrArray": 27,
+    "AtomicsSynchronizationPrimitiveNumWaitersForTesting": 28,
+    "BigIntCompareToNumber": 29,
+    "BigIntCompareToString": 30,
+    "BigIntEqualToBigInt": 31,
+    "BigIntEqualToNumber": 32,
+    "BigIntEqualToString": 33,
+    "BigIntExponentiate": 34,
+    "BigIntMaxLengthBits": 35,
+    "BigIntToNumber": 36,
+    "BigIntUnaryOp": 37,
+    "ToBigInt": 38,
+    "ToBigIntConvertNumber": 39,
+    "ThrowConstructorNonCallableError": 40,
+    "ThrowNotSuperConstructor": 41,
+    "ThrowStaticPrototypeError": 42,
+    "ThrowSuperAlreadyCalledError": 43,
+    "ThrowSuperNotCalled": 44,
+    "ThrowUnsupportedSuperError": 45,
+    "DefineClass": 46,
+    "LoadFromSuper": 47,
+    "LoadKeyedFromSuper": 48,
+    "StoreKeyedToSuper": 49,
+    "StoreToSuper": 50,
+    "MapGrow": 51,
+    "MapShrink": 52,
+    "OrderedHashSetGrow": 53,
+    "SetGrow": 54,
+    "SetShrink": 55,
+    "OrderedHashSetShrink": 56,
+    "TheHole": 57,
+    "WeakCollectionDelete": 58,
+    "WeakCollectionSet": 59,
+    "OrderedHashMapGrow": 60,
+    "CompileOptimizedOSR": 61,
+    "CompileOptimizedOSRFromMaglev": 62,
+    "CompileOptimizedOSRFromMaglevInlined": 63,
+    "LogOrTraceOptimizedOSREntry": 64,
+    "CompileLazy": 65,
+    "CompileBaseline": 66,
+    "InstallBaselineCode": 67,
+    "InstallSFICode": 68,
+    "InstantiateAsmJs": 69,
+    "NotifyDeoptimized": 70,
+    "ObserveNode": 71,
+    "ResolvePossiblyDirectEval": 72,
+    "VerifyType": 73,
+    "CheckTurboshaftTypeOf": 74,
+    "FunctionLogNextExecution": 75,
+    "OptimizeMaglevEager": 76,
+    "StartMaglevOptimizeJob": 77,
+    "OptimizeTurbofanEager": 78,
+    "StartTurbofanOptimizeJob": 79,
+    "MarkLazyDeoptimized": 80,
+    "DateCurrentTime": 81,
+    "ClearStepping": 82,
+    "CollectGarbage": 83,
+    "DebugAsyncFunctionSuspended": 84,
+    "DebugBreakAtEntry": 85,
+    "DebugCollectCoverage": 86,
+    "DebugGetLoadedScriptIds": 87,
+    "DebugOnFunctionCall": 88,
+    "DebugPrepareStepInSuspendedGenerator": 89,
+    "DebugPromiseThen": 90,
+    "DebugToggleBlockCoverage": 91,
+    "DebugTogglePreciseCoverage": 92,
+    "FunctionGetInferredName": 93,
+    "GetBreakLocations": 94,
+    "GetGeneratorScopeCount": 95,
+    "GetGeneratorScopeDetails": 96,
+    "HandleDebuggerStatement": 97,
+    "IsBreakOnException": 98,
+    "LiveEditPatchScript": 99,
+    "ProfileCreateSnapshotDataBlob": 100,
+    "ScheduleBreak": 101,
+    "ScriptLocationFromLine2": 102,
+    "SetGeneratorScopeVariableValue": 103,
+    "IncBlockCounter": 104,
+    "ForInEnumerate": 105,
+    "ForInHasProperty": 106,
+    "Call": 107,
+    "FunctionGetScriptSource": 108,
+    "FunctionGetScriptId": 109,
+    "FunctionGetScriptSourcePosition": 110,
+    "FunctionGetSourceCode": 111,
+    "FunctionIsAPIFunction": 112,
+    "AsyncFunctionAwait": 113,
+    "AsyncFunctionEnter": 114,
+    "AsyncFunctionReject": 115,
+    "AsyncFunctionResolve": 116,
+    "AsyncGeneratorAwait": 117,
+    "AsyncGeneratorReject": 118,
+    "AsyncGeneratorResolve": 119,
+    "AsyncGeneratorYieldWithAwait": 120,
+    "CreateJSGeneratorObject": 121,
+    "GeneratorClose": 122,
+    "GeneratorGetFunction": 123,
+    "GeneratorGetResumeMode": 124,
+    "ElementsTransitionAndStoreIC_Miss": 125,
+    "KeyedLoadIC_Miss": 126,
+    "KeyedStoreIC_Miss": 127,
+    "DefineKeyedOwnIC_Miss": 128,
+    "StoreInArrayLiteralIC_Miss": 129,
+    "DefineNamedOwnIC_Slow": 130,
+    "KeyedStoreIC_Slow": 131,
+    "DefineKeyedOwnIC_Slow": 132,
+    "LoadElementWithInterceptor": 133,
+    "LoadGlobalIC_Miss": 134,
+    "LoadGlobalIC_Slow": 135,
+    "LoadIC_Miss": 136,
+    "LoadIC_Miss_FromBaseline": 137,
+    "PatchLoadICUninitializedBaseline": 138,
+    "LoadNoFeedbackIC_Miss": 139,
+    "LoadWithReceiverIC_Miss": 140,
+    "LoadWithReceiverNoFeedbackIC_Miss": 141,
+    "LoadPropertyWithInterceptor": 142,
+    "StoreCallbackProperty": 143,
+    "StoreGlobalIC_Miss": 144,
+    "StoreGlobalICNoFeedback_Miss": 145,
+    "StoreGlobalIC_Slow": 146,
+    "StoreIC_Miss": 147,
+    "DefineNamedOwnIC_Miss": 148,
+    "StoreInArrayLiteralIC_Slow": 149,
+    "StorePropertyWithInterceptor": 150,
+    "CloneObjectIC_Slow": 151,
+    "CloneObjectIC_Miss": 152,
+    "KeyedHasIC_Miss": 153,
+    "HasElementWithInterceptor": 154,
+    "ObjectAssignTryFastcase": 155,
+    "Throw": 156,
+    "ThrowTargetNonFunction": 157,
+    "ThrowCalledNonCallable": 158,
+    "ThrowConstructedNonConstructable": 159,
+    "ThrowConstructorReturnedNonObject": 160,
+    "ThrowInvalidStringLength": 161,
+    "ThrowInvalidTypedArrayAlignment": 162,
+    "ThrowIteratorError": 163,
+    "ThrowSpreadArgError": 164,
+    "ThrowIteratorResultNotAnObject": 165,
+    "ThrowNoAccess": 166,
+    "ThrowNotConstructor": 167,
+    "ThrowPatternAssignmentNonCoercible": 168,
+    "ThrowRangeError": 169,
+    "ThrowReferenceError": 170,
+    "ThrowAccessedUninitializedVariable": 171,
+    "ThrowStackOverflow": 172,
+    "ThrowSymbolAsyncIteratorInvalid": 173,
+    "ThrowSymbolIteratorInvalid": 174,
+    "ThrowThrowMethodMissing": 175,
+    "ThrowTypeError": 176,
+    "ThrowTypeErrorIfStrict": 177,
+    "ReThrow": 178,
+    "ReThrowWithMessage": 179,
+    "AccessCheck": 180,
+    "AllocateByteArray": 181,
+    "AllocateInYoungGeneration": 182,
+    "AllocateInOldGeneration": 183,
+    "AllocateInSharedHeap": 184,
+    "AllowDynamicFunction": 185,
+    "CreateAsyncFromSyncIterator": 186,
+    "CreateListFromArrayLike": 187,
+    "DoubleToStringWithRadix": 188,
+    "FatalProcessOutOfMemoryInAllocateRaw": 189,
+    "FatalProcessOutOfMemoryInvalidArrayLength": 190,
+    "FatalInvalidSize": 191,
+    "GetAndResetRuntimeCallStats": 192,
+    "GetAndResetTurboProfilingData": 193,
+    "GetTemplateObject": 194,
+    "IncrementUseCounter": 195,
+    "InvalidateStringWrapperToPrimitiveProtector": 196,
+    "BytecodeBudgetInterrupt_Ignition": 197,
+    "BytecodeBudgetInterruptWithStackCheck_Ignition": 198,
+    "BytecodeBudgetInterrupt_Sparkplug": 199,
+    "BytecodeBudgetInterruptWithStackCheck_Sparkplug": 200,
+    "BytecodeBudgetInterrupt_Maglev": 201,
+    "BytecodeBudgetInterruptWithStackCheck_Maglev": 202,
+    "NotifyContextCellStateWillChange": 203,
+    "NewError": 204,
+    "NewReferenceError": 205,
+    "NewTypeError": 206,
+    "OrdinaryHasInstance": 207,
+    "PropagateException": 208,
+    "ReportMessageFromMicrotask": 209,
+    "RunMicrotaskCallback": 210,
+    "PerformMicrotaskCheckpoint": 211,
+    "SharedValueBarrierSlow": 212,
+    "StackGuard": 213,
+    "HandleNoHeapWritesInterrupts": 214,
+    "StackGuardWithGap": 215,
+    "TerminateExecution": 216,
+    "Typeof": 217,
+    "UnwindAndFindExceptionHandler": 218,
+    "AddLhsIsStringConstantInternalize": 219,
+    "AddRhsIsStringConstantInternalize": 220,
+    "FormatList": 221,
+    "FormatListToParts": 222,
+    "StringToLowerCaseIntl": 223,
+    "StringToLocaleLowerCase": 224,
+    "StringToUpperCaseIntl": 225,
+    "CreateArrayLiteral": 226,
+    "CreateObjectLiteral": 227,
+    "SetPrototypeProperties": 228,
+    "CreateRegExpLiteral": 229,
+    "DynamicImportCall": 230,
+    "GetImportMetaObject": 231,
+    "GetModuleNamespace": 232,
+    "GetModuleNamespaceExport": 233,
+    "ArrayBufferMaxByteLength": 234,
+    "IsSmi": 235,
+    "MaxSmi": 236,
+    "NumberToStringSlow": 237,
+    "Float64ToStringSlow": 238,
+    "StringParseFloat": 239,
+    "StringParseInt": 240,
+    "StringToNumber": 241,
+    "AddAsyncDisposableValue": 242,
+    "AddDictionaryProperty": 243,
+    "AddDisposableValue": 244,
+    "AddPrivateBrand": 245,
+    "AllocateHeapNumber": 246,
+    "CompleteInobjectSlackTrackingForMap": 247,
+    "CopyDataProperties": 248,
+    "CopyDataPropertiesWithExcludedPropertiesOnStack": 249,
+    "CreateDataProperty": 250,
+    "CreateIterResultObject": 251,
+    "CreatePrivateAccessors": 252,
+    "DefineAccessorPropertyUnchecked": 253,
+    "DefineKeyedOwnPropertyInLiteral": 254,
+    "DefineGetterPropertyUnchecked": 255,
+    "DefineSetterPropertyUnchecked": 256,
+    "DeleteProperty": 257,
+    "DisposeDisposableStack": 258,
+    "GetDerivedMap": 259,
+    "GetFunctionName": 260,
+    "GetOwnPropertyDescriptorObject": 261,
+    "GetOwnPropertyKeys": 262,
+    "GetPrivateMember": 263,
+    "GetProperty": 264,
+    "HandleExceptionsInDisposeDisposableStack": 265,
+    "HasFastPackedElements": 266,
+    "HasInPrototypeChain": 267,
+    "HasProperty": 268,
+    "InitializeDisposableStack": 269,
+    "InternalSetPrototype": 270,
+    "IsJSReceiver": 271,
+    "JSReceiverPreventExtensionsDontThrow": 272,
+    "JSReceiverPreventExtensionsThrow": 273,
+    "JSReceiverGetPrototypeOf": 274,
+    "JSReceiverSetPrototypeOfDontThrow": 275,
+    "JSReceiverSetPrototypeOfThrow": 276,
+    "LoadPrivateGetter": 277,
+    "LoadPrivateSetter": 278,
+    "NewObject": 279,
+    "ObjectCreate": 280,
+    "ObjectEntries": 281,
+    "ObjectEntriesSkipFastPath": 282,
+    "ObjectGetOwnPropertyNames": 283,
+    "ObjectGetOwnPropertyNamesTryFast": 284,
+    "ObjectHasOwnProperty": 285,
+    "HasOwnConstDataProperty": 286,
+    "ObjectIsExtensible": 287,
+    "ObjectKeys": 288,
+    "ObjectValues": 289,
+    "ObjectValuesSkipFastPath": 290,
+    "OptimizeObjectForAddingMultipleProperties": 291,
+    "SetDataProperties": 292,
+    "SetFunctionName": 293,
+    "SetKeyedProperty": 294,
+    "DefineObjectOwnProperty": 295,
+    "SetNamedProperty": 296,
+    "SetOwnPropertyIgnoreAttributes": 297,
+    "ShrinkNameDictionary": 298,
+    "ShrinkSwissNameDictionary": 299,
+    "ToFastProperties": 300,
+    "ToLength": 301,
+    "ToName": 302,
+    "ToNumber": 303,
+    "ToNumeric": 304,
+    "ToObject": 305,
+    "ToString": 306,
+    "TryMigrateInstance": 307,
+    "TryMigrateInstanceAndMarkMapAsMigrationTarget": 308,
+    "SetPrivateMember": 309,
+    "SwissTableAdd": 310,
+    "SwissTableAllocate": 311,
+    "SwissTableDelete": 312,
+    "SwissTableDetailsAt": 313,
+    "SwissTableElementsCount": 314,
+    "SwissTableEquals": 315,
+    "SwissTableFindEntry": 316,
+    "SwissTableUpdate": 317,
+    "SwissTableValueAt": 318,
+    "SwissTableKeyAt": 319,
+    "Add": 320,
+    "Equal": 321,
+    "GreaterThan": 322,
+    "GreaterThanOrEqual": 323,
+    "LessThan": 324,
+    "LessThanOrEqual": 325,
+    "NotEqual": 326,
+    "StrictEqual": 327,
+    "StrictNotEqual": 328,
+    "ReferenceEqual": 329,
+    "EnqueueMicrotask": 330,
+    "PromiseHookAfter": 331,
+    "PromiseHookBefore": 332,
+    "PromiseHookInit": 333,
+    "PromiseRejectEventFromStack": 334,
+    "PromiseRevokeReject": 335,
+    "RejectPromise": 336,
+    "ResolvePromise": 337,
+    "PromiseRejectAfterResolved": 338,
+    "PromiseResolveAfterResolved": 339,
+    "ConstructSuppressedError": 340,
+    "ConstructAggregateErrorHelper": 341,
+    "ConstructInternalAggregateErrorHelper": 342,
+    "CheckProxyGetSetTrapResult": 343,
+    "CheckProxyHasTrapResult": 344,
+    "CheckProxyDeleteTrapResult": 345,
+    "GetPropertyWithReceiver": 346,
+    "IsJSProxy": 347,
+    "JSProxyGetHandler": 348,
+    "JSProxyGetTarget": 349,
+    "SetPropertyWithReceiver": 350,
+    "RegExpBuildIndices": 351,
+    "RegExpGrowRegExpMatchInfo": 352,
+    "RegExpExecMultiple": 353,
+    "RegExpInitializeAndCompile": 354,
+    "RegExpMatchGlobalAtom": 355,
+    "RegExpReplaceRT": 356,
+    "RegExpSplit": 357,
+    "RegExpStringFromFlags": 358,
+    "StringReplaceNonGlobalRegExpWithFunction": 359,
+    "StringSplit": 360,
+    "RegExpExec": 361,
+    "RegExpExperimentalOneshotExec": 362,
+    "ThrowConstAssignError": 363,
+    "ThrowUsingAssignError": 364,
+    "ThrowAwaitUsingAssignError": 365,
+    "DeclareEvalFunction": 366,
+    "DeclareEvalVar": 367,
+    "DeclareGlobals": 368,
+    "DeclareModuleExports": 369,
+    "DeleteLookupSlot": 370,
+    "LoadLookupSlot": 371,
+    "LoadLookupSlotInsideTypeof": 372,
+    "LoadLookupSlotForCall_Baseline": 373,
+    "NewClosure": 374,
+    "NewClosure_Tenured": 375,
+    "NewFunctionContext": 376,
+    "NewRestParameter": 377,
+    "NewSloppyArguments": 378,
+    "NewStrictArguments": 379,
+    "PushBlockContext": 380,
+    "PushCatchContext": 381,
+    "PushWithContext": 382,
+    "StoreGlobalNoHoleCheckForReplLetOrConst": 383,
+    "StoreLookupSlot_Sloppy": 384,
+    "StoreLookupSlot_SloppyHoisting": 385,
+    "StoreLookupSlot_Strict": 386,
+    "ShadowRealmWrappedFunctionCreate": 387,
+    "ShadowRealmImportValue": 388,
+    "ShadowRealmThrow": 389,
+    "FlattenString": 390,
+    "GetSubstitution": 391,
+    "InternalizeString": 392,
+    "StringAdd": 393,
+    "StringAdd_LhsIsStringConstant_Internalize": 394,
+    "StringAdd_RhsIsStringConstant_Internalize": 395,
+    "StringBuilderConcat": 396,
+    "StringCharCodeAt": 397,
+    "StringCodePointAt": 398,
+    "StringCompare": 399,
+    "StringEqual": 400,
+    "StringEscapeQuotes": 401,
+    "StringGreaterThan": 402,
+    "StringGreaterThanOrEqual": 403,
+    "StringIsWellFormed": 404,
+    "StringLastIndexOf": 405,
+    "StringLessThan": 406,
+    "StringLessThanOrEqual": 407,
+    "StringMaxLength": 408,
+    "StringReplaceOneCharWithString": 409,
+    "StringSubstring": 410,
+    "StringToArray": 411,
+    "StringToWellFormed": 412,
+    "CreatePrivateNameSymbol": 413,
+    "CreatePrivateBrandSymbol": 414,
+    "CreatePrivateSymbol": 415,
+    "SymbolDescriptiveString": 416,
+    "SymbolIsPrivate": 417,
+    "Abort": 418,
+    "AbortCSADcheck": 419,
+    "AbortJS": 420,
+    "ActiveTierIsIgnition": 421,
+    "ActiveTierIsSparkplug": 422,
+    "ActiveTierIsMaglev": 423,
+    "ActiveTierIsTurbofan": 424,
+    "ArrayBufferDetachForceWasm": 425,
+    "ArrayIteratorProtector": 426,
+    "ArraySpeciesProtector": 427,
+    "BaselineOsr": 428,
+    "BenchMaglev": 429,
+    "BenchTurbofan": 430,
+    "VerifyGetJSBuiltinState": 431,
+    "ClearFunctionFeedback": 432,
+    "ClearMegamorphicStubCache": 433,
+    "CompleteInobjectSlackTracking": 434,
+    "ConstructConsString": 435,
+    "ConstructDouble": 436,
+    "ConstructInternalizedString": 437,
+    "ConstructSlicedString": 438,
+    "ConstructThinString": 439,
+    "CurrentFrameIsTurbofan": 440,
+    "DebugPrint": 441,
+    "DebugPrintCppHeapPointerTable": 442,
+    "DebugPrintCppHeapPointerTableFilterTag": 443,
+    "DebugPrintExternalPointerTable": 444,
+    "DebugPrintExternalPointerTableFilterTag": 445,
+    "DebugPrintGeneric": 446,
+    "DebugPrintFloat": 447,
+    "DebugPrintPtr": 448,
+    "DebugPrintWord": 449,
+    "DebugTrace": 450,
+    "DeoptimizeFunction": 451,
+    "DisableOptimizationFinalization": 452,
+    "DisallowCodegenFromStrings": 453,
+    "DisassembleFunction": 454,
+    "EnableCodeLoggingForTesting": 455,
+    "EnsureFeedbackVectorForFunction": 456,
+    "FinalizeOptimization": 457,
+    "ForceFlush": 458,
+    "MajorGCForCompilerTesting": 459,
+    "GetAbstractModuleSource": 460,
+    "GetCallable": 461,
+    "GetFeedback": 462,
+    "GetFunctionForCurrentFrame": 463,
+    "GetInitializerFunction": 464,
+    "GetOptimizationStatus": 465,
+    "GetUndetectable": 466,
+    "GetWeakCollectionSize": 467,
+    "GlobalPrint": 468,
+    "HasCowElements": 469,
+    "HasDictionaryElements": 470,
+    "HasDoubleElements": 471,
+    "HasElementsInALargeObjectSpace": 472,
+    "HasFastElements": 473,
+    "HasFastProperties": 474,
+    "HasFixedBigInt64Elements": 475,
+    "HasFixedBigUint64Elements": 476,
+    "HasFixedFloat16Elements": 477,
+    "HasFixedFloat32Elements": 478,
+    "HasFixedFloat64Elements": 479,
+    "HasFixedInt16Elements": 480,
+    "HasFixedInt32Elements": 481,
+    "HasFixedInt8Elements": 482,
+    "HasFixedUint16Elements": 483,
+    "HasFixedUint32Elements": 484,
+    "HasFixedUint8ClampedElements": 485,
+    "HasFixedUint8Elements": 486,
+    "HasHoleyElements": 487,
+    "HasObjectElements": 488,
+    "HasPackedElements": 489,
+    "HasSloppyArgumentsElements": 490,
+    "HasSmiElements": 491,
+    "HasSmiOrObjectElements": 492,
+    "HaveSameMap": 493,
+    "HeapObjectVerify": 494,
+    "ICsAreEnabled": 495,
+    "InLargeObjectSpace": 496,
+    "InYoungGeneration": 497,
+    "Is64Bit": 498,
+    "IsAtomicsWaitAllowed": 499,
+    "IsBeingInterpreted": 500,
+    "IsConcatSpreadableProtector": 501,
+    "IsConcurrentRecompilationSupported": 502,
+    "IsDictPropertyConstTrackingEnabled": 503,
+    "IsEfficiencyModeEnabled": 504,
+    "IsInPlaceInternalizableString": 505,
+    "IsInternalizedString": 506,
+    "StringToCString": 507,
+    "StringUtf8Value": 508,
+    "IsUndefinedDoubleEnabled": 509,
+    "IsMaglevEnabled": 510,
+    "IsSameHeapObject": 511,
+    "IsSharedString": 512,
+    "IsInWritableSharedSpace": 513,
+    "IsSparkplugEnabled": 514,
+    "IsTurbofanEnabled": 515,
+    "IsWasmTieringPredictable": 516,
+    "MapIteratorProtector": 517,
+    "NeverOptimizeFunction": 518,
+    "NewRegExpWithBacktrackLimit": 519,
+    "NoElementsProtector": 520,
+    "NotifyContextDisposed": 521,
+    "SetPriorityBestEffort": 522,
+    "SetPriorityUserVisible": 523,
+    "SetPriorityUserBlocking": 524,
+    "OptimizeMaglevOnNextCall": 525,
+    "OptimizeFunctionOnNextCall": 526,
+    "OptimizeOsr": 527,
+    "PrepareFunctionForOptimization": 528,
+    "PretenureAllocationSite": 529,
+    "PrintWithNameForAssert": 530,
+    "PromiseSpeciesProtector": 531,
+    "RegExpSpeciesProtector": 532,
+    "RegexpHasBytecode": 533,
+    "RegexpHasNativeCode": 534,
+    "RegexpIsUnmodified": 535,
+    "RegexpTypeTag": 536,
+    "RunningInSimulator": 537,
+    "RuntimeEvaluateREPL": 538,
+    "ScheduleGCInStackCheck": 539,
+    "SerializeDeserializeNow": 540,
+    "SetAllocationTimeout": 541,
+    "SetBatterySaverMode": 542,
+    "SetForceSlowPath": 543,
+    "SetIteratorProtector": 544,
+    "SharedGC": 545,
+    "ShareObject": 546,
+    "SimulateNewspaceFull": 547,
+    "StringIsFlat": 548,
+    "StringIteratorProtector": 549,
+    "StringWrapperToPrimitiveProtector": 550,
+    "SystemBreak": 551,
+    "TakeHeapSnapshot": 552,
+    "TraceEnter": 553,
+    "TraceExit": 554,
+    "TurbofanStaticAssert": 555,
+    "TypedArraySpeciesProtector": 556,
+    "WaitForBackgroundOptimization": 557,
+    "DeoptimizeNow": 558,
+    "LeakHole": 559,
+    "GetHoleNaNLower": 560,
+    "GetHoleNaNUpper": 561,
+    "GetHoleNaN": 562,
+    "GetUndefinedNaN": 563,
+    "ArrayBufferDetach": 564,
+    "ArrayBufferSetDetachKey": 565,
+    "GrowableSharedArrayBufferByteLength": 566,
+    "TypedArrayCopyElements": 567,
+    "TypedArrayGetBuffer": 568,
+    "TypedArraySet": 569,
+    "TypedArraySortFast": 570,
+    "JSFinalizationRegistryRegisterWeakCellWithUnregisterToken": 571,
+    "JSWeakRefAddToKeptObjects": 572,
+    "InlineIncBlockCounter": 573,
+    "InlineAsyncFunctionAwait": 574,
+    "InlineAsyncFunctionEnter": 575,
+    "InlineAsyncFunctionReject": 576,
+    "InlineAsyncFunctionResolve": 577,
+    "InlineAsyncGeneratorAwait": 578,
+    "InlineAsyncGeneratorReject": 579,
+    "InlineAsyncGeneratorResolve": 580,
+    "InlineAsyncGeneratorYieldWithAwait": 581,
+    "InlineCreateJSGeneratorObject": 582,
+    "InlineGeneratorClose": 583,
+    "InlineGeneratorGetResumeMode": 584,
+    "InlineCreateAsyncFromSyncIterator": 585,
+    "InlineAddLhsIsStringConstantInternalize": 586,
+    "InlineAddRhsIsStringConstantInternalize": 587,
+    "InlineGetImportMetaObject": 588,
+    "InlineCopyDataProperties": 589,
+    "InlineCopyDataPropertiesWithExcludedPropertiesOnStack": 590,
+    "InlineCreateDataProperty": 591,
+    "InlineCreateIterResultObject": 592,
+    "InlineDeoptimizeNow": 593
+  },
+  "note": "CallRuntime's kRuntimeId operand is an index into this table"
+}

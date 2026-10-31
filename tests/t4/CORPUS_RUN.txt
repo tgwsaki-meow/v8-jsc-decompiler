@@ -1,0 +1,93 @@
+  100/1039 files, 53130 units, 156532 ms
+  200/1039 files, 66692 units, 226195 ms
+  300/1039 files, 88066 units, 310726 ms
+  400/1039 files, 103869 units, 326139 ms
+  500/1039 files, 124210 units, 346571 ms
+  600/1039 files, 143966 units, 375788 ms
+  700/1039 files, 161494 units, 400974 ms
+  800/1039 files, 199476 units, 429466 ms
+  900/1039 files, 216665 units, 440471 ms
+  1000/1039 files, 229869 units, 458086 ms
+corpus run: extracted_jsc against profiles\14.4.258.16 (V8 14.4.258.16, kTaggedSize=4)
+overlay layouts-overlay\14.4.258.16.json   read-only table profiles\14.4.258.16\ro-heap.json
+
+files            1039/1039 parsed, 0 failed   104.0 MiB read
+objects          2485908
+units            239979   compiled 239979 (100.00%)   uncompiled 0 (0.00%)
+decoded          1790172 constants, 25189 handler rows, 4406509 source positions, 6389 constant-pool Smi runs
+header           0 errors, 1039 warnings; 0 file(s) with non-kNop padding after kSynchronize; 0 unresolved forward reference(s)
+wall time        464719 ms  (447.3 ms/file, 0.23 KiB/ms)
+
+-- read-only references ---------------------------------------------
+159497/159497 occurrences resolved (100.00%), 0 distinct unresolved
+
+-- context slot naming ----------------------------------------------
+scopes 242345   context slots 161968   named 161968 (100.00%)   anonymous 0
+  from the inlined name array 129482, from the name hash table 32486 (106400 scope visits took the hash-table branch)
+  outer_scope_info links walked 455849, deepest chain 10
+  per-file named rate: min 100.00%  p25 100.00%  median 100.00%  p75 100.00%  max 100.00% (1018 files have at least one context slot)
+
+-- unresolved, by category ------------------------------------------
+39256 occurrences in 10 categories
+      11213  noLayoutForClass:StrongDescriptorArrayMap
+      10571  noLayoutForClass:AccessorPairMap
+       5627  noLayoutForClass:ClassBoilerplateMap
+       5627  noLayoutForClass:ClassPositionsMap
+       2500  noLayoutForClass:FixedDoubleArrayMap
+       2500  arrayBoilerplate:no-layout-for-elements:FixedDoubleArrayMap
+       1039  noLayoutForClass:WeakFixedArrayMap
+         97  noLayoutForClass:NameToIndexHashTableMap
+         41  noLayoutForClass:NameDictionaryMap
+         41  noLayoutForClass:NumberDictionaryMap
+
+-- maps with no layouts.json class ----------------------------------
+      11213  strong_descriptor_array_map
+      10571  accessor_pair_map
+       5627  class_boilerplate_map
+       5627  class_positions_map
+       2500  fixed_double_array_map
+       1039  weak_fixed_array_map
+         97  name_to_index_hash_table_map
+         41  name_dictionary_map
+         41  number_dictionary_map
+
+-- object classes ---------------------------------------------------
+     478332  SeqOneByteString
+     258224  TrustedByteArray
+     247702  ScopeInfo
+     239979  SharedFunctionInfo
+     239979  BytecodeArray
+     239979  BytecodeWrapper
+     215720  TrustedFixedArray
+     208163  FeedbackMetadata
+     124119  ObjectBoilerplateDescription
+      85103  ArrayBoilerplateDescription
+      80624  FixedArray
+      36756  (unclassified)
+      25472  SeqTwoByteString
+       4617  HeapNumber
+       1039  Script
+         76  TemplateObjectDescription
+         24  BigIntBase
+
+-- function kinds ---------------------------------------------------
+      93216  normal
+      79720  arrow
+      37350  method
+      10820  getter
+       9887  method+async
+       5627  classCtor
+       2279  arrow+async
+        718  normal+async
+        213  setter
+         76  normal+gen
+         66  method+gen
+          5  normal+gen+async
+          2  method+gen+async
+
+-- handler catch predictions ----------------------------------------
+      13713  ASYNC_AWAIT
+       5821  CAUGHT
+       5655  UNCAUGHT
+
+unit warnings total 0
