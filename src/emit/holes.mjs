@@ -51,6 +51,9 @@ export const EMIT_HOLE_WHY = Object.freeze({
   awaitOutsideAnAsyncFunction: 'an {e:\'await\'} in a unit whose SFI is not async',
   yieldOutsideAGenerator: 'an {e:\'yield\'} in a unit whose SFI is not a generator',
   unitNotRecovered: 'recover() or structure() threw for this unit',
+  contextBindingUnplaceable: 'a context slot this function reads belongs to a frame whose '
+    + 'owning function could not be determined, so there is no scope to declare the binding '
+    + 'in; declaring it locally would shadow the closure (scopes.mjs::SCOPE_REFUSAL_WHY)',
   updateTargetNotAnLVal: 'an {e:\'update\'} whose argument cannot be written',
   assignTargetNotAnLVal: 'an assignment target that is not an identifier, member or pattern',
   forUpdateNotAnExpression: 'a `for` update region that is not a single expression',

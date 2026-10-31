@@ -53,7 +53,11 @@ const R = {
   droppedStatementsOnRemovedBlocks: 0, droppedStatementBlocks: 0,
   droppedByRemovedKind: {}, droppedByStatementTag: {},
   topLevelReturns: 0, forcedAsync: 0, forcedGenerator: 0,
-  localsRenamed: 0, outerSlotDeclaredLocally: 0, declarations: 0,
+  localsRenamed: 0, paramsRenamedForABinding: 0, declarations: 0,
+  contextBindingsOwned: 0, contextBindingsInherited: 0,
+  contextBindingsUnplaceable: 0, constBindingsEmittedAsLet: 0,
+  functionsRefusedForAnUnplaceableBinding: 0, refusalsByWhy: {}, refusalSamples: [],
+  scopePlan: {}, unreferencedClosures: 0,
   namesReadButNeverWritten: 0, namesDeclared: 0, unwrittenSamples: [],
   unresolvedNames: 0, globalReads: 0, blocksWithoutStatements: 0,
   regionKindsNot112: {}, unknownRegionKinds: {},
@@ -92,11 +96,17 @@ try {
     'loopTestChainsMaterialised', 'loopTestChainStatements', 'catchContextBindings',
     'catchContextBindingsAmbiguous', 'droppedStatementsOnRemovedBlocks',
     'droppedStatementBlocks', 'topLevelReturns', 'forcedAsync', 'forcedGenerator',
-    'localsRenamed', 'outerSlotDeclaredLocally', 'declarations',
+    'localsRenamed', 'paramsRenamedForABinding', 'declarations',
+    'contextBindingsOwned', 'contextBindingsInherited', 'contextBindingsUnplaceable',
+    'constBindingsEmittedAsLet', 'functionsRefusedForAnUnplaceableBinding',
     'namesReadButNeverWritten', 'namesDeclared', 'unresolvedNames', 'globalReads',
     'blocksWithoutStatements']) {
     R[k] = rep[k] ?? 0;
   }
+  R.unreferencedClosures = rep.unreferencedClosures ?? 0;
+  R.refusalsByWhy = rep.refusalsByWhy ?? {};
+  R.refusalSamples = rep.refusalSamples ?? [];
+  R.scopePlan = rep.scopePlan ?? {};
   R.loopForms = rep.loopForms;
   R.loopIdioms = rep.loopIdioms;
   R.triesByPrediction = rep.triesByPrediction;

@@ -22,6 +22,8 @@ src/emit/
   stmt.mjs       T7's Stmt  -> @babel/types, and the source position
   region.mjs     T8's Region -> @babel/types, and the join of the two
   names.mjs      SSA destruction with naming: declarations, scoping, collisions
+  scopes.mjs     which function owns each context frame, so a closure variable
+                 is declared once and shared -- and refused when it cannot be
   fallback.mjs   §4.4.7's `while (true) switch (__pc)`
   holes.mjs      how a hole is rendered, and counted
   sourcemap.mjs  source positions -> a source map, and §3.5's monotonicity check
@@ -161,6 +163,11 @@ could not resolve. What is left for this layer is **where each name is
 declared** and **which names must be renamed** so that two storage locations
 do not end up spelled the same way in one function.
 
+The one thing T7 does *not* decide, and the one this layer got wrong for a
+whole measurement cycle, is that a context slot is not a name at all: it is
+**storage belonging to a particular scope**, shared by every function nested
+inside that scope. Rule 3 below is where that lives.
+
 ### Rule 1 — every local is declared once, at the top of the function body
 
 T7's `declarations[]` carries `scope: blockId|'function'`, where a block id is
@@ -174,9 +181,13 @@ copy — which is what SSA destruction needs. `{s:'decl'}` therefore emits the
 moves, the initialiser does not.
 
 The list over-declares rather than leave a name free: every non-global,
-non-parameter spelling a statement mentions gets a declaration even when T7's
-`declarations[]` has no row for it. An unused `let` is ugly; an undeclared read
-is §11.3 invariant 5.
+non-parameter, **non-slot** spelling a statement mentions gets a declaration
+even when T7's `declarations[]` has no row for it. An unused `let` is ugly; an
+undeclared read is §11.3 invariant 5.
+
+"Local" here means a register-allocated value — a temp, a phi, a caught
+exception, a hole, a scratch variable. A **context slot is not a local**, and
+putting it in this list is the defect O1.md §6.5 measured; rule 3 owns it.
 
 ### Rule 2 — a temp whose spelling another storage class owns is renamed
 
@@ -201,14 +212,114 @@ present, or `origin: 'scopeInfo'`) — classifying every row as a temp made the
 `__ctx_d0_i2` placeholder look like a temp *and* a slot and renamed it against
 itself.
 
-### Rule 3 — an outer context slot is not declared locally
+The one case where a **parameter** is renamed instead of a temp: a parameter
+may not shadow a context binding an enclosing function declares, because the
+body may read that binding. T7 spells parameters `p0..pN`, so this only fires
+when a ScopeInfo variable is literally called `p0`; the parameter is positional
+and its name is ours to choose, so it is the one that moves. Counted as
+`paramsRenamedForABinding`.
 
-`LdaContextSlot depth 1` is a read of the enclosing function's variable.
-Declaring it in the inner function would shadow the closure and break it.
-Because functions are emitted nested, the ancestor's declaration is in scope,
-so the inner function declares nothing. A depth > 0 name no ancestor declares
-is still declared locally — nothing may be free — and counted as
-`outerSlotDeclaredLocally`.
+### Rule 3 — a context slot is storage belonging to a scope, not a name
+
+`src/emit/scopes.mjs`, and the correctness decision §2's nesting exists for:
+
+> A context slot is declared **exactly once**, in the emitted function that
+> owns the context frame it lives in, and every other function that reads or
+> writes it resolves to that one binding through lexical scope.
+
+#### What the rule used to say, and why it was wrong
+
+It asked `depth > 0` — the bytecode operand — and declared the slot locally
+otherwise. That is the wrong question. The operand counts `PREVIOUS_INDEX`
+hops from whatever the frame's context register holds, and a function that
+allocates no context of its own never pushes one, so for such a function
+`LdaImmutableCurrentContextSlot [8]` at depth **0** is already a read of the
+*enclosing* function's variable. ARCHITECTURE.md §10.3 states exactly this and
+calls it the worst failure mode; `src/ir/context.mjs` measured it on a real
+listing. So the ordinary capture is depth 0, rule 3 never fired for it, and
+every inner function declared its own `undefined` copy of the variable it was
+supposed to capture. That is O1.md §6.5: 0 context operations in the output
+against the original's 4 `CreateFunctionContext`, 10 `PushContext`, 64
+`StaCurrentContextSlotNoCell` and 299 immutable slot loads, and 594
+`LdaUndefined` against 38.
+
+`outerSlotDeclaredLocally` therefore counted the rare deep read (367 over 465
+files) and not the common one. Measured over 61 corpus files, 8 882 units and
+27 891 slot references: **13 556 `incoming` + 2 592 `outerScope` references
+belong to an enclosing function**, against 11 249 the reading function owns.
+
+#### The question that is actually asked
+
+Does *this* function's prologue create the frame? `ir.contextChain.frames`
+answers it per frame, as a fact rather than an inference:
+
+| `frame.kind` | meaning | owner |
+|---|---|---|
+| `created` | this function built it — `Create{Function,Block,Catch,Eval,With,FunctionWithCells}Context` | this function |
+| `incoming` | the context the closure was entered with, `unit.scope.outer` | an enclosing function |
+| `outerScope` | one or more `PREVIOUS_INDEX` hops above that | an enclosing function |
+
+For the two enclosing kinds the owner is the function whose `created` frame
+carries the same `scopeInfoId`. A ScopeInfo is a heap object and `src/heap`
+gives it one id per cache graph, so that id is the frame's file-wide identity —
+the same number on the creating side (a constant-pool operand of the
+`Create*Context`) and on the reading side (`unit.scope.outer.scopeInfoId`).
+Measured: **16 148 of 16 148** enclosing-frame references resolve to an emitted
+ancestor this way, 0 of 1 805 `created` frames lacked a `scopeInfoId`, and no
+two functions claimed one frame.
+
+The owner declares every binding its descendants read, including ones its own
+body never mentions — a catch context's slot is written by the
+context-creating instruction and so has no store op in the owner at all — which
+is why the plan is computed for the whole file before any body is built.
+
+#### Spellings come from the binding, not from T7
+
+T7 names every slot per function off its own `taken` set, so two functions can
+spell one slot differently — measured, 9 bindings over the 61 files — and a
+closure that resolves `x` in one function and `x$2` in another is not a
+closure. The owner allocates the spelling once and every reader reads it from
+the table. The allocation avoids, file-wide, every parameter name, every global
+any function reads, every emitted function name and this layer's own internal
+names, and on the current path every binding an ancestor already declared;
+collisions take a `$s<n>` suffix. None of this is visible to O1 — a context
+slot is an index in the bytecode — so renaming a binding cannot change one
+instruction.
+
+The declaration keyword is read off the ScopeInfo rather than chosen: a `kVar`
+binding is declared `var`, everything else `let`. It matters because V8
+initialises a context-allocated `let` and does not initialise a `var` — `let
+x;` costs `LdaTheHole; StaCurrentContextSlot` at scope entry plus
+`LdaUndefined; StaCurrentContextSlot` for the declaration, and `var x;` costs
+nothing. At the file's top level `var` is not available (a top-level `var` is a
+property of the global object, not a context slot), so the script unit declares
+everything `let`. A `kConst` binding is declared `let` and **counted**
+(`constBindingsEmittedAsLet`): rule 1 separates the declaration from the store,
+`const x;` is a `SyntaxError`, and the consequence is that V8 reads it with
+`LdaCurrentContextSlot` instead of the immutable form. That is a real residual,
+reported rather than hidden — §9.
+
+#### A binding that cannot be placed refuses the function
+
+The project's standing instruction is that compiler engineering is
+deterministic, that every heuristic implementation is to be removed, and that
+an error must be thrown explicitly rather than papered over. So there is no
+fall-back: a slot this function neither owns nor inherits is **not** declared
+locally and **not** left free. The function is refused, with the slot, the
+frame, the depth and the reason named — `scopes.mjs::SCOPE_REFUSAL_WHY` has
+seven reasons — and the body becomes a counted
+`HOLE contextBindingUnplaceable` throw. The prologue still carries the bindings
+that function *owns*, so a refusal costs that function and not its
+descendants, and §11.5's "every function enters the output" still holds.
+
+Measured cost on the 61 files: **494 of 27 891 references (1.77%) and 51 of
+8 882 functions (0.57%)**, all of them T7's frameless `ctx[d][i]` placeholder —
+`contextValueNotStaticallyKnown`, where the context register holds different
+context objects on different paths into the instruction (IR.md §11), so there
+is no single frame and therefore no storage location to place. §4.5's
+`/* ctx[d][i] */` placeholder is still emitted for the other case, a slot whose
+**frame** is known and whose **name** is not: that binding is real and shared,
+so it is declared by its owner under a synthetic name carrying the marker.
 
 ### `ctx` (§11.3 invariant 5)
 
@@ -403,13 +514,14 @@ reject anything.
 ### 8.1 `tools/emit/selftest.mjs` — engine-free, both profiles
 
 ```
-node tools/emit/selftest.mjs      ->  73 passed, 0 failed
-npm test                          ->  the `emit` slot runs the same 73
+node tools/emit/selftest.mjs      ->  76 passed, 0 failed
+npm test                          ->  the `emit` slot runs the same 76
 ```
 
 Groups: 5 layering, 6 closed-set, 10 per profile × 2 profiles = 20 assembled
-shapes, 24 fixtures (one named check per source construct), 18 invariant and
-rendering checks. Over the 24 minted fixtures in `tests/t8/fixtures/`:
+shapes, 25 fixtures (one named check per source construct, plus the closure
+check below), 20 invariant and rendering checks. Over the 24 minted fixtures in
+`tests/t8/fixtures/`:
 
 | | |
 |---|---:|
@@ -420,6 +532,26 @@ rendering checks. Over the 24 minted fixtures in `tests/t8/fixtures/`:
 | parse failures (a precondition) | 0 |
 | names declared | 297 |
 | names read but never written (check 3c, reported) | 61 |
+
+Three of those checks are about rule 3, and the first is the one that would
+have caught §6.5's defect:
+
+* **`loop-for-of-break`: a captured variable is declared once, by the function
+  that owns its frame.** The fixture closes over the iterator helper's `i` and
+  the outer `closed`, which an inner function assigns. The check counts
+  `VariableDeclarator` nodes per name over the whole file and requires exactly
+  one for each, requires the inner function's write to be there, and requires
+  `contextBindingsInherited ≥ 2`. Before rule 3 was rewritten each inner
+  function declared its own copy, so each name had two declarators and the
+  write went to a fresh `undefined`.
+* **Every context slot of every fixture was placed in a real scope** — 6 slot
+  locations owned by the reading function, 2 by an enclosing one, 0
+  unplaceable, 0 functions refused.
+* **A context slot whose frame has no identity refuses the function instead of
+  shadowing it** (per profile). An assembled unit carries no ScopeInfo, so
+  nothing can say who owns the frame; the check requires the refusal, the
+  named reason, the counted `HOLE contextBindingUnplaceable`, no `__ctx_`
+  declaration and `ctx` still absent.
 
 The negative controls matter as much as the zeros: the suite removes an id from
 `duplicable` and requires invariant 4 to fire, deletes an `exprs` entry and
@@ -556,7 +688,7 @@ What the join decided, over the same 465 files:
 | statements of a `removed` block with nowhere to go | **683** in 146 blocks: `asyncHandlerBlocks` 644, `loopTestBlocks` 3 |
 | script `return` turned into the completion value | 465 |
 | locals renamed away from a global/param/slot spelling (§3 rule 2) | 6 999 |
-| outer context slots declared locally (§3 rule 3) | 367 |
+| outer context slots declared locally — the §6.5 defect, before rule 3 was rewritten | 367 (the counter saw only the rare deep read; §3 rule 3) |
 | declarations emitted | 290 883 |
 | **names read but never written** (check 3c) | **112 266 of 350 607 declared = 32.0%** |
 | unresolved context-slot placeholders used | 1 823 |
@@ -577,6 +709,46 @@ produces statements. Each one is rendered as a counted
 `DROPPED <n> statement(s) of removed block(s) ...` note at the end of the
 function. Checks 1, 1b, 1c, 2, 3, 4 and 5 are **0** over all 465 files. §9 and
 §6 have the reasoning; this is the single largest piece of unfinished business.
+
+### 8.5 Rule 3, measured
+
+A separate, smaller sample — **130 files, every 8th, no size cap**, so it is
+*not* comparable to §8.4's 465 — run after rule 3 was rewritten:
+
+```
+node tools/emit/corpus_scan.mjs --jobs 1 --child-heap 5000 --timeout 600 --stride 8
+```
+
+| | |
+|---|---:|
+| compiled functions / **functions emitted** | 24 318 / **24 318 = 100.00%** (metric 6) |
+| **the identifier `ctx` as a variable** | **0** |
+| **values emitted twice outside `duplicable`** | **0** |
+| §11.3 invariant violations | 94 — 93 of check 3b, 1 of check 1 |
+| holes | 349 |
+| slot locations the reading function owns | 15 590 |
+| **slot locations owned by an enclosing function** | **26 785** |
+| slot locations that could not be placed | **0** |
+| distinct bindings | 15 813 (15 804 named from the ScopeInfo, 9 as a declared `ctx[*][i]` placeholder) |
+| bindings whose spelling moved for a collision | 14 175 |
+| `const` bindings emitted as `let` (§9 gap 11) | 4 641 |
+| context-creating frames / without a ScopeInfo id / claimed by two functions | 4 589 / 0 / 0 |
+| parameters renamed off a binding's spelling (§3 rule 2) | 0 |
+| **functions refused because a binding could not be placed** | **157 = 0.65%**, 1 588 slot uses, all `contextFrameNotStaticallyKnown` |
+| unresolved context-slot placeholders still used | 17 (was 1 823: those functions are now refused) |
+| names read but never written (check 3c) | 38 529 of 183 584 declared = 21.0% (was 32.0% on §8.4's sample) |
+| **functions declared but never referenced** | **5 772 of 24 318 = 23.7%** — §9 gap 13 |
+
+**26 785 slot locations are now one shared binding instead of a shadowing
+local**, which is the whole of the §6.5 defect. The one invariant-1 violation is
+not from this layer: check 1 is computed from T8's region tree against the IR's
+blocks and never reads a name or a plan — it is in a file §8.4's size cap
+excluded.
+
+The 14 175 renamed spellings are not a smell: minified bundles reuse `e`, `t`,
+`n` at every nesting level, and a block context flattened to its function's top
+(rule 1) *must* be suffixed or it would shadow the function context's variable
+of the same name for the whole body. The spelling is invisible to O1.
 
 ---
 
@@ -649,6 +821,50 @@ Everything here is counted by the tooling and appears in `report`.
     not used here: `@babel/generator`'s output is deterministic, which O2's
     round-trip fixpoint needs, and a second formatter is one more thing that
     could change the text between two runs.
+11. **A context binding is always `let` or `var`, never `const`, so V8 reads
+    it with the mutable opcode.** Rule 1 declares with no initialiser and
+    assigns separately, which makes every binding `maybe_assigned`;
+    `const x;` is not expressible. The original reads an unassigned context
+    variable with `LdaImmutableContextSlot` /
+    `LdaImmutableCurrentContextSlot`, and on
+    `r_commonKitComponentXkitXDialog.jsc` those two account for 299 of the
+    file's 363 slot reads against 64 stores (O1.md §6.5), so this is the
+    largest residual the rule-3 fix leaves behind. The same cause removes the
+    `ThrowReferenceErrorIfHole` the original emits for a TDZ-guarded read.
+    Fixing it means emitting `const x = <value>` / `let x = <value>` **at the
+    store site** for a binding with exactly one store that dominates every
+    read, which is a dominance analysis rule 1 deliberately avoided for phis
+    and a separate measurement. Counted as `constBindingsEmittedAsLet`.
+12. **A temp of an enclosing function can still shadow a descendant's global
+    read.** Rule 2 renames a temp whose spelling is also a global *in the same
+    function*, which is where the two storage classes are both visible. It
+    does not look at descendants: if an outer function has a temp T7 named
+    `x` — `inferBase` names the result of `GetNamedProperty 'x'` after the
+    property — and an inner function reads the real global `x`, the inner read
+    resolves to the outer temp. The nesting that makes rule 3 work is what
+    makes this reachable. It is the same defect shape as §6.5's, one storage
+    class out, and the cheap fix (reserve every global the *file* reads
+    against every temp) would rename thousands of temps and so belongs in its
+    own measurement rather than in rule 3's.
+13. **A function this file declares but nothing references is not compiled
+    back.** `5 772 of 24 318` over §8.5's sample, counted as
+    `unreferencedClosures` and marked in the text as
+    `/* unreferenced closure (sfi N) */`. V8's scope analysis does not allocate
+    the variable of an unreferenced inner declaration, so no `CreateClosure` is
+    emitted, the SFI is unreachable from the parent's constant pool, and the
+    function is absent from the recompiled cache — O1's self-test F measured 2
+    of 102 carried in exactly this situation. That is what O1's **A-side
+    unpaired 26.27%** is, and `docs/O1.md` §6.5 step 5 attributed it to this
+    layer's scoping instead: the rule-3 rewrite collapsed the other four steps
+    of that chain and moved A-side unpaired by 38 functions out of 12 750.
+    Checked directly on five of the scanned files — of 19 A-side-unpaired
+    functions named by the oracle, 17 sit immediately after that marker in our
+    own text and 2 are not declared at all. The cause is upstream: T7 produced
+    no `{e:'fn', sfiId}` reference reachable from an emitted statement, which
+    the ranked shapes corroborate (`CreateClosure -> Ldar` 2 699 functions,
+    `GetNamedProperty -> CreateClosure` 2 231,
+    `CreateClosure -> LdaUndefined` 1 260,
+    `missing-allocation CreateClosure` 1 174). O2's 0/257 is downstream of it.
 
 ### Found in other layers while building this one
 

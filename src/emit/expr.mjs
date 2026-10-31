@@ -102,10 +102,26 @@ function literal(ctx, v) {
   }
 }
 
-/** The name a `{e:'name'}` is emitted under, after names.mjs's rename map. */
+/**
+ * The name a `{e:'name'}` is emitted under.
+ *
+ * A context slot does NOT use T7's per-function spelling: the binding is
+ * shared with the function that owns its context frame, and that function
+ * chose the spelling (scopes.mjs). T7 names each slot off its own `taken` set,
+ * so two functions can spell one slot differently -- measured on 9 bindings
+ * over 61 corpus files -- and a closure that resolves `x` in one function and
+ * `x$2` in another is not a closure. `slotName` having no entry is only
+ * reachable inside a function this layer refused, whose body is not emitted.
+ */
 export function nameOf(ctx, e) {
+  const k = e.ref?.k;
+  if (k === 'global') return sanitise(e.name);
+  if (k === 'contextSlot') {
+    const bound = ctx.plan.slotName.get(e.ref.slotValue);
+    return bound === undefined ? sanitise(e.name) : bound;
+  }
   const raw = sanitise(e.name);
-  if (e.ref?.k === 'global' || e.ref?.k === 'param') return raw;
+  if (k === 'param') return ctx.plan.paramRename.get(raw) ?? raw;
   return ctx.plan.rename.get(raw) ?? raw;
 }
 

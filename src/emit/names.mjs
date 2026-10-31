@@ -13,20 +13,24 @@
 // are already merged into names, and this file makes the merged names legal
 // JavaScript.
 //
-// THREE RULES, each forced by something measured on T7's output.
+// THREE RULES, each forced by something measured.
 //
-// 1. EVERY local name is declared ONCE, at the top of the function body.
+// 1. EVERY LOCAL is declared ONCE, at the top of the function body.
 //
 //    T7's `declarations[]` carries `scope: blockId|'function'`, where a block
 //    id is the block the value is defined in. Declaring there is wrong for a
 //    phi: `loop-while.jsc` #15 `f` gives phi 8 `scope: 1` (the loop header)
 //    while its predecessor copies are emitted in blocks 0 and 2, so a
 //    declaration in block 1 is both after the first write and inside a
-//    narrower block than the reads. One `let` list at the top of the body is
-//    the only placement that dominates every copy, which is exactly what SSA
-//    destruction needs. `{s:'decl'}` statements therefore become plain
-//    assignments (stmt.mjs) -- the declaration moves, the initialiser does
-//    not.
+//    narrower block than the reads. One declaration list at the top of the
+//    body is the only placement that dominates every copy, which is exactly
+//    what SSA destruction needs. `{s:'decl'}` statements therefore become
+//    plain assignments (stmt.mjs) -- the declaration moves, the initialiser
+//    does not.
+//
+//    "Local" here means a register-allocated value: a temp, a phi, a caught
+//    exception, a hole or a scratch variable. A CONTEXT SLOT is not a local
+//    and rule 3 owns it.
 //
 // 2. A temp whose name is ALSO a global, a parameter or a context slot in the
 //    same function is RENAMED.
@@ -43,15 +47,27 @@
 //    contextSlot > global > temp, i.e. a real source name keeps its spelling
 //    and the synthetic copy is suffixed. Counted as `localsRenamed`.
 //
-// 3. A context slot at depth > 0 is NOT declared locally when an ancestor
-//    declares it.
+//    The one case where a PARAMETER is renamed instead: a parameter cannot
+//    shadow a context binding an enclosing function declared, because the
+//    body may read that binding. T7 spells parameters `p0..pN`, so this only
+//    fires when a ScopeInfo variable is literally called `p0`; the parameter
+//    is positional and its name is ours to choose, so it is the one that
+//    moves. Counted as `paramsRenamedForABinding`.
 //
-//    `LdaContextSlot depth 1` is a read of the ENCLOSING function's variable.
-//    Declaring it in the inner function would shadow the closure and break
-//    it. Because functions are emitted nested (index.mjs), the ancestor's
-//    declaration is in scope, so the inner function declares nothing. A depth
-//    > 0 name no ancestor declares is still declared locally -- nothing may be
-//    free (11.3 invariant 5) -- and counted as `outerSlotDeclaredLocally`.
+// 3. A CONTEXT SLOT IS NOT A LOCAL. It is declared once, by the function that
+//    owns its context frame, and nowhere else.
+//
+//    This is scopes.mjs, and it is the correctness decision the nesting in
+//    index.mjs exists for. The old rule asked `depth > 0` and declared the
+//    slot locally otherwise, which shadowed the closure on every ordinary
+//    capture -- a function that allocates no context of its own reads its
+//    enclosing variable at depth **0** (ARCHITECTURE.md 10.3). That is
+//    docs/O1.md 6.5's defect, and `outerSlotDeclaredLocally` was a counter for
+//    the rare case rather than a detector for the common one.
+//
+//    A binding this function neither owns nor inherits is NOT declared
+//    locally and NOT left free: the function is refused, with the slot, the
+//    frame and the depth named (scopes.mjs::SCOPE_REFUSAL_WHY).
 //
 // The identifier `ctx` is banned outright (11.3 invariant 5). T7 cannot emit
 // it (docs/RECOVER.md 4.2 puts it in BANNED), and `sanitise()` below is the
@@ -145,6 +161,12 @@ function parameterNames(ir, rec, unit) {
   return { params, restName: rest ? sanitise(rest.name) : null };
 }
 
+/** The empty scope plan, for a unit scopes.mjs produced nothing for. */
+const NO_SCOPE = {
+  owns: [], ownNames: new Set(), inheritedNames: new Set(), visibleNames: new Set(),
+  slotName: new Map(), slotBinding: new Map(), unplaceable: [], inheritedCount: 0,
+};
+
 /**
  * Plan the names of one function.
  *
@@ -153,11 +175,27 @@ function parameterNames(ir, rec, unit) {
  * @param {object} unit
  * @param {object[]} extraExprs  Exprs reached outside `stmts` (Tests, Targets)
  * @param {Set<string>} inherited names an enclosing emitted function declares
+ * @param {object} scope  this unit's view of the file-wide scope plan
  */
-export function planNames(rec, ir, unit, extraExprs, inherited = new Set()) {
+export function planNames(rec, ir, unit, extraExprs, inherited = new Set(), scope = null) {
+  const sc = scope ?? NO_SCOPE;
   const { params, restName } = parameterNames(ir, rec, unit);
-  const paramNames = new Set(params.map((p) => p.name));
-  if (restName) paramNames.add(restName);
+
+  // --- rule 2's parameter half: a parameter may not shadow a context binding
+  const paramRename = new Map();
+  let paramsRenamed = 0;
+  const paramNames = new Set();
+  const claimParam = (name) => {
+    let candidate = name;
+    for (let n = 2; sc.visibleNames.has(candidate) || paramNames.has(candidate); n++) {
+      candidate = `${name}$p${n}`;
+    }
+    if (candidate !== name) { paramRename.set(name, candidate); paramsRenamed++; }
+    paramNames.add(candidate);
+    return candidate;
+  };
+  for (const p of params) p.name = claimParam(p.name);
+  const finalRestName = restName === null ? null : claimParam(restName);
 
   // --- classify every spelling by the storage classes that use it
   const classesOf = new Map();          // name -> Set<'global'|'param'|'ctx'|'temp'>
@@ -179,19 +217,26 @@ export function planNames(rec, ir, unit, extraExprs, inherited = new Set()) {
     return 'temp';
   };
   const uses = collectNameUses(rec, extraExprs);
-  const outerSlotNames = new Set();
+  const slotUsesWithoutABinding = [];
   for (const u of uses) {
     const k = u.ref?.k;
     if (k === 'global') add(u.name, 'global');
     else if (k === 'param') add(u.name, 'param');
     else if (k === 'contextSlot') {
-      add(u.name, 'ctx');
-      if ((u.ref.depth ?? 0) > 0) outerSlotNames.add(sanitise(u.name));
+      const spelling = sc.slotName.get(u.ref.slotValue);
+      if (spelling === undefined) slotUsesWithoutABinding.push(u);
+      else add(spelling, 'ctx');
     } else add(u.name, 'temp');
   }
   for (const p of params) add(p.name, 'param');
-  if (restName) add(restName, 'param');
-  for (const d of rec.names.declarations ?? []) add(d.name, declClass(d));
+  if (finalRestName) add(finalRestName, 'param');
+  for (const d of rec.names.declarations ?? []) {
+    if (d.contextSlot) continue;                  // rule 3 owns every slot
+    add(d.name, declClass(d));
+  }
+  // Every binding in scope, whether this function owns it or inherits it, so
+  // rule 2 can move a temp off its spelling.
+  for (const n of sc.visibleNames) add(n, 'ctx');
 
   // --- rule 2: a temp spelling that another storage class also owns is renamed
   const rename = new Map();
@@ -215,40 +260,68 @@ export function planNames(rec, ir, unit, extraExprs, inherited = new Set()) {
     if (paramNames.has(k)) return;                      // a parameter declares it
     if (!declared.has(k)) declared.set(k, info);
   };
-  let outerSlotDeclaredLocally = 0;
+
+  // rule 3 first: the context bindings this function OWNS. They come first
+  // because they are the real source variables, and because the owner declares
+  // every binding its descendants need even when its own body never mentions
+  // one -- a catch context's slot is stored by the context-creating
+  // instruction and so has no store op in the owner at all.
+  let constAsLet = 0;
+  for (const b of sc.owns) {
+    const kind = b.declKind === 'const' ? 'let' : b.declKind;
+    if (b.declKind === 'const') constAsLet++;
+    declared.set(b.name, {
+      kind, origin: b.rawName ? 'scopeInfo' : 'synthetic',
+      why: 'contextBinding', comment: b.comment ?? null, binding: b,
+    });
+  }
+
   for (const d of rec.names.declarations ?? []) {
     if (d.kind === 'param') continue;
+    if (d.contextSlot) continue;                        // rule 3 owns every slot
     note(d.name, { kind: d.kind, origin: d.origin, why: 'declaration', comment: d.comment ?? null });
   }
-  // Over-declare rather than leave a name free: every non-global, non-param
-  // spelling a statement mentions gets a declaration, even when T7's
+  // Over-declare rather than leave a LOCAL free: every non-global, non-param,
+  // non-slot spelling a statement mentions gets a declaration, even when T7's
   // `declarations[]` has no row for it. An unused `let` is ugly; an undeclared
-  // read is 11.3 invariant 5.
+  // read is 11.3 invariant 5. A context slot is deliberately NOT in this loop:
+  // declaring it here is exactly the defect of docs/O1.md 6.5.
   for (const u of uses) {
     const k = u.ref?.k;
-    if (k === 'global' || k === 'param') continue;
-    const spelling = sanitise(u.name);
-    if (k === 'contextSlot' && (u.ref.depth ?? 0) > 0) {
-      if (inherited.has(spelling)) continue;            // rule 3: the closure owns it
-      outerSlotDeclaredLocally++;
-    }
-    note(u.name, {
-      kind: 'let', origin: k === 'contextSlot' ? 'scopeInfo' : 'synthetic',
-      why: 'referenced', comment: u.ref?.comment ?? null,
-    });
+    if (k === 'global' || k === 'param' || k === 'contextSlot') continue;
+    note(u.name, { kind: 'let', origin: 'synthetic', why: 'referenced', comment: u.ref?.comment ?? null });
   }
 
   const declaredNames = new Set(declared.keys());
   const globalNames = new Set([...classesOf.entries()].filter(([, c]) => c.has('global')).map(([n]) => n));
+  // A slot use with no binding. Measured over 130 corpus files, every one of
+  // these is T7's frameless `ctx[d][i]` placeholder -- `ref.slotValue` is null
+  // because no single context object reaches the instruction, so there is no
+  // storage LOCATION, which is a different thing from a location whose owner
+  // could not be found. The two are reported under their own reasons rather
+  // than as one number.
+  const unplaceable = [...sc.unplaceable];
+  for (const u of slotUsesWithoutABinding) {
+    const frameless = u.ref?.slotValue === null || u.ref?.slotValue === undefined;
+    unplaceable.push({
+      why: frameless ? 'contextFrameNotStaticallyKnown' : 'contextSlotWithoutABinding',
+      detail: `${sanitise(u.name)} depth ${u.ref?.depth} index ${u.ref?.index}`
+        + `${u.ref?.why ? ` (${u.ref.why})` : ''}`,
+    });
+  }
   return {
-    params, restName, paramNames,
-    declared, declaredNames, rename, globalNames,
+    params, restName: finalRestName, paramNames,
+    declared, declaredNames, rename, paramRename, globalNames,
+    slotName: sc.slotName, visibleBindingNames: sc.visibleNames, unplaceable,
     stats: {
       params: params.length,
       declarations: declared.size,
       localsRenamed: renamed,
-      outerSlotNames: outerSlotNames.size,
-      outerSlotDeclaredLocally,
+      paramsRenamedForABinding: paramsRenamed,
+      contextBindingsOwned: sc.owns.length,
+      contextBindingsInherited: sc.inheritedCount,
+      contextBindingsUnplaceable: unplaceable.length,
+      constBindingsEmittedAsLet: constAsLet,
     },
     /** Everything in scope inside this function, for the nested ones. */
     exported: new Set([...inherited, ...declaredNames, ...paramNames]),
@@ -256,13 +329,24 @@ export function planNames(rec, ir, unit, extraExprs, inherited = new Set()) {
 }
 
 /**
- * The declaration prologue: one `let` list, in a deterministic order, with the
- * `ctx[d][i]` comment on the placeholders that carry one.
+ * The declaration prologue, with the `ctx[*][i]` comment on the placeholders
+ * that carry one.
+ *
+ * Two lists, not one, and the split is read off the data rather than chosen: a
+ * context binding whose ScopeInfo mode is `kVar` is declared `var`, everything
+ * else `let`. It matters because V8 initialises a context-allocated `let` and
+ * does not initialise a `var` -- `let x;` costs `LdaTheHole;
+ * StaCurrentContextSlot` at scope entry plus `LdaUndefined;
+ * StaCurrentContextSlot` for the declaration, and `var x;` costs nothing. At
+ * the FILE's top level `var` is not available: a top-level `var` is a property
+ * of the global object, not a context slot, so the script unit declares
+ * everything `let`.
  */
-export function declarationPrologue(plan, extraNames = []) {
+export function declarationPrologue(plan, extraNames = [], opts = {}) {
+  const topLevel = opts.topLevel === true;
   const names = [...plan.declaredNames, ...extraNames.map((n) => sanitise(n))];
   const seen = new Set();
-  const decls = [];
+  const lists = new Map([['var', []], ['let', []]]);
   for (const n of names) {
     if (seen.has(n) || plan.paramNames.has(n)) continue;
     seen.add(n);
@@ -270,10 +354,15 @@ export function declarationPrologue(plan, extraNames = []) {
     const id = t.identifier(n);
     const d = t.variableDeclarator(id, null);
     if (info?.comment) t.addComment(d, 'leading', ` ${String(info.comment).replace(/\*\//g, '* /')} `, false);
-    decls.push(d);
+    const kind = !topLevel && info?.kind === 'var' && info?.why === 'contextBinding' ? 'var' : 'let';
+    lists.get(kind).push(d);
   }
-  if (!decls.length) return [];
-  return [t.variableDeclaration('let', decls)];
+  const out = [];
+  for (const kind of ['var', 'let']) {
+    const decls = lists.get(kind);
+    if (decls.length) out.push(t.variableDeclaration(kind, decls));
+  }
+  return out;
 }
 
 export default { planNames, declarationPrologue, sanitise, walkExprsOfStmt, BANNED_IDENTIFIER };

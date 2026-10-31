@@ -41,6 +41,8 @@ import { unstructuredRegion } from '../../src/structure/fallback.mjs';
 import { emit } from '../../src/emit/index.mjs';
 import { decompile, decompileFile, V8Decompiler } from '../../src/emit/decompile.mjs';
 import { sanitise } from '../../src/emit/names.mjs';
+import { SCOPE_REFUSAL_WHY } from '../../src/emit/scopes.mjs';
+import { walkAst } from '../../src/emit/verify.mjs';
 import { EMIT_HOLE_WHY } from '../../src/emit/holes.mjs';
 import { asm } from '../ir/asm.mjs';
 
@@ -310,18 +312,28 @@ for (const { tag, profile } of profiles) {
     };
   });
 
-  check(P, 'an unnamed context slot becomes a declared placeholder, never the identifier `ctx`', () => {
+  check(P, 'a context slot whose frame has no identity refuses the function instead of shadowing it', () => {
+    // An assembled unit carries no ScopeInfo, so `LdaCurrentContextSlot [2]`
+    // resolves to the entry frame and nothing can say which function owns it.
+    // The old behaviour declared the spelling locally, which is docs/O1.md
+    // 6.5's defect: the slot belongs to an ENCLOSING scope, so a local
+    // declaration shadows the closure and reads `undefined`. The honest answer
+    // is to refuse this function, name the slot and keep 11.3 invariant 5 --
+    // `ctx` still does not occur, and nothing is left free either.
     const a = asm(profile);
     a.emit('LdaCurrentContextSlot', [{ u: 2 }]).emit('Return');
     const { out } = run(a, profile, { name: 'ctxslot' });
-    // 11.3 invariant 5 bans the IDENTIFIER; 4.5 REQUIRES the `/* ctx[d][i] */`
-    // comment on the placeholder, so the comments are stripped before looking.
     const noComments = out.code.replace(/\/\*[\s\S]*?\*\//g, '');
-    const declared = /let [^;]*__ctx_d0_i2/.test(noComments);
+    const why = Object.keys(out.report.refusalsByWhy ?? {});
     return {
-      ok: !/\bctx\b/.test(noComments) && out.report.ctxIdentifiersInTheOutput === 0 && declared
-        && /ctx\[0\]\[2\]/.test(out.code),
-      detail: out.code.replace(/\s+/g, ' ').slice(0, 170),
+      ok: out.report.functionsRefusedForAnUnplaceableBinding === 1
+        && why.includes('contextSlotLocalIndexUnknown')
+        && /HOLE contextBindingUnplaceable/.test(out.code)
+        && !/__ctx_/.test(noComments)
+        && !/\bctx\b/.test(noComments) && out.report.ctxIdentifiersInTheOutput === 0
+        && violationsOf(out) === 0 && !parses(out.code),
+      detail: `refused ${out.report.functionsRefusedForAnUnplaceableBinding}, why ${why.join(',')}; `
+        + out.code.replace(/\s+/g, ' ').slice(0, 130),
     };
   });
 
@@ -375,6 +387,8 @@ const FIXTURE_CHECKS = [
 const fixtureTotals = {
   files: 0, functions: 0, violations: 0, ctx: 0, holes: 0, parseFailures: 0,
   unwritten: 0, declared: 0, forIn: 0, finallyShapes: 0, chains: 0,
+  bindingsOwned: 0, bindingsInherited: 0, slotsUnplaceable: 0, refused: 0,
+  slotsHere: 0, slotsAncestor: 0,
 };
 
 for (const [name, want, what] of FIXTURE_CHECKS) {
@@ -393,6 +407,12 @@ for (const [name, want, what] of FIXTURE_CHECKS) {
     fixtureTotals.forIn += r.report.forInRebuilt;
     fixtureTotals.finallyShapes += r.report.finallyShapes;
     fixtureTotals.chains += r.report.loopTestChainsMaterialised;
+    fixtureTotals.bindingsOwned += r.report.contextBindingsOwned;
+    fixtureTotals.bindingsInherited += r.report.contextBindingsInherited;
+    fixtureTotals.slotsUnplaceable += r.report.contextBindingsUnplaceable;
+    fixtureTotals.refused += r.report.functionsRefusedForAnUnplaceableBinding;
+    fixtureTotals.slotsHere += r.report.scopePlan.slotLocationsOwnedHere ?? 0;
+    fixtureTotals.slotsAncestor += r.report.scopePlan.slotLocationsOwnedByAnAncestor ?? 0;
     if (perr) fixtureTotals.parseFailures++;
     const matched = want.test(r.code);
     return {
@@ -403,7 +423,59 @@ for (const [name, want, what] of FIXTURE_CHECKS) {
   });
 }
 
+// ---- the defect of docs/O1.md 6.5, on a fixture whose answer is known.
+//
+// `loop-for-of-break.src.js` closes over two variables: the iterator helper's
+// `i` and the outer `closed`, which an inner function assigns. Both are
+// context slots, so before scopes.mjs each inner function declared its own
+// copy and read `undefined` from it. The check is the one thing that makes a
+// closure real: the binding is declared ONCE, in the function that owns the
+// frame, and the inner function declares nothing.
+check('D', 'loop-for-of-break: a captured variable is declared once, by the function that owns its frame', () => {
+  const r = decompile(path.join(FIXTURES, 'loop-for-of-break.jsc'), { profile: FIXTURE_TAG });
+  const declarators = (name) => {
+    let n = 0;
+    walkAst(r.ast, (x) => {
+      if (x.type === 'VariableDeclarator' && x.id?.type === 'Identifier' && x.id.name === name) n++;
+    });
+    return n;
+  };
+  const flat = r.code.replace(/\s+/g, ' ');
+  // an inner function writes the outer binding -- that write is the closure
+  const writesTheOuterBinding = /function \w+\(\) \{ closed = true;/.test(flat);
+  const counts = { closed: declarators('closed'), i: declarators('i') };
+  return {
+    ok: counts.closed === 1 && counts.i === 1 && writesTheOuterBinding
+      && r.report.contextBindingsInherited >= 2 && r.report.contextBindingsOwned >= 2
+      && r.report.contextBindingsUnplaceable === 0 && violationsOf(r) === 0 && !parses(r.code),
+    detail: `declarators closed=${counts.closed} i=${counts.i}; owned `
+      + `${r.report.contextBindingsOwned}, inherited ${r.report.contextBindingsInherited}; `
+      + `inner write=${writesTheOuterBinding}`,
+  };
+});
+
 // ========================================================= E  invariants
+check('E', 'every context slot of every fixture was placed in a real scope', () => ({
+  ok: fixtureTotals.slotsUnplaceable === 0 && fixtureTotals.refused === 0
+    && fixtureTotals.slotsAncestor > 0 && fixtureTotals.slotsHere > 0,
+  detail: `${fixtureTotals.slotsHere} slot location(s) owned by the reading function, `
+    + `${fixtureTotals.slotsAncestor} by an enclosing one, ${fixtureTotals.slotsUnplaceable} unplaceable, `
+    + `${fixtureTotals.refused} function(s) refused`,
+}));
+
+check('E', 'every refusal reason scopes.mjs can produce is documented', () => {
+  const src = fs.readFileSync('src/emit/scopes.mjs', 'utf8');
+  const used = new Set([...src.matchAll(/refuse\(plan, '([A-Za-z]+)'/g)].map((m) => m[1]));
+  const names = fs.readFileSync('src/emit/names.mjs', 'utf8');
+  for (const m of names.matchAll(/unplaceable\.push\(\{\s*why: '([A-Za-z]+)'/g)) used.add(m[1]);
+  const undocumented = [...used].filter((w) => !(w in SCOPE_REFUSAL_WHY));
+  return {
+    ok: undocumented.length === 0 && Object.keys(SCOPE_REFUSAL_WHY).length >= used.size,
+    detail: undocumented.length ? `undocumented: ${undocumented.join(', ')}`
+      : `${used.size} reason(s) raised, ${Object.keys(SCOPE_REFUSAL_WHY).length} documented`,
+  };
+});
+
 check('E', '11.3 invariants 1-6: zero violations over every fixture', () => ({
   ok: fixtureTotals.violations === 0,
   detail: `${fixtureTotals.violations} violations over ${fixtureTotals.functions} functions in ${fixtureTotals.files} files`,

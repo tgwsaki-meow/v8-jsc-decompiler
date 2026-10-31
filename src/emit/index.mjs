@@ -47,6 +47,7 @@ import generatorModule from '@babel/generator';
 import { structureFacts } from '../structure/facts.mjs';
 import { terminatorInputs } from '../structure/conditions.mjs';
 import { planNames, declarationPrologue, sanitise } from './names.mjs';
+import { planScopes } from './scopes.mjs';
 import { expr, nameOf } from './expr.mjs';
 import { regionStatements } from './region.mjs';
 import { holeExpr, holeStmt, noteStmt, mark, HOLE_IDENTIFIER } from './holes.mjs';
@@ -64,6 +65,8 @@ const toArray = (x) => (x === null || x === undefined ? [] : (Array.isArray(x) ?
 /** How much of a failure message, and of its top frame, is kept. */
 const MAX_ERROR = 300;
 const MAX_FRAME = 200;
+/** How many per-file samples a report keeps. */
+const MAX_SAMPLES = 6;
 
 function newReport() {
   return {
@@ -230,9 +233,19 @@ export function emit(recovered, structured, opts = {}) {
   // ------------------------------------------------- the tree
   const { childrenOf, roots, treeSource } = buildUnitTree(order, byId);
 
+  // ------------------------------------ where every closure variable is bound
+  //
+  // One pass over the whole file, before any body is built, because a context
+  // slot belongs to a SCOPE and not to a function: the function that owns the
+  // frame has to declare every binding its descendants read, including the
+  // ones its own body never mentions. See scopes.mjs.
+  const scopes = planScopes({
+    order, childrenOf, roots, reserved: reservedSpellings(order, emitName, taken),
+  });
+
   const state = {
     emitted: new Set(), claimed: new Set(), inProgress: new Set(),
-    perFunction: [], report: fileReport(), byId, childrenOf, emitName,
+    perFunction: [], report: fileReport(), byId, childrenOf, emitName, scopes,
     positions: [], opts, file, sourceName,
   };
 
@@ -298,9 +311,34 @@ export function emit(recovered, structured, opts = {}) {
   r.elapsedMs = Number(process.hrtime.bigint() - t0) / 1e6;
   r.invariants = summariseInvariants(state.perFunction);
   r.unitTree = treeSource;
+  r.scopePlan = scopes.stats;
   r.metrics = fileMetrics(state, r);
 
   return { code, map, ast, perFunction: state.perFunction, report: r };
+}
+
+/**
+ * Spellings a context binding may not take, file-wide.
+ *
+ * A binding's name is ours to choose and is invisible to O1 -- a context slot
+ * is an index in the bytecode -- so the cheap, certain thing is to keep it off
+ * every name this file binds some other way: the parameters (T7 spells them
+ * `p0..pN`), every global any function reads (a global cannot be renamed, and
+ * a binding that shadowed one would silently capture its reads), every
+ * emitted function name, and every SFI name, which is what
+ * `declareFunctionSelf` binds inside a named function expression.
+ */
+function reservedSpellings(order, emitName, functionNames) {
+  const out = new Set([HOLE_IDENTIFIER, '__super', ...functionNames]);
+  for (const [, n] of emitName) if (n) out.add(n);
+  for (const r of order) {
+    if (r.unit?.name) out.add(sanitise(r.unit.name));
+    const names = r.rec?.names;
+    if (!names) continue;
+    for (const n of names.paramNames ?? []) if (n) out.add(sanitise(n));
+    for (const g of names.globals?.keys() ?? []) out.add(sanitise(g));
+  }
+  return out;
 }
 
 /**
@@ -377,6 +415,7 @@ function fileReport() {
   return {
     file: null, units: 0, compiledUnits: 0, functionsEmitted: 0, orphans: 0,
     functionsFailed: 0, functionsClaimedInline: 0, topLevelReturns: 0, emitFailures: [],
+    unreferencedClosures: 0,
     holes: { total: 0, byWhy: {}, byKind: { expr: 0, stmt: 0, region: 0 } },
     loops: 0, loopForms: {}, loopIdioms: {}, tries: 0, triesByPrediction: {},
     finallyShapes: 0, finallyShapeKinds: {}, switches: 0, switchForms: {},
@@ -386,7 +425,11 @@ function fileReport() {
     droppedByRemovedKind: {}, droppedByStatementTag: {},
     namesReadButNeverWritten: 0, namesDeclared: 0, unwrittenSamples: [],
     duplicatedValues: 0, unresolvedJoins: 0, unresolvedNames: 0, globalReads: 0,
-    localsRenamed: 0, outerSlotDeclaredLocally: 0, declarations: 0,
+    localsRenamed: 0, paramsRenamedForABinding: 0, declarations: 0,
+    contextBindingsOwned: 0, contextBindingsInherited: 0,
+    contextBindingsUnplaceable: 0, constBindingsEmittedAsLet: 0,
+    functionsRefusedForAnUnplaceableBinding: 0, refusalsByWhy: {}, refusalSamples: [],
+    scopePlan: {},
     forcedAsync: 0, forcedGenerator: 0,
     blocksWithoutStatements: 0, regionKindsNot112: {}, unknownRegionKinds: {},
     monotonicity: { functions: 0, monotone: 0, inversions: 0 },
@@ -499,6 +542,29 @@ function emitUnit(state, rec0, how) {
   }
 }
 
+/**
+ * The body of a function this layer refuses because a context binding it reads
+ * cannot be placed (scopes.mjs::SCOPE_REFUSAL_WHY).
+ *
+ * The alternative that was there before is the defect: `names.mjs` declared
+ * the slot's spelling locally, which shadowed the closure, so the function
+ * read its own fresh `undefined` instead of the captured variable and nothing
+ * said so. A throw is loud, is counted, and keeps 11.3 invariant 5 -- and
+ * because this layer still declares the bindings this function OWNS, a
+ * refusal costs this function and not its descendants.
+ */
+function refusedBody(unit, unplaceable) {
+  const text = (u) => `${u.why}${u.detail ? `: ${u.detail}` : ''}`.replace(/\*\//g, '* /');
+  const s = t.throwStatement(t.newExpression(t.identifier('Error'), [
+    t.stringLiteral(`NOT DECOMPILED: ${unit.name || '<anonymous>'} sfi ${unit.sfiId}`
+      + `: ${unplaceable.length} context binding(s) could not be placed`),
+  ]));
+  mark(s, `HOLE contextBindingUnplaceable ${text(unplaceable[0]).slice(0, MAX_ERROR)}`);
+  const note = noteStmt(`REFUSED: this layer cannot place ${unplaceable.length} context slot(s) of `
+    + `${unit.name || '<anonymous>'}; ` + unplaceable.slice(0, MAX_SAMPLES).map(text).join(' | ').slice(0, MAX_ERROR));
+  return [note, s];
+}
+
 function failedBody(unit, failure) {
   const why = String(failure?.error ?? 'no recovered/structured pair').replace(/\*\//g, '* /').slice(0, MAX_ERROR);
   const s = t.throwStatement(t.newExpression(t.identifier('Error'), [
@@ -537,12 +603,15 @@ function emitUnitInner(state, rec0, how) {
   }
 
   const facts = structureFacts(rec.ir.profile ?? sf.ir.profile);
-  const plan = planNames(rec, rec.ir, unit, joinExprs(rec, sf), how.inherited ?? new Set());
+  const plan = planNames(rec, rec.ir, unit, joinExprs(rec, sf), how.inherited ?? new Set(),
+    state.scopes.forUnit(rec0.sfiId));
 
   // ---- names for the children, before the body is built: `{e:'fn'}` emits a
-  //      reference to one of them, so the spelling has to exist first.
+  //      reference to one of them, so the spelling has to exist first. A child
+  //      may not be spelled like a context binding in scope here either: the
+  //      declaration would shadow the closure for the rest of the body.
   const children = state.childrenOf.get(rec0.sfiId) ?? [];
-  const localTaken = new Set([...plan.declaredNames, ...plan.paramNames]);
+  const localTaken = new Set([...plan.declaredNames, ...plan.paramNames, ...plan.visibleBindingNames]);
   if (!how.topLevel) for (const g of plan.globalNames ?? []) localTaken.add(g);
   const childName = new Map();
   for (const c of children) {
@@ -608,8 +677,32 @@ function emitUnitInner(state, rec0, how) {
   ctx.allowSuper = !!how.allowSuper;
 
   // ---- the body: T8's tree, T7's statements
+  //
+  // Unless a context binding this function reads cannot be placed. Then the
+  // body is NOT emitted: declaring the slot locally would shadow the closure
+  // (docs/O1.md 6.5) and leaving it free would break 11.3 invariant 5, so the
+  // honest answer is "I cannot place this binding", per function, with the
+  // slot, the frame and the depth named. The declaration prologue below still
+  // carries the bindings this function OWNS, so its descendants stay
+  // placeable: one unplaceable binding costs this function and not the file.
   let body;
-  try {
+  let refused = null;
+  if (plan.unplaceable.length) {
+    refused = plan.unplaceable;
+    body = refusedBody(unit, refused);
+    ctx.countHole('contextBindingUnplaceable', 'stmt');
+    state.report.functionsFailed++;
+    state.report.functionsRefusedForAnUnplaceableBinding++;
+    for (const u of refused) {
+      state.report.refusalsByWhy[u.why] = (state.report.refusalsByWhy[u.why] ?? 0) + 1;
+    }
+    if (state.report.refusalSamples.length < MAX_SAMPLES) {
+      state.report.refusalSamples.push({
+        sfiId: unit.sfiId, name: unit.name ?? null,
+        why: refused[0].why, detail: refused[0].detail ?? null, slots: refused.length,
+      });
+    }
+  } else try {
     body = regionStatements(ctx, sf.root);
   } catch (e) {
     if (state.opts.rethrow) throw e;
@@ -645,14 +738,24 @@ function emitUnitInner(state, rec0, how) {
       + dropped.blocks.map((b) => `${b.block}:${b.kind}`).join(' ')));
   }
 
-  // ---- the prologue: one declaration list, then the nested functions
-  const prologue = declarationPrologue(plan, [...ctx.extraDeclNames]);
+  // ---- the prologue: the declaration lists, then the nested functions
+  const prologue = declarationPrologue(plan, [...ctx.extraDeclNames], { topLevel: how.role === 'script' });
   const nested = [];
   for (const c of children) {
     if (state.claimed.has(c.sfiId) || state.emitted.has(c.sfiId)) continue;
     const node = emitUnit(state, c, { role: 'declaration', inherited: plan.exported, childName });
     for (const s of asStatements(node)) {
-      if (!referenced.has(c.sfiId)) mark(s, `unreferenced closure (sfi ${c.sfiId})`);
+      if (!referenced.has(c.sfiId)) {
+        // Measured consequence, counted because docs/O1.md 6.5 step 5 blamed
+        // it on the context-slot defect and the measurement says otherwise: a
+        // function this file declares but nothing REFERENCES is dropped by
+        // V8's scope analysis, so no CreateClosure is emitted, the SFI is
+        // unreachable from the parent's constant pool, and the function is
+        // absent from the recompiled cache. That -- not the scoping of its
+        // captured variables -- is what O1's A-side unpaired count measures.
+        state.report.unreferencedClosures++;
+        mark(s, `unreferenced closure (sfi ${c.sfiId})`);
+      }
       nested.push(s);
     }
   }
@@ -716,7 +819,11 @@ function emitUnitInner(state, rec0, how) {
     }
   }
   state.report.localsRenamed += plan.stats.localsRenamed;
-  state.report.outerSlotDeclaredLocally += plan.stats.outerSlotDeclaredLocally;
+  state.report.paramsRenamedForABinding += plan.stats.paramsRenamedForABinding;
+  state.report.contextBindingsOwned += plan.stats.contextBindingsOwned;
+  state.report.contextBindingsInherited += plan.stats.contextBindingsInherited;
+  state.report.contextBindingsUnplaceable += plan.stats.contextBindingsUnplaceable;
+  state.report.constBindingsEmittedAsLet += plan.stats.constBindingsEmittedAsLet;
   state.report.declarations += plan.stats.declarations;
   state.report.monotonicity.functions++;
   if (mono.monotone) state.report.monotonicity.monotone++;
@@ -736,6 +843,9 @@ function emitUnitInner(state, rec0, how) {
     name: name ?? '<script>', role: how.role, inlineClaims,
     code: null, statements: statements.length,
     patterns: patternSummary(rec),
+    failed: !!refused,
+    error: refused ? `${refused[0].why}: ${refused[0].detail ?? ''}`.slice(0, MAX_ERROR) : null,
+    refused: refused ? refused.length : 0,
   }));
   return how.role === 'script' ? statements : node;
 }
@@ -826,6 +936,7 @@ function perFunctionEntry(unit, ctx, verification, mono, extra) {
     role: extra.role ?? null,
     failed: !!extra.failed,
     error: extra.error ?? null,
+    refused: extra.refused ?? 0,
     holes: rep ? rep.holes.total : 0,
     holesByWhy: rep ? rep.holes.byWhy : {},
     unstructuredRegions: rep ? rep.unstructuredRegions : 0,
