@@ -46,13 +46,40 @@ const MAX_EXPR_DEPTH = 400;
 /** Is this string usable as a non-computed member / property key? */
 function isIdent(s) { return typeof s === 'string' && /^[A-Za-z_$][A-Za-z0-9_$]*$/.test(s); }
 
-function keyOf(ctx, key, computed) {
+/**
+ * A property key, as (node, computed).
+ *
+ * The two call sites have DIFFERENT rules and conflating them was a real bug.
+ * For an object literal, `computed: false` with a `StringLiteral` or a
+ * `NumericLiteral` key is legal and is what the source said -- `{0: x}` and
+ * `{'a-b': x}` are correct and more readable than `{[0]: x}`. For a
+ * **member expression** it is not legal: Babel requires the property to be an
+ * `Identifier` or a `PrivateName` whenever `computed` is false, because
+ * `o.a-b` is not a property access at all.
+ *
+ * Measured on the full corpus: `o['a-b']` and `o[0]` reached
+ * `t.memberExpression(obj, StringLiteral, false)` and Babel threw
+ *
+ *   Property property of MemberExpression expected node to be of a type
+ *   ["Identifier","PrivateName"] but instead got "StringLiteral"
+ *
+ * which the emitter caught per unit and turned into a
+ * `HOLE unitNotRecovered` stub. 924 of 1514 holes were that reason, and it is
+ * also why five entries of the O1 sample emitted output that would not parse.
+ *
+ * @param {boolean} forMember true at a member expression, false at an object key
+ */
+function keyOf(ctx, key, computed, forMember = false) {
   if (computed || (key && typeof key === 'object')) {
     return { node: key && typeof key === 'object' ? expr(ctx, key) : t.stringLiteral(String(key)), computed: true };
   }
   if (isIdent(key)) return { node: t.identifier(key), computed: false };
-  if (typeof key === 'number') return { node: t.numericLiteral(key), computed: false };
-  return { node: t.stringLiteral(String(key)), computed: false };
+  // Not an identifier. A member access has to become a computed one; an
+  // object key may stay as it is written.
+  if (typeof key === 'number') {
+    return { node: t.numericLiteral(key), computed: forMember };
+  }
+  return { node: t.stringLiteral(String(key)), computed: forMember };
 }
 
 /** A literal value of the kinds 11.1 allows for `{e:'lit'}`. */
@@ -101,7 +128,7 @@ function isChained(node) {
 
 function memberExpr(ctx, e) {
   const obj = expr(ctx, e.obj);
-  const { node: prop, computed } = keyOf(ctx, e.prop, e.computed);
+  const { node: prop, computed } = keyOf(ctx, e.prop, e.computed, true);
   if (e.optional || isChained(obj)) {
     return t.optionalMemberExpression(obj, prop, computed, !!e.optional);
   }
