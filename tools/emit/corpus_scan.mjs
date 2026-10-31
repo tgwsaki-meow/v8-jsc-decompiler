@@ -202,9 +202,29 @@ L(`| files with a result | ${rows.length} |`);
 L(`| files that threw or were killed | ${rows.length - ok.length} |`);
 L(`| input | ${(inputKB / 1024).toFixed(1)} MB |`);
 L(`| emitted JavaScript | ${(sum('codeBytes') / 1048576).toFixed(1)} MB |`);
-L(`| compiled functions (SFI with bytecode) | ${sum('compiledUnits')} |`);
-L(`| **functions emitted** | **${sum('functionsEmitted') + sum('functionsClaimedInline')}** `
-  + `= ${pct(sum('functionsEmitted') + sum('functionsClaimedInline'), sum('compiledUnits'))} (metric 6, baseline 38.76%) |`);
+// `functionsEmitted` is `perFunction.length`, and a function emitted INLINE --
+// a class constructor placed in a ClassBody, an object literal's accessor --
+// got there through emitUnit() like any other, so it is already in that
+// length. Adding `functionsClaimedInline` counted it twice and metric 6 read
+// 240 195 / 239 979 = 100.09%. The real number is 100.00%: every compiled
+// function enters the output exactly once.
+//
+// A ratio above 1 here means a function was emitted twice, which is a
+// correctness failure and not a rounding curiosity, so it now stops the run
+// instead of being printed. This was found by a reader asking how a coverage
+// metric could exceed 100%, which is the question the assertion now asks.
+const emitted = sum('functionsEmitted');
+const compiled = sum('compiledUnits');
+if (emitted > compiled) {
+  throw new Error(
+    `metric 6 is impossible: ${emitted} functions emitted against ${compiled} compiled.\n`
+    + '  A coverage ratio above 1 means some function reached the output more than once.\n'
+    + `  functionsClaimedInline = ${sum('functionsClaimedInline')} (already counted in functionsEmitted)\n`
+    + `  orphans = ${sum('orphans')}, stubs = ${sum('functionsFailed')}`,
+  );
+}
+L(`| compiled functions (SFI with bytecode) | ${compiled} |`);
+L(`| **functions emitted** | **${emitted}** = ${pct(emitted, compiled)} (metric 6, baseline 38.76%) |`);
 L(`| of those, emitted as a stub because a layer threw | ${sum('functionsFailed')} |`);
 L(`| functions emitted inline (a class constructor, an accessor) | ${sum('functionsClaimedInline')} |`);
 L(`| functions emitted at the top level because their parent is missing | ${sum('orphans')} |`);
@@ -230,8 +250,7 @@ L(`| 2 — \`try\` per handler range | ${sum('tries')} / ${sumIn('bytecode', 'ha
   + `| ${pct(sum('tries'), sumIn('bytecode', 'handlerRanges'))} (baseline 0 / 667 exception opcodes) |`);
 L(`| 3 — \`switch\` per switch-dispatch opcode | ${sum('switches')} / ${sumIn('bytecode', 'switchDispatchOpcodes')} `
   + `| ${pct(sum('switches'), sumIn('bytecode', 'switchDispatchOpcodes'))} (baseline 0 / 160) |`);
-L(`| 6 — functions emitted / deserialized | ${sum('functionsEmitted') + sum('functionsClaimedInline')} / ${sum('compiledUnits')} `
-  + `| ${pct(sum('functionsEmitted') + sum('functionsClaimedInline'), sum('compiledUnits'))} |`);
+L(`| 6 — functions emitted / deserialized | ${emitted} / ${compiled} | ${pct(emitted, compiled)} |`);
 L(`| 7 — values emitted twice | ${sum('duplicatedValues')} | — |`);
 L(`| 9 — unresolved constant-pool entries | ${mergeMetric('m9_unresolvedConstants', 'value')} | — |`);
 L(`| 10 — \`unstructured\` regions | ${sum('unstructuredRegions')} | — |`);
@@ -311,8 +330,8 @@ fs.writeFileSync(OUT.replace(/\.md$/, '.json'), JSON.stringify({
   generatedAt: new Date().toISOString(), profile: PROFILE, corpus: CORPUS,
   selected: files.length, withResult: rows.length, ok: ok.length,
   totals: {
-    compiledUnits: sum('compiledUnits'),
-    functionsEmitted: sum('functionsEmitted') + sum('functionsClaimedInline'),
+    compiledUnits: compiled,
+    functionsEmitted: emitted,
     invariantViolations: sum('invariantViolations'),
     ctxIdentifiers: sum('ctxIdentifiers'),
     duplicatedValues: sum('duplicatedValues'),
