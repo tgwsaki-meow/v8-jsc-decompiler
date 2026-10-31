@@ -34,6 +34,11 @@
 //  12  typeofetc  typeof / delete / in / instanceof -- counted here, but
 //                 transcribed directly in expr.mjs because each is one opcode.
 //  13  misc       the remaining single-instruction desugarings.
+//  14  calls      `o.m(x)` -- the receiver/callee register identity of
+//                 VisitCall:6738. LAST, so every family that owns a call shape
+//                 of its own (a tagged template's tag call, an iterator's
+//                 `next()`, an optional `?.()`, a `super()`) has already
+//                 claimed it; this one only takes what is left.
 
 import logical from './logical.mjs';
 import optional from './optional.mjs';
@@ -48,10 +53,11 @@ import accessor from './accessor.mjs';
 import typeofetc from './typeofetc.mjs';
 import update from './update.mjs';
 import misc from './misc.mjs';
+import calls from './calls.mjs';
 
 export const FAMILIES = Object.freeze([
   asyncgen, classes, forof, forin, destructure, spread, literals, accessor,
-  optional, logical, update, typeofetc, misc,
+  optional, logical, update, typeofetc, misc, calls,
 ]);
 
 export function runPatterns(pc) {

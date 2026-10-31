@@ -615,6 +615,12 @@ export function recover(ir, opts = {}) {
     return transcribe({
       ir, names, reg, E,
       sameValue: (a, b) => sameValue(a, b),
+      // The defining SSA value behind a use, with moves canonicalised away.
+      // The transcription needs it where the SHAPE of a use depends on which
+      // instruction produced the value and not only on its expression: a
+      // property call has to know whether its callee register was loaded out
+      // of its receiver register (expr.mjs, CallProperty*).
+      defOf: (id) => (id === null || id === undefined ? null : (values[canon(id)] ?? null)),
       contextSlotName,
       closureMeta,
       runtimeCall: (op, env) => runtimeCall(op, env, E),

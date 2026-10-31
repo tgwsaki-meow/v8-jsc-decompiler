@@ -125,12 +125,36 @@ function collectStores(pc, ctor, isStore) {
   const b = ir.blocks[ctor.block];
   if (!b) return [];
   const chain = b.effects ?? [];
-  const start = chain.indexOf(ctor.id);
+  // Where in the block's effect chain does the literal come into existence?
+  //
+  // `CreateObjectLiteral` / `CreateArrayLiteral` / the empty forms are PURE
+  // ALLOCATIONS -- `src/ir/opcode_effects.mjs` gives them `alloc(...)`, which
+  // writes no effect kind, throws nothing and enters no user code -- so they
+  // are not members of the chain at all and `chain.indexOf(ctor.id)` is -1.
+  // This used to fall back to `0`, i.e. to the START of the block, where the
+  // first chain member is almost never a store into a literal that does not
+  // exist yet; the walk below broke on it and the fold never fired. Measured
+  // on `r_19252.jsc` + two others: 713 of 866 `Define*`/`Sta*` stores survived
+  // with their `CreateObjectLiteral` sitting in the SAME block.
+  //
+  // The honest position is the instruction order the generator emitted:
+  // `BuildCreateObjectLiteral:4179` emits the constructor and
+  // `VisitObjectLiteral:4190`'s "store computed values into the literal" loop
+  // emits every runtime store after it, so the stores to fold are the chain
+  // members whose instruction follows the constructor's. `CloneObject` (object
+  // spread) IS in the chain because it runs getters, and the same test finds
+  // it: its own instruction is not strictly after itself.
+  let start = 0;
+  while (start < chain.length) {
+    const m = ir.values[chain[start]];
+    if (m && m.instruction > ctor.instruction) break;
+    start++;
+  }
   const out = [];
   // the set of store instructions we are willing to fold, grown as we go
   const targetIns = new Set();
   const candidates = [];
-  for (let j = (start >= 0 ? start + 1 : 0); j < chain.length; j++) {
+  for (let j = start; j < chain.length; j++) {
     const m = ir.values[chain[j]];
     if (!m || m.kind !== 'Op') break;
     if (isStore(m.op) && pc.sameValue(pc.firstRegInput(m), ctor.id)) {

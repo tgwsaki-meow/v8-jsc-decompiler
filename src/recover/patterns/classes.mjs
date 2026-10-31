@@ -61,22 +61,102 @@ export function run(pc) {
   for (const v of ir.values) {
     if (v?.kind !== 'Op') continue;
     if (v.op === 'FindNonDefaultConstructorOrConstruct') {
-      // its outputs are (found_non_default, implicit_this_or_constructor)
-      pc.setExpr(v.id, () => ({ e: 'lit', v: true, superDispatch: true }));
+      // BuildSuperCallOptimization:7123, the shape BuildGetAndCheckSuperConstructor
+      // :7105 takes when `omit_default_ctors` is on (it is, for every derived
+      // constructor in the corpus):
+      //
+      //   FindNonDefaultConstructorOrConstruct this_function, new_target, out(2)
+      //   Mov out[1] -> constructor_then_instance
+      //   Ldar out[0] ; JumpIfTrue -> super_ctor_call_done
+      //
+      // out[0] is a RUNTIME boolean: true when V8 walked past a chain of
+      // default constructors and already built the instance, false when this
+      // frame still has to call the super constructor. It was transcribed here
+      // as `{e:'lit', v:true}`, and that is a fabrication with teeth -- the
+      // emitted text became `if (!true) { ... }`, which makes the super call
+      // DEAD CODE and silently deletes the whole derived-constructor protocol.
+      // A runtime value we cannot name is a hole (docs/RECOVER.md 6).
+      pc.setExpr(v.id, () => ({
+        e: 'hole',
+        why: 'superConstructorDispatchFlagIsARuntimeValue',
+        detail: 'FindNonDefaultConstructorOrConstruct out[0] (BuildSuperCallOptimization:7123) '
+          + 'is true iff V8 already constructed the instance by walking past default '
+          + 'constructors; it has no source form, and the branch on it is part of the '
+          + '`super()` desugaring, not of the program',
+        dump: null,
+      }));
+      // out[1] is the super constructor on the false path and the finished
+      // instance on the true path -- the two lifetimes deliberately share one
+      // register ("the lifetimes of the two don't need to overlap",
+      // VisitCallSuper:6961). After the join it is `this`.
       for (const p of v.projections ?? []) {
         pc.setExpr(p, () => ({ e: 'name', name: 'this', ref: { k: 'local', superResult: true } }));
       }
+      superConstructCall(pc, v, [v.id, ...(v.projections ?? [])]);
       pc.claim({
         kind: 'class', blocks: [v.block], values: [v.id, ...(v.projections ?? [])],
         instructions: [], confidence: 'exact',
-        cites: ['BuildGetAndCheckSuperConstructor:7105', 'VisitCallSuper:6961'],
+        cites: ['BuildGetAndCheckSuperConstructor:7105', 'BuildSuperCallOptimization:7123', 'VisitCallSuper:6961'],
         detail: 'super() dispatch',
       });
     } else if (v.op === 'GetSuperConstructor') {
+      // the other half of BuildGetAndCheckSuperConstructor:7105 -- no dispatch
+      // flag, the accumulator is `this_function` and the destination register
+      // receives the super constructor.
+      superConstructCall(pc, v, [v.id]);
       pc.claim({
         kind: 'class', blocks: [v.block], values: [v.id], instructions: [],
         confidence: 'exact', cites: ['BuildGetAndCheckSuperConstructor:7105'],
         detail: 'GetSuperConstructor',
+      });
+    }
+  }
+}
+
+/**
+ * The `Construct` that VisitCallSuper:6961 emits on the register
+ * BuildGetAndCheckSuperConstructor just filled IS `super(args)` -- the
+ * constructor is not an expression the source wrote, it is `this_function`'s
+ * prototype, so `new <that>(args)` is a different program: it allocates a
+ * second object, binds no `this`, and passes the wrong `new.target`
+ * (VisitCallSuper loads `new_target` into the accumulator immediately before
+ * the Construct, which is what makes it a super call rather than a `new`).
+ *
+ * So the construct is rewritten to `{e:'call', callee:{e:'super'}}`. When the
+ * unit is not emitted as a derived class constructor the emitter turns the
+ * `{e:'super'}` into a counted `superOutsideAMethod` hole, which is the honest
+ * outcome: a visible refusal rather than a `new` that looks like source.
+ */
+function superConstructCall(pc, dispatch, candidateValues) {
+  const ir = pc.ir;
+  // `super(...)` is legal only in a DERIVED class constructor, and V8's own
+  // FunctionKind bit says whether this unit is one (kDerivedConstructor /
+  // kDefaultDerivedConstructor). VisitCallSuper:6961 is only reachable from a
+  // Call::SUPER_CALL, so the kind and the shape always agree -- the guard is
+  // here so that a shape which somehow appears elsewhere produces no illegal
+  // text.
+  if (!/Derived/.test(ir.unit?.functionKindName ?? '')) return;
+  const targets = new Set(candidateValues.map((x) => pc.canon(x)));
+  for (const id of candidateValues) {
+    for (const useId of pc.usesOf(id)) {
+      const use = ir.values[useId];
+      if (!use || use.kind !== 'Op') continue;
+      if (use.op !== 'Construct' && use.op !== 'ConstructWithSpread') continue;
+      const all = pc.flatRegInputs(use);
+      if (!all.length || !targets.has(pc.canon(all[0]))) continue;
+      const rest = all.slice(1);
+      pc.setExpr(use.id, () => ({
+        e: 'call', optional: false,
+        callee: { e: 'super' },
+        args: use.op === 'ConstructWithSpread'
+          ? rest.map((x, i) => (i === rest.length - 1 ? { spread: pc.E(x) } : pc.E(x)))
+          : rest.map((x) => pc.E(x)),
+      }));
+      pc.claim({
+        kind: 'class', blocks: [use.block], values: [use.id], instructions: [],
+        confidence: 'exact',
+        cites: ['VisitCallSuper:6961', 'BuildGetAndCheckSuperConstructor:7105'],
+        detail: `super(${rest.length} argument(s))`,
       });
     }
   }
@@ -88,9 +168,48 @@ function defineClass(pc, v) {
   const superId = args[2] ?? null;
   const ctorExpr = ctorId === null ? null : pc.exprOf(pc.canon(ctorId));
   const superExpr = superId === null ? null : pc.exprOf(pc.canon(superId));
-  const noExtends = !superExpr || superExpr.e === 'hole' && superExpr.why === 'theHole';
+  // `class X {}` and `class X extends E {}` differ by ONE value:
+  // BuildClassLiteral:3657 is `VisitForAccumulatorValueOrTheHole(expr->extends())`,
+  // so args[2] is the hole oddball exactly when there is no `extends` clause.
+  // Anything else is an extends clause, INCLUDING a value this shallow
+  // transcription cannot describe -- a phi, for instance, which
+  // `pc.exprOf` has no answer for. Treating "no answer" as "no extends" (the
+  // old `!superExpr`) emitted `class { constructor() { super() } }` for a
+  // derived class whose super class was computed by a conditional, and that is
+  // a SyntaxError, not a decompilation: measured on `r_vendorsXvue.jsc`, whose
+  // whole output stopped compiling (`'super' keyword unexpected here`).
+  // `pc.E(superId)` resolves the phi properly.
+  const noExtends = superId === null || superId === undefined
+    || (superExpr?.e === 'hole' && (superExpr.why === 'theHole' || superExpr.why === 'theHoleConstant'));
 
-  pc.setExpr(v.id, () => ({
+  // WHICH VALUE IS THE CLASS?  Not the runtime call's result.
+  //
+  // BuildClassLiteral:3645-3662 allocates `args[1]`
+  // (`class_constructor_in_args`) and then does
+  //
+  //     VisitFunctionLiteral(expr->constructor());                  // CreateClosure
+  //     StoreAccumulatorInRegister(class_constructor)               // a temp
+  //     MoveRegister(class_constructor, class_constructor_in_args)  // -> args[1]
+  //
+  // `Runtime::kDefineClass` installs the prototype, the home object and the
+  // members ONTO THAT JSFunction -- the class IS the constructor object -- and
+  // returns the PROTOTYPE in the accumulator, which is why the generator
+  // continues with "Accumulator already contains the prototype" (:3738) and
+  // finishes with `LoadAccumulatorWithRegister(class_constructor)` (:3829),
+  // reading the class back out of the register it moved the closure into. The
+  // move makes the two one SSA value.
+  //
+  // So `{e:'class'}` belongs on the CreateClosure's value and the call's own
+  // value is `<that class>.prototype`. With it the other way round, the class
+  // expression sat on a value the generator never reads: measured on
+  // `r_55201.jsc`, 8 of 8 %DefineClass sites produced an `{e:'class'}` that
+  // reached no statement, the emitted text contained no `class` at all, and
+  // every use of the class resolved to `{e:'fn', sfiId}` -- so the constructor
+  // was emitted as a sibling function declaration, which is also why a derived
+  // constructor's `super()` could not be written (`super` is only legal inside
+  // a class method).
+  const classValue = ctorId !== null && ctorExpr?.e === 'fn' ? pc.canon(ctorId) : v.id;
+  pc.setExpr(classValue, () => ({
     e: 'class',
     sfiId: ctorExpr?.e === 'fn' ? ctorExpr.sfiId : null,
     name: ctorExpr?.e === 'fn' ? ctorExpr.name : null,
@@ -98,10 +217,14 @@ function defineClass(pc, v) {
     members: [],
     dynamicArguments: Math.max(0, args.length - 3),
   }));
-  // the class is a value, not a statement: its %DefineClass returns a pair
-  // (the class and its prototype) and the prototype projection is plumbing.
+  if (classValue !== v.id) {
+    pc.setExpr(v.id, () => ({
+      e: 'member', obj: pc.E(classValue), prop: 'prototype', computed: false, optional: false,
+    }));
+  }
+  // A pair-returning form puts the prototype in a projection instead.
   for (const p of v.projections ?? []) {
-    pc.setExpr(p, () => ({ e: 'member', obj: pc.E(v.id), prop: 'prototype', computed: false, optional: false }));
+    pc.setExpr(p, () => ({ e: 'member', obj: pc.E(classValue), prop: 'prototype', computed: false, optional: false }));
   }
   pc.consumeMovesFeeding(v);
   pc.claim({

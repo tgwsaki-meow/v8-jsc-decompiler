@@ -184,7 +184,8 @@ cannot present itself as exact.
 | `destructureDefault` | destructure | `BuildDestructuringArrayAssignment:5464`, `BuildDestructuringObjectAssignment:5638` | exact |
 | `spread` | spread | `VisitSpread:7887` + `VisitCall:6738` / `VisitCallNew:7136`; `BuildCreateArrayLiteral:4508` + `BuildFillArrayWithIterator:4474` for `CreateArrayFromIterable`; `VisitSuperCallForwardArgs:7184` for `ConstructForwardAllArgs`; `VisitObjectLiteral:4190` for object spread | exact; shape when the spread target is not visible |
 | `restParameter` | spread | `VisitRestArgumentsArray:8571` | exact |
-| `class` | classes | `BuildClassLiteral:3534`, `VisitClassLiteral:3832`; `BuildGetAndCheckSuperConstructor:7105`, `VisitCallSuper:6961` for `super()` | shape for `%DefineClass`; exact for the `super()` dispatch |
+| `class` | classes | `BuildClassLiteral:3534`, `VisitClassLiteral:3832`; `BuildGetAndCheckSuperConstructor:7105`, `BuildSuperCallOptimization:7123`, `VisitCallSuper:6961` for `super()` | shape for `%DefineClass`; exact for the `super()` dispatch and for `super(args)` |
+| `propertyCall` | calls | `VisitCall:6738` (`:6782`, `:6854`), `VisitPropertyLoadForRegister:6638`, `VisitNamedSuperPropertyLoad:6646` | exact |
 | `privateField` | classes | `BuildClassLiteral:3534`, `BuildPrivateBrandInitialization:3994` | exact |
 | `await` | asyncgen | `BuildAwait:6337`, `BuildSuspendPoint:5977`, `VisitAwait:6389` | exact when the resume-mode dispatch matched, shape otherwise |
 | `yield` | asyncgen | `VisitYield:6001`, `BuildSuspendPoint:5977` | exact / shape as above |
@@ -388,6 +389,10 @@ The `why` values and what each one means:
 | `runtimeIdNotNamedByProfile` | the profile's runtime table has no name for the id |
 | `unresolvedConstant:<reason>` | `src/heap` could not classify a constant-pool entry |
 | `opcodeNotTranscribed` | the transcription table has no branch for this opcode |
+| `ownPropertyDefinitionNotFoldedIntoItsLiteral` | a `DefineNamedOwnProperty` / `DefineKeyedOwnProperty` / `DefineKeyedOwnPropertyInLiteral` that no literal fold claimed. The generator emits these only inside an object literal (`VisitObjectLiteral:4281`, `:4285`, `:4406`) or a class body (`BuildClassProperty:3908`, `:3930`), so the only source form is the literal — and `o.x = v` is **not** it: `Set*Property` walks the prototype chain and calls a setter, `Define*OwnProperty` creates an own data property and does not |
+| `arrayLiteralElementStoreNotFoldedIntoItsLiteral` | the same, for `StaInArrayLiteral` (`BuildCreateArrayLiteral:4605`/`:4643`, `BuildFillArrayWithIterator:4500`, `BuildDestructuringArrayAssignment:5596`) |
+| `classFieldOutsideItsClassBody` | a `Define*OwnProperty` **on the receiver**, which only `BuildClassProperty:3908`/`:3930` emits and only from `VisitInitializeClassMembersStatement:3935` / `VisitInitializeClassStaticElementsStatement:3942`. The unit is therefore a class-members initialiser (its SFI's `FunctionKind` says so) and the store is a class field; a class field has no spelling outside a class body |
+| `superConstructorDispatchFlagIsARuntimeValue` | `FindNonDefaultConstructorOrConstruct`'s `out[0]` (`BuildSuperCallOptimization:7123`): true iff V8 already built the instance by walking past default constructors. It was transcribed as `{e:'lit', v:true}`, which made the `super()` call dead code and silently deleted the derived-constructor protocol |
 | `contextSlotUnnamed` | a slot location with no entry in the name table |
 | `phiWithoutName` | a live phi that was neither named nor rewritten |
 | `effectValueReadAsData` | an effect-chain value read as data |
@@ -426,6 +431,41 @@ representative.
   `ClassBoilerplate` constant that `src/heap` does not decode, so
   `{e:'class'}` carries `superClass` and the constructor SFI but
   `members: []` plus a `dynamicArguments` count. Confidence `shape`.
+* **A derived constructor's `super()` is recovered but its dispatch diamond is
+  not collapsed.** `BuildSuperCallOptimization:7123` branches on a runtime
+  flag, so T8 structures the two paths as an `if` and T7 contributes
+  `super(args)` inside it plus a hole for the flag. The source is one
+  statement; the output is `if (<hole>) { instance = super(args) }` and a phi
+  for `this`. Collapsing it needs T8/T9, because the dispatch is control flow.
+* **A class field is still not placed in its class body.** T7 now knows which
+  unit is the class-members initialiser (the SFI's `FunctionKind` is
+  `kClassMembersInitializerFunction`) and `VisitClassLiteral:3795` ties it to
+  its class with `StoreClassFieldsInitializer`, so the link is recoverable —
+  but emitting one unit's statements as another unit's class members is
+  `src/emit/index.mjs::resolveClass`'s decision, not this layer's. Until then
+  each field is a counted `classFieldOutsideItsClassBody` hole.
+* **`{e:'class'}` used to sit on a value nothing reads.** Recorded because it
+  was invisible for a long time: `Runtime::kDefineClass` installs the
+  prototype and the members **onto the constructor JSFunction** and returns
+  the prototype in the accumulator, and `BuildClassLiteral:3645-3662` moves
+  the constructor closure into `args[1]` before the call, so the register that
+  held the closure holds the class afterwards (`VisitClassLiteral:3829` reads
+  it back). With `{e:'class'}` on the `%DefineClass` value instead, every use
+  of a class resolved to `{e:'fn', sfiId}`: measured on `r_55201.jsc`, 8 of 8
+  `%DefineClass` sites produced an `{e:'class'}` that reached no statement and
+  the emitted text contained no `class` at all. `classes.mjs` now puts the
+  class expression on the constructor's value and `<class>.prototype` on the
+  call's.
+* **A property call whose callee crosses a suspend point still comes back as
+  `callee.call(receiver, …)`.** `patterns/calls.mjs` claims a call whose
+  callee register was loaded out of its receiver register, which is every
+  property call `VisitCall:6738` can emit — but after a `SuspendGenerator` the
+  callee arrives as a `ResumeGenerator` projection of the spilled register
+  (§2.1), a different SSA value, so the identity test cannot see it. Measured
+  residue: 1 of 374 property calls in `r_19252.jsc` + `r_89889.jsc`. The
+  `.call` form is counted (`stats.notes.propertyCallReceiverMismatch`) and is
+  **not** bytecode-equal: it loads `"call"` off the callee and depends on
+  `Function.prototype.call`.
 * **`staticBlock` is never claimed** (§11.1 lists it).
 * **A `switch`'s compare chain is not folded.** §9.3 measured only 1140 real
   jump tables against a majority of compare chains; folding the chain into one
@@ -454,6 +494,35 @@ representative.
 ### 8.2 In other layers, found while building this one
 
 Reported, not fixed.
+
+* **`src/emit/index.mjs` emits a closure in an argument position as a hoisted
+  function declaration plus a name, which changes evaluation order.**
+  `resolveFn(ctx, e, 'expression')` returns `t.identifier(n)` and the unit is
+  emitted as a sibling `function` declaration, so its `CreateClosure` moves to
+  the top of the enclosing body. `VisitCall:6738` evaluates the callee in its
+  `switch` and only then calls `VisitArguments`, so a callee and a closure
+  argument swap order. The minimal case, `p_preload_ex.jsc` sfi 4126
+  (`return qe(this, function () { … })`):
+
+  ```diff
+  - LdaImmutableContextSlot <context> [137] [2]   ; the callee, first
+  + CreateClosure K(<SharedFunctionInfo #*>) FB[*] #2   ; the argument, first
+    Star R0
+  - CreateClosure K(<SharedFunctionInfo #*>) FB[*] #2
+  + LdaUndefined
+    Star R1
+  - CallUndefinedReceiver2 R0 <this> R1 FB[*]
+  + CallUndefinedReceiver2 R1 <this> R0 FB[*]
+  ```
+
+  This is the whole of O1's `operand-order` family. T7's output is already
+  right — `{e:'call', callee:<the context slot>, args:[{e:'this'}, {e:'fn'}]}`
+  — so the fix is to emit a `FunctionExpression` in the argument position when
+  the closure has one reference, which is `src/emit/index.mjs`'s call.
+* **Emitting a class member needs one unit's statements inside another unit.**
+  `resolveClass` builds `members` only from `{e:'class'}.members`, so a class
+  field (which lives in its own `kClassMembersInitializerFunction` SFI) and a
+  static block cannot be placed even when T7 can identify them. See §8.1.
 
 * **`src/profile` has `runtimeId(name)` but no `intrinsicId(name)`.** The
   intrinsic table is exposed id → name only (`intrinsicName`, `intrinsic`),

@@ -251,62 +251,123 @@ export function transcribe(cx, v) {
     }
 
     // ----------------------------------------- properties: VisitPropertyLoad
+    //
+    // `objValue` is the SSA value of the register the load read its object
+    // out of, carried alongside the already-resolved `obj` expression. It is
+    // what makes a property CALL recoverable as `o.m(x)` rather than
+    // `o.m.call(o, x)`: VisitCall:6738's NAMED_PROPERTY_CALL /
+    // KEYED_PROPERTY_CALL / PRIVATE_CALL cases push the object into the
+    // argument list first (`VisitAndPushIntoRegisterList(property->obj())`,
+    // :6782) and then load the callee OUT OF THAT REGISTER
+    // (`VisitPropertyLoadForRegister(args.last_register(), ...)`, :6638), so
+    // for a real property call the receiver register and the load's object
+    // register hold the same value, and the CallProperty* branch below can
+    // check that instead of assuming it. Without the field the check read
+    // `undefined` and never held, so every property call in the corpus came
+    // back as `.call(recv, ...)`.
     case 'GetNamedProperty': {
       const c = firstConst();
       if (c?.t !== 'string') return expr(hole('namedPropertyKeyNotAString', at(), at()));
-      return expr({ e: 'member', obj: E(reg1(0)), prop: c.v, computed: false, optional: false });
+      return expr({ e: 'member', obj: E(reg1(0)), objValue: reg1(0), prop: c.v, computed: false, optional: false });
     }
     case 'GetNamedPropertyFromSuper': {
       const c = operands.find((o, i) => o.type === 'kConstantPoolIndex')?.constant;
       if (c?.t !== 'string') return expr(hole('superPropertyKeyNotAString', at(), at()));
-      return expr({ e: 'member', obj: { e: 'super' }, prop: c.v, computed: false, optional: false, homeObject: E(reg1(0)) });
+      // VisitNamedSuperPropertyLoad:6646: the REGISTER operand holds `this`
+      // (`BuildThisVariableLoad` -> `StoreAccumulatorInRegister(receiver)`)
+      // and the home object is in the ACCUMULATOR. So the register is the
+      // receiver -- which is also what VisitCall:6837 copies into the
+      // argument list for a `super.m()` call, so `objValue` is right here too.
+      return expr({
+        e: 'member', obj: { e: 'super' }, prop: c.v, computed: false, optional: false,
+        objValue: reg1(0), homeObject: E(acc),
+      });
     }
     case 'GetKeyedProperty':
-      return expr({ e: 'member', obj: E(reg1(0)), prop: E(acc), computed: true, optional: false });
+      return expr({ e: 'member', obj: E(reg1(0)), objValue: reg1(0), prop: E(acc), computed: true, optional: false });
     case 'GetEnumeratedKeyedProperty':
       // VisitForInStatement's body load: obj[key] with the enum cache attached.
-      return expr({ e: 'member', obj: E(reg1(0)), prop: E(acc), computed: true, optional: false });
+      return expr({ e: 'member', obj: E(reg1(0)), objValue: reg1(0), prop: E(acc), computed: true, optional: false });
 
-    case 'SetNamedProperty':
-    case 'DefineNamedOwnProperty': {
+    case 'SetNamedProperty': {
       const c = firstConst();
       const target = c?.t === 'string'
-        ? { e: 'member', obj: E(reg1(0)), prop: c.v, computed: false, optional: false }
+        ? { e: 'member', obj: E(reg1(0)), objValue: reg1(0), prop: c.v, computed: false, optional: false }
         : hole('namedStoreKeyNotAString', at(), at());
       return stmt({
         s: 'expr', pos, values: [v.id],
-        expr: { e: 'assign', op: '=', target, value: E(acc), define: op !== 'SetNamedProperty' },
+        expr: { e: 'assign', op: '=', target, value: E(acc), define: false },
       });
     }
     case 'SetKeyedProperty':
+      return stmt({
+        s: 'expr', pos, values: [v.id],
+        expr: {
+          e: 'assign', op: '=',
+          target: { e: 'member', obj: E(reg1(0)), objValue: reg1(0), prop: E(reg1(1)), computed: true, optional: false },
+          value: E(acc), define: false,
+        },
+      });
+
+    // ------------------------------------------- the Define* / Sta* stores
+    //
+    // These reach this transcription only when NO pattern consumed them, and
+    // that is a refusal, not an assignment. `Define*OwnProperty` creates an
+    // OWN data property and ignores a setter anywhere on the prototype chain;
+    // `Set*Property` walks the chain and calls one. They are different
+    // programs, so emitting `o.x = v` for a Define* is not an approximation of
+    // the source -- it is a different source.
+    //
+    // There is also no `o.x = v` that compiles BACK to a Define* form. At
+    // 14.4.258.16 the generator emits them from exactly these places:
+    //
+    //   DefineNamedOwnProperty            BuildClassProperty:3908  (receiver)
+    //                                     VisitObjectLiteral:4281  (literal reg)
+    //   DefineKeyedOwnProperty            BuildClassProperty:3930  (receiver)
+    //                                     VisitObjectLiteral:4285  (literal reg)
+    //                                     BuildPrivateBrandInitialization:4005
+    //   DefineKeyedOwnPropertyInLiteral   VisitObjectLiteral:4406
+    //   StaInArrayLiteral                 BuildCreateArrayLiteral:4605,:4643
+    //                                     BuildFillArrayWithIterator:4500
+    //                                     BuildDestructuringArrayAssignment:5596
+    //
+    // Every one of them is INSIDE a literal or a class body, so the only
+    // source form is the literal or the class member that literals.mjs /
+    // accessor.mjs / spread.mjs fold it into. If the fold did not fire there
+    // is no text to write, and a hole says so (docs/RECOVER.md 6) instead of
+    // changing the program.
+    //
+    // The receiver tells the two kinds of site apart with no guessing: the
+    // class sites target `builder()->Receiver()` and the literal sites target
+    // a freshly allocated temporary, which is never the receiver register.
+    case 'DefineNamedOwnProperty':
     case 'DefineKeyedOwnProperty':
-      return stmt({
-        s: 'expr', pos, values: [v.id],
-        expr: {
-          e: 'assign', op: '=',
-          target: { e: 'member', obj: E(reg1(0)), prop: E(reg1(1)), computed: true, optional: false },
-          value: E(acc), define: op !== 'SetKeyedProperty',
-        },
-      });
-    case 'StaInArrayLiteral':
-      return stmt({
-        s: 'expr', pos, values: [v.id],
-        expr: {
-          e: 'assign', op: '=',
-          target: { e: 'member', obj: E(reg1(0)), prop: E(reg1(1)), computed: true, optional: false },
-          value: E(acc), define: true, inArrayLiteral: true,
-        },
-      });
     case 'DefineKeyedOwnPropertyInLiteral':
-      // BuildLoadPropertyKey + the object-literal computed-key path.
+    case 'StaInArrayLiteral': {
+      const objE = E(reg1(0));
+      const keyC = firstConst();
+      const key = keyC?.t === 'string' ? JSON.stringify(keyC.v) : 'a computed key';
+      if (op !== 'StaInArrayLiteral' && objE?.e === 'this') {
+        return stmt({
+          s: 'hole', pos, values: [v.id],
+          why: 'classFieldOutsideItsClassBody',
+          detail: `${op} on the receiver defines the class field ${key} `
+            + '(BuildClassProperty:3908/:3930, reached only from '
+            + 'VisitInitializeClassMembersStatement:3935 or '
+            + 'VisitInitializeClassStaticElementsStatement:3942); a class field has no '
+            + 'spelling outside a class body, and this unit is emitted as a function',
+        });
+      }
       return stmt({
-        s: 'expr', pos, values: [v.id],
-        expr: {
-          e: 'assign', op: '=',
-          target: { e: 'member', obj: E(reg1(0)), prop: E(reg1(1)), computed: true, optional: false },
-          value: E(acc), define: true, inLiteral: true,
-        },
+        s: 'hole', pos, values: [v.id],
+        why: op === 'StaInArrayLiteral'
+          ? 'arrayLiteralElementStoreNotFoldedIntoItsLiteral'
+          : 'ownPropertyDefinitionNotFoldedIntoItsLiteral',
+        detail: `${op} of ${key} into ${objE?.e ?? 'an unknown value'}; the only source form is the `
+          + 'literal it belongs to and no fold claimed it, so there is no assignment to write '
+          + '(Set*Property would walk the prototype chain and is a different program)',
       });
+    }
 
     // ---------------------------------------------------- VisitDelete
     case 'DeletePropertyStrict':
@@ -397,13 +458,34 @@ export function transcribe(cx, v) {
       const receiver = all.length ? all[0] : null;
       const args = all.slice(1).map((id) => E(id));
       const calleeExpr = E(callee);
-      // VisitCall for a property call loads the callee out of the receiver
-      // register, so `o.m()` has callee = member(obj=<the receiver's value>).
-      // Check that rather than assume it: if the receiver is a different SSA
-      // value, the shape is `f.call(recv, ...)`-like and is reported.
+      // VisitCall:6738, cases NAMED_PROPERTY_CALL / KEYED_PROPERTY_CALL /
+      // PRIVATE_CALL (:6782) and the two optional-chain forms (:6854): the
+      // object is pushed into the argument list as the receiver and the callee
+      // is then loaded OUT OF THAT REGISTER
+      // (`VisitPropertyLoadForRegister`, :6638). The super forms (:6837,
+      // :6844) copy the receiver `VisitNamedSuperPropertyLoad:6646` already
+      // loaded `this` into. So for every CallProperty* the generator can emit
+      // from a source-level property call, the receiver register and the
+      // callee's object register hold the SAME value -- which is exactly the
+      // check below, and `GetNamedProperty`'s `objValue` is what makes it
+      // answerable.
       if (calleeExpr?.e === 'member' && cx.sameValue(calleeExpr.objValue, receiver)) {
         return { kind: 'expr', expr: { e: 'call', callee: calleeExpr, args, optional: false } };
       }
+      // The residue, after patterns/calls.mjs has claimed every call whose
+      // callee register was STRUCTURALLY loaded out of its receiver register.
+      // `callee.call(receiver, ...)` is not what the source said -- it loads
+      // `"call"` off the callee and leans on `Function.prototype.call` -- and
+      // it is reported as such (`note`, counted in stats.notes). It is kept
+      // rather than turned into a hole because the measured residue is not
+      // "unknowable": it is dominated by a callee that crosses a suspend
+      // point, where the callee IS the receiver's property and only T7's SSA
+      // cannot see it, because a `ResumeGenerator` projection restores the
+      // spilled register as a new value (docs/RECOVER.md 2.1). Making it a
+      // hole deleted the `await` from `arr.push(await p)` -- caught by
+      // `tools/emit/selftest.mjs` D async-await-in-loop. Measured residue
+      // after calls.mjs: 1 of 374 property calls in
+      // `r_19252.jsc` + `r_89889.jsc`.
       return {
         kind: 'expr',
         expr: {
@@ -421,12 +503,26 @@ export function transcribe(cx, v) {
       const rest = all.slice(1);
       const args = rest.map((id, i) => (i === rest.length - 1 ? { spread: E(id) } : E(id)));
       const calleeExpr = E(callee);
-      const useMember = calleeExpr?.e === 'member' && cx.sameValue(calleeExpr.objValue, receiver);
+      // Same receiver rule as CallProperty* (VisitCall:6738). The receiver is
+      // args[0] either because the call is a property call (:6782) or because
+      // `BuildPushUndefinedIntoRegisterList` pushed `undefined` for a global /
+      // other call that has a spread (:6786, :6830) -- in which case the
+      // callee is not a member of it and `f(...xs)` is the whole shape.
+      if (calleeExpr?.e === 'member' && cx.sameValue(calleeExpr.objValue, receiver)) {
+        return { kind: 'expr', expr: { e: 'call', callee: calleeExpr, args, optional: false } };
+      }
+      // `BuildPushUndefinedIntoRegisterList` pushes `undefined` as the
+      // receiver for a global / other call that carries a spread, so an
+      // undefined receiver means the callee is not a member of it and
+      // `f(...xs)` is the whole shape.
+      const recvExpr = receiver === null ? null : E(receiver);
+      if (recvExpr && recvExpr.e === 'lit' && recvExpr.v === undefined) {
+        return { kind: 'expr', expr: { e: 'call', callee: calleeExpr, args, optional: false } };
+      }
       return {
         kind: 'expr',
-        expr: useMember
-          ? { e: 'call', callee: calleeExpr, args, optional: false }
-          : { e: 'call', callee: calleeExpr, args, optional: false, receiver: E(receiver) },
+        expr: { e: 'call', callee: calleeExpr, args, optional: false, receiver: recvExpr },
+        note: 'spreadCallReceiverMismatch',
       };
     }
     case 'Construct': {
