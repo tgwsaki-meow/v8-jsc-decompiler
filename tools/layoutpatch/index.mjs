@@ -582,8 +582,44 @@ async function main() {
   // the whole point of the tool now: a second derivation, written separately
   // from profilegen's, reading the same pinned sources.
   const crossChecks = [];
+  /**
+   * Compare two derivations by their DATA, not by their JSON text.
+   *
+   * `JSON.stringify(a) === JSON.stringify(b)` made this oracle report three
+   * false failures, and a cross-check that cries wolf is worse than none:
+   *
+   *   * **key order.** `HashTableBase` came out as
+   *     `{numberOfElementsIndex,...,source,note}` here and
+   *     `{source,numberOfElementsIndex,...}` in the profile. Every value was
+   *     identical.
+   *   * **prose.** `BigIntBase` and `SourcePosition` differed only in the
+   *     wording of their `note` -- "is an UnalignedValueMember<digit_t>
+   *     flexible array" against "is a FLEXIBLE_ARRAY_MEMBER of
+   *     UnalignedValueMember<digit_t>", which say the same thing. A `note` is
+   *     documentation for a human; two independent readers agreeing on every
+   *     number and explaining it differently is agreement.
+   *
+   * So: keys sorted, and the documentation-only fields dropped. Anything that
+   * is a layout fact is still compared exactly.
+   */
+  const PROSE_KEYS = new Set(['note', 'comment', 'why', 'doc']);
+  const canon = (x) => {
+    if (Array.isArray(x)) return x.map(canon);
+    if (x === null || typeof x !== 'object') return x;
+    const out = {};
+    for (const k of Object.keys(x).sort()) {
+      if (PROSE_KEYS.has(k)) continue;
+      out[k] = canon(x[k]);
+    }
+    return out;
+  };
   const addCheck = (what, mine, theirs) => {
-    crossChecks.push({ what, agrees: JSON.stringify(mine) === JSON.stringify(theirs), mine, profile: theirs });
+    crossChecks.push({
+      what,
+      agrees: JSON.stringify(canon(mine)) === JSON.stringify(canon(theirs)),
+      mine,
+      profile: theirs,
+    });
   };
   const pc = profile.constants.codeCacheHeader ?? {};
   addCheck('codeCache.magicBase', codeCache.magicBase, pc.magicBase);

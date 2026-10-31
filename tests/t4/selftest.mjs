@@ -78,9 +78,29 @@ function sourceFiles() {
   return out.sort();
 }
 
+/**
+ * Read a source file for analysis, with line endings normalised to LF.
+ *
+ * Not cosmetic. JavaScript's `.` does not match `\r`, so on a CRLF checkout
+ * `line.replace(/\/\/.*$/, '')` fails to match at all -- `.*` stops before the
+ * `\r` and then `$` cannot be satisfied -- and the line comment is NOT
+ * stripped. Every numeric literal inside a header comment then gets flagged as
+ * unjustified. Measured: this check passed on ubuntu-latest and failed on
+ * windows-latest in the same CI run, reporting 7 literals in
+ * `src/cache/deserialize.mjs`, `header.mjs`, `handlertable.mjs` and
+ * `roref.mjs` that are all inside comments.
+ *
+ * `.gitattributes` now normalises the working tree as well, which stops this
+ * happening to the next reader; this function is the half that does not depend
+ * on a checkout being configured correctly.
+ */
+function readSource(rel) {
+  return fs.readFileSync(rel, 'utf8').replace(/\r\n?/g, '\n');
+}
+
 /** Lines with code, block comments removed, line comments kept for the marker. */
 function codeLines(rel) {
-  return fs.readFileSync(rel, 'utf8')
+  return readSource(rel)
     .replace(/\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, ' '))
     .split('\n');
 }
@@ -135,7 +155,7 @@ check('literals', 'the allowlisted file contains nothing but hash mixing constan
 check('literals', 'no file reaches into profiles/ or layouts-overlay/ by name', () => {
   const bad = [];
   for (const rel of sourceFiles()) {
-    const text = fs.readFileSync(rel, 'utf8');
+    const text = readSource(rel);
     // A version tag spelled out in code would defeat the whole arrangement.
     const tags = [...text.matchAll(/(?<![\w.])\d+\.\d+\.\d+\.\d+(?![\w.])/g)].map((m) => m[0]);
     const inComment = (tag) => text.split('\n').filter((l) => l.includes(tag)).every((l) => /^\s*(\/\/|\*|\/\*)/.test(l));

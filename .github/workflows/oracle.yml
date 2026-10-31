@@ -51,11 +51,35 @@ jobs:
           path: .v8bin-cache
           key: v8bin-linux-14.4.258.16-electron40-v1
 
-      - name: fetch d8 14.4.258.16 (linux64)
-        run: node tools/oracle/fetch_v8_binary.mjs --platform linux64 --version 14.4.258.16
+      # Both CLIs are positional/flag forms taken from the scripts' own usage
+      # lines, not guessed: `--get <platform-channel> <version> [--unzip]` and
+      # `<version> <platform>`. The platform is `linux64-rel`, with the channel
+      # suffix -- the bucket has no bare `linux64`.
+      - name: fetch d8 14.4.258.16 (linux64-rel)
+        run: node tools/oracle/fetch_v8_binary.mjs --get linux64-rel 14.4.258.16 --unzip
 
-      - name: fetch Electron 40.0.0 (linux-x64)
-        run: node tools/oracle/fetch_electron.mjs --version 40.0.0 --platform linux-x64
+      # This extracts only v8_context_snapshot.bin and snapshot_blob.bin, which
+      # is all the read-only table needs. It does NOT give an electron
+      # executable, so nothing here mints a .jsc with Electron.
+      - name: fetch Electron 40.0.0's snapshots (linux-x64)
+        run: node tools/oracle/fetch_electron.mjs 40.0.0 linux-x64
+
+      # tests/t4/acceptance.mjs mints its .jsc with the RUNNING node and
+      # therefore needs a profile for the running node's V8, built with
+      # kTaggedSize=8 -- that build has no pointer compression, so the
+      # corpus profile's layouts do not describe it (docs/FRONTEND.md 7).
+      # profiles-local/ is gitignored because it is one command, and this is
+      # that command, with the version read from the runtime rather than
+      # written down.
+      - name: generate the local profile for this runner's node
+        run: |
+          set -euo pipefail
+          V8=$(node -p "process.versions.v8.split('-')[0]")
+          echo "this node runs V8 $V8"
+          node tools/profilegen/index.mjs --tag "$V8" --variant intl+wasm \
+            --tagged-size 8 --out profiles-local/
+          node tools/layoutpatch/index.mjs --tag "$V8" \
+            --profiles profiles-local --out layouts-overlay-local
 
       # profiles/14.4.258.16/ro-heap.json is committed, but regenerating it here
       # proves the claim docs/ARCHITECTURE.md 3.6 rests on: the table is a
@@ -69,8 +93,10 @@ jobs:
           set -euo pipefail
           node tools/profilegen/index.mjs --tag 14.4.258.16 --variant intl+wasm \
             --tagged-size 4 --out /tmp/profiles-ci
+          BLOB=$(find .v8bin-cache -name v8_context_snapshot.bin | head -1)
+          echo "using snapshot $BLOB"
           node tools/oracle/gen_ro_heap.mjs \
-            --blob .v8bin-cache/electron-v40.0.0-linux-x64/v8_context_snapshot.bin \
+            --blob "$BLOB" \
             --static-roots .v8src-cache/14.4.258.16/src/roots/static-roots-intl-wasm.h \
             --tag 14.4.258.16 --variant intl-wasm \
             --out /tmp/ro-heap-ci.json --report /tmp/ro-heap-ci.txt

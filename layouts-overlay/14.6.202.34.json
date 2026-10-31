@@ -5,7 +5,7 @@
   "name": "layoutpatch",
   "version": "1.0.0"
  },
- "generatedAt": "2026-10-30T03:46:42.311Z",
+ "generatedAt": "2026-10-31T08:10:48.935Z",
  "why": "an independent second derivation of the build facts in profiles/<tag>/, from the same pinned V8 sources, kept as a cross-check oracle. Nothing reads this file: since the profilegen back-port (ARCHITECTURE.md 9.9) src/cache/overlay.mjs builds the same view out of the profile itself.",
  "profile": {
   "dir": "profiles\\14.6.202.34",
@@ -335,7 +335,7 @@
   },
   {
    "what": "cppLayouts.BigIntBase",
-   "agrees": false,
+   "agrees": true,
    "mine": {
     "source": "src/objects/bigint.h",
     "parent": "PrimitiveHeapObject",
@@ -383,7 +383,7 @@
   },
   {
    "what": "cppLayouts.HashTableBase",
-   "agrees": false,
+   "agrees": true,
    "mine": {
     "numberOfElementsIndex": 0,
     "numberOfDeletedElementsIndex": 1,
@@ -403,7 +403,7 @@
   },
   {
    "what": "cppLayouts.SourcePosition",
-   "agrees": false,
+   "agrees": true,
    "mine": {
     "source": "src/codegen/source-position.h",
     "fields": {
@@ -2151,15 +2151,26 @@
     "kArrayIndexValueBits": "Name::kArrayIndexValueBits",
     "kDoesNotContainCachedArrayIndexMask": "Name::kDoesNotContainCachedArrayIndexMask"
    },
-   "fields": [],
+   "fields": [
+    {
+     "name": "length",
+     "type": "int32",
+     "kind": "int",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 8
+    }
+   ],
    "crossCheck": {
-    "issues": [
-     "profile has fields this reader did not find: length"
-    ],
+    "issues": [],
     "added": [],
-    "compared": 0,
+    "compared": 1,
     "profileFieldCount": 1,
-    "overlayFieldCount": 0
+    "overlayFieldCount": 1
    }
   },
   "ConsString": {
@@ -2179,7 +2190,7 @@
    },
    "fields": [
     {
-     "name": "second",
+     "name": "first",
      "type": "String",
      "kind": "tagged",
      "size": 4,
@@ -2189,17 +2200,26 @@
      "present": true,
      "gatedOn": null,
      "offset": 12
+    },
+    {
+     "name": "second",
+     "type": "String",
+     "kind": "tagged",
+     "size": 4,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 16
     }
    ],
    "crossCheck": {
-    "issues": [
-     "second: offset 16 vs 12",
-     "profile has fields this reader did not find: first"
-    ],
+    "issues": [],
     "added": [],
-    "compared": 1,
+    "compared": 2,
     "profileFieldCount": 2,
-    "overlayFieldCount": 1
+    "overlayFieldCount": 2
    }
   },
   "ExternalString": {
@@ -3057,7 +3077,7 @@
    },
    "fields": [
     {
-     "name": "inobject_properties_start_or_constructor_function_index",
+     "name": "instance_size_in_words",
      "type": "uint8",
      "kind": "int",
      "size": 1,
@@ -3069,7 +3089,7 @@
      "offset": 4
     },
     {
-     "name": "used_or_unused_instance_size_in_words",
+     "name": "inobject_properties_start_or_constructor_function_index",
      "type": "uint8",
      "kind": "int",
      "size": 1,
@@ -3081,7 +3101,7 @@
      "offset": 5
     },
     {
-     "name": "visitor_id",
+     "name": "used_or_unused_instance_size_in_words",
      "type": "uint8",
      "kind": "int",
      "size": 1,
@@ -3093,6 +3113,18 @@
      "offset": 6
     },
     {
+     "name": "visitor_id",
+     "type": "uint8",
+     "kind": "int",
+     "size": 1,
+     "sizeHow": "observed-in-profile",
+     "conditional": false,
+     "indexed": false,
+     "present": true,
+     "gatedOn": null,
+     "offset": 7
+    },
+    {
      "name": "instance_type",
      "type": "InstanceType",
      "kind": "tagged",
@@ -3102,7 +3134,7 @@
      "indexed": false,
      "present": true,
      "gatedOn": null,
-     "offset": 7
+     "offset": 8
     },
     {
      "name": "bit_field",
@@ -3114,7 +3146,7 @@
      "indexed": false,
      "present": true,
      "gatedOn": null,
-     "offset": 11
+     "offset": 12
     },
     {
      "name": "bit_field2",
@@ -3126,7 +3158,7 @@
      "indexed": false,
      "present": true,
      "gatedOn": null,
-     "offset": 12
+     "offset": 13
     },
     {
      "name": "bit_field3",
@@ -3138,7 +3170,7 @@
      "indexed": false,
      "present": true,
      "gatedOn": null,
-     "offset": 13
+     "offset": 14
     },
     {
      "name": "optional_padding",
@@ -3168,7 +3200,7 @@
       "sense": "ifnot",
       "flag": "TAGGED_SIZE_8_BYTES"
      },
-     "offset": 17
+     "offset": 18
     },
     {
      "name": "prototype",
@@ -3180,7 +3212,7 @@
      "indexed": false,
      "present": true,
      "gatedOn": null,
-     "offset": 17
+     "offset": 18
     },
     {
      "name": "constructor_or_back_pointer_or_native_context",
@@ -3192,7 +3224,7 @@
      "indexed": false,
      "present": true,
      "gatedOn": null,
-     "offset": 21
+     "offset": 22
     },
     {
      "name": "instance_descriptors",
@@ -3207,7 +3239,7 @@
       "sense": "if",
       "flag": "V8_ENABLE_WEBASSEMBLY"
      },
-     "offset": 25
+     "offset": 26
     },
     {
      "name": "instance_descriptors",
@@ -3237,7 +3269,7 @@
       "sense": "if",
       "flag": "V8_ENABLE_WEBASSEMBLY"
      },
-     "offset": 29
+     "offset": 30
     },
     {
      "name": "dependent_code",
@@ -3264,7 +3296,7 @@
      "indexed": false,
      "present": true,
      "gatedOn": null,
-     "offset": 33
+     "offset": 34
     },
     {
      "name": "transitions_or_prototype_info",
@@ -3276,31 +3308,15 @@
      "indexed": false,
      "present": true,
      "gatedOn": null,
-     "offset": 37
+     "offset": 38
     }
    ],
    "crossCheck": {
-    "issues": [
-     "inobject_properties_start_or_constructor_function_index: offset 5 vs 4",
-     "used_or_unused_instance_size_in_words: offset 6 vs 5",
-     "visitor_id: offset 7 vs 6",
-     "instance_type: offset 8 vs 7",
-     "bit_field: offset 12 vs 11",
-     "bit_field2: offset 13 vs 12",
-     "bit_field3: offset 14 vs 13",
-     "optional_padding: offset 18 vs 17",
-     "prototype: offset 18 vs 17",
-     "constructor_or_back_pointer_or_native_context: offset 22 vs 21",
-     "instance_descriptors: offset 26 vs 25",
-     "dependent_code: offset 30 vs 29",
-     "prototype_validity_cell: offset 34 vs 33",
-     "transitions_or_prototype_info: offset 38 vs 37",
-     "profile has fields this reader did not find: instance_size_in_words"
-    ],
+    "issues": [],
     "added": [],
-    "compared": 14,
+    "compared": 15,
     "profileFieldCount": 15,
-    "overlayFieldCount": 17
+    "overlayFieldCount": 18
    }
   }
  },
@@ -3973,13 +3989,11 @@
     "source": "src/objects/string.tq",
     "lost": [],
     "crossCheck": {
-     "issues": [
-      "profile has fields this reader did not find: length"
-     ],
+     "issues": [],
      "added": [],
-     "compared": 0,
+     "compared": 1,
      "profileFieldCount": 1,
-     "overlayFieldCount": 0
+     "overlayFieldCount": 1
     }
    },
    {
@@ -3987,14 +4001,11 @@
     "source": "src/objects/string.tq",
     "lost": [],
     "crossCheck": {
-     "issues": [
-      "second: offset 16 vs 12",
-      "profile has fields this reader did not find: first"
-     ],
+     "issues": [],
      "added": [],
-     "compared": 1,
+     "compared": 2,
      "profileFieldCount": 2,
-     "overlayFieldCount": 1
+     "overlayFieldCount": 2
     }
    },
    {
@@ -4182,27 +4193,11 @@
     "source": "src/objects/map.tq",
     "lost": [],
     "crossCheck": {
-     "issues": [
-      "inobject_properties_start_or_constructor_function_index: offset 5 vs 4",
-      "used_or_unused_instance_size_in_words: offset 6 vs 5",
-      "visitor_id: offset 7 vs 6",
-      "instance_type: offset 8 vs 7",
-      "bit_field: offset 12 vs 11",
-      "bit_field2: offset 13 vs 12",
-      "bit_field3: offset 14 vs 13",
-      "optional_padding: offset 18 vs 17",
-      "prototype: offset 18 vs 17",
-      "constructor_or_back_pointer_or_native_context: offset 22 vs 21",
-      "instance_descriptors: offset 26 vs 25",
-      "dependent_code: offset 30 vs 29",
-      "prototype_validity_cell: offset 34 vs 33",
-      "transitions_or_prototype_info: offset 38 vs 37",
-      "profile has fields this reader did not find: instance_size_in_words"
-     ],
+     "issues": [],
      "added": [],
-     "compared": 14,
+     "compared": 15,
      "profileFieldCount": 15,
-     "overlayFieldCount": 17
+     "overlayFieldCount": 18
     }
    }
   ],

@@ -1,0 +1,38 @@
+# Normalise line endings in the repository to LF, and check out text files with
+# LF on every platform.
+#
+# `eol=lf` rather than the default `text=auto` (which checks out CRLF on
+# Windows) because several checks in this project read their own source files
+# and reason about lines, and JavaScript's `.` does not match `\r`. Measured:
+# `tests/t4/selftest.mjs`'s literal-justification check passed on
+# ubuntu-latest and failed on windows-latest in the same CI run, because
+# `line.replace(/\/\/.*$/, '')` silently matches nothing when the line ends
+# `\r` -- so every numeric literal inside a header comment was reported as
+# unjustified. The checks have been made line-ending agnostic as well; this
+# file is the half that keeps the working tree consistent in the first place.
+* text=auto eol=lf
+
+# Binary: never touch, never diff as text.
+*.jsc      binary
+*.bin      binary
+*.dat      binary
+*.zip      binary
+*.png      binary
+
+# Generated per-version tables. Diffing them line by line is rarely what anyone
+# wants -- they are regenerated wholesale by tools/profilegen -- but keeping
+# them as text means `git log -p` still works when a field really does move.
+profiles/**/*.json      text eol=lf
+layouts-overlay/*.json  text eol=lf
+
+# Keep the shell scripts' endings right for the shell that runs them.
+*.ps1      text eol=crlf
+*.sh       text eol=lf
+*.mjs      text eol=lf
+*.js       text eol=lf
+*.cjs      text eol=lf
+*.json     text eol=lf
+*.md       text eol=lf
+*.yml      text eol=lf
+*.h        text eol=lf
+*.cc       text eol=lf

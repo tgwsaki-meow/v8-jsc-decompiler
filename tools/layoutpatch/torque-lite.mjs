@@ -292,9 +292,35 @@ function parseClassBody(body, className) {
       annotations.push({ name: am[1], arg: am[2] ? am[2].slice(1, -1) : null });
       rest = rest.slice(am[0].length);
     }
+    // A member introduced by a keyword is not a field. This has to be tested
+    // BEFORE the "what follows the name" rule below, because that rule looks
+    // at the character after the FIRST identifier and a method's first
+    // identifier is the keyword: in `macro StringInstanceType(): ...` the
+    // character after `macro` is `S`, which is neither `(`, `<` nor `{`, so
+    // the declaration fell through to the field regex and threw.
+    //
+    // It only started throwing once splitTopLevel learned to end a
+    // declaration at the `}` of a method body. Before that the method and the
+    // field after it arrived glued together, the pair happened to start with
+    // `macro StringInstanceType(` -- so the `(` rule skipped it -- and the
+    // field was silently lost. That is where `String.length`,
+    // `ConsString.first` and `Map.instance_size_in_words` went. Fixing the
+    // splitter turned a silent omission into a loud failure, which is the
+    // right direction, and this is the other half of the fix.
+    //
+    // Keywords from `src/torque/torque-parser.cc`'s `classBody` /
+    // `classMethod` productions.
+    const MEMBER_KEYWORDS = /^(transitioning|macro|operator|builtin|extern|javascript|generates|labels|intrinsic)\b/;
+    if (MEMBER_KEYWORDS.test(rest)) continue;
+
     const km = /^(const|weak)\s+/.exec(rest);
     const qualifiers = [];
     if (km) { qualifiers.push(km[1]); rest = rest.slice(km[0].length); }
+
+    // `const kFoo: constexpr int31 = 5` is a class CONSTANT, not a field: it
+    // occupies no object slot. `const length: int32` is a field with a const
+    // qualifier. The initialiser is what tells them apart.
+    if (qualifiers.includes('const') && /(^|[^=!<>])=([^=]|$)/.test(rest)) continue;
 
     // Per src/torque/torque-parser.cc `Symbol classField`, a field is
     //   name ('?')? ('[' expr ']')? ':' type
