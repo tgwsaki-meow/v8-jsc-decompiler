@@ -18,7 +18,7 @@ import { resolveMinter, matchingBytecodeEngine, findElectron, findD8 } from '../
 import { o1One, o1Summary, o1SelfCheck } from '../../../src/verify/o1_bytecode.mjs';
 import { o2One, o2Summary, o2Control } from '../../../src/verify/o2_fixpoint.mjs';
 import { o3One, o3Summary, o3SelfCheck } from '../../../src/verify/o3_behaviour.mjs';
-import { pipelineId } from '../../../src/verify/pipeline.mjs';
+import { pipelineId, pipelineChoice } from '../../../src/verify/pipeline.mjs';
 
 const argv = process.argv.slice(2);
 const val = (f, d) => { const i = argv.indexOf(f); return i >= 0 ? argv[i + 1] : d; };
@@ -92,6 +92,8 @@ const result = {
   generatedAt: new Date().toISOString(),
   mode,
   pipeline: pipelineId(),
+  // 'default' means no run named a pipeline; the report says so out loud.
+  pipelineSource: pipelineChoice().source,
   minter: { label: opts.minter.label, v8: opts.minter.v8 },
   engine: String(opts.engine),
   electronFound: Boolean(findElectron()),

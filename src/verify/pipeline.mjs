@@ -8,10 +8,21 @@
 // perFunction is [{ index, name, code, bytes, loc }] for every top-level
 // function in the emitted text. That is what O1 pairs against V8's listing.
 //
-// Swapping the implementation (T4/T5/T6 land new layers):
-//   * default: src/decompiler.js  -> new V8Decompiler().decompileFile(path)
+// Choosing the implementation:
+//   * default: src/emit/decompile.mjs -> new V8Decompiler().decompileFile(path)
 //   * override: set V8D_PIPELINE=<module> (or pass {module}) where the module
 //     exports decompileFile(path) / decompile(path) / default
+//
+// The default used to name src/decompiler.js, the prototype BASELINE_AUDIT.md
+// condemned and legacy/README.md explains. Every run that did not set
+// V8D_PIPELINE therefore graded the wrong artefact, and docs/EMIT.md records
+// that happening: a liveness run came back tagged `pipeline:
+// src/decompiler.js` with `function func_1` in its output. Two things keep
+// that from recurring. loadPipeline() asserts the resolved module exists and
+// exports the shape it is about to use, so a stale default fails loudly
+// instead of measuring something else; and every row carries
+// `pipelineSource`, so a report can state whether anybody actually named what
+// was graded.
 //
 // A broken pipeline must not break a measurement run: every failure comes back
 // as a row with ok:false and a stage, and decompileInChild() turns a crash,
@@ -23,21 +34,46 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { parse } from '@babel/parser';
 
-export const DEFAULT_PIPELINE = 'src/decompiler.js';
+export const DEFAULT_PIPELINE = 'src/emit/decompile.mjs';
 const CHILD = path.resolve('src/verify/pipeline_child.mjs');
 
 export function pipelineId(moduleSpec) {
-  return moduleSpec ?? process.env.V8D_PIPELINE ?? DEFAULT_PIPELINE;
+  return pipelineChoice(moduleSpec).spec;
+}
+
+/**
+ * Which module will be graded, and who chose it. `source` is the whole point:
+ * 'default' means nobody named a pipeline, which is exactly the condition
+ * under which the old stale default went unnoticed.
+ * @returns {{spec: string, source: 'explicit'|'env'|'default'}}
+ */
+export function pipelineChoice(moduleSpec) {
+  if (moduleSpec) return { spec: moduleSpec, source: 'explicit' };
+  if (process.env.V8D_PIPELINE) return { spec: process.env.V8D_PIPELINE, source: 'env' };
+  return { spec: DEFAULT_PIPELINE, source: 'default' };
 }
 
 async function loadPipeline(moduleSpec) {
-  const spec = pipelineId(moduleSpec);
-  const url = new URL(`file:///${path.resolve(spec).replace(/\\/g, '/')}`);
+  const { spec, source } = pipelineChoice(moduleSpec);
+  const abs = path.resolve(spec);
+  // A default that has gone stale must fail here, not quietly grade whatever
+  // module still happens to sit at that path.
+  if (!fs.existsSync(abs)) {
+    throw new Error(`pipeline module ${spec} does not exist (resolved to ${abs}${source === 'default' ? '; this is the built-in default, so it is out of date' : ''})`);
+  }
+  const url = new URL(`file:///${abs.replace(/\\/g, '/')}`);
   const mod = await import(url.href);
-  if (spec === DEFAULT_PIPELINE || mod.V8Decompiler) {
+  if (mod.V8Decompiler) {
     const d = new mod.V8Decompiler();
+    // deserializeFile() is what fills in deserializedFunctions, metric 6's
+    // denominator. Losing it silently turns metric 6 into `null`, so the
+    // richer branch only engages when the whole shape is really there.
+    if (typeof d.deserializer?.deserializeFile !== 'function') {
+      throw new Error(`pipeline module ${spec} exports V8Decompiler but no .deserializer.deserializeFile`);
+    }
     return {
       spec,
+      source,
       run: (p) => {
         const res = d.decompileFile(p);
         return { code: res.code, totalFunctions: res.totalFunctions, header: res.header, fnCacheSize: d.fnCache?.size ?? null };
@@ -47,7 +83,7 @@ async function loadPipeline(moduleSpec) {
   }
   const fn = mod.decompileFile ?? mod.decompile ?? mod.default;
   if (typeof fn !== 'function') throw new Error(`pipeline module ${spec} exports no decompileFile/decompile/default`);
-  return { spec, run: (p) => { const r = fn(p); return typeof r === 'string' ? { code: r } : r; }, deserialize: null };
+  return { spec, source, run: (p) => { const r = fn(p); return typeof r === 'string' ? { code: r } : r; }, deserialize: null };
 }
 
 /** Split emitted text into its top-level functions. */
@@ -74,10 +110,11 @@ export async function decompile(jscPath, opts = {}) {
   try {
     pipe = await loadPipeline(opts.module);
   } catch (e) {
-    return { ok: false, stage: 'load', error: `${e.constructor.name}: ${e.message}`, pipeline: pipelineId(opts.module) };
+    const c = pipelineChoice(opts.module);
+    return { ok: false, stage: 'load', error: `${e.constructor.name}: ${e.message}`, pipeline: c.spec, pipelineSource: c.source };
   }
 
-  const row = { ok: false, pipeline: pipe.spec, jsc: jscPath, inputBytes: fs.statSync(jscPath).size };
+  const row = { ok: false, pipeline: pipe.spec, pipelineSource: pipe.source, jsc: jscPath, inputBytes: fs.statSync(jscPath).size };
   if (pipe.deserialize) {
     try {
       const d = pipe.deserialize(jscPath);
@@ -167,7 +204,8 @@ export function decompileInChild(jscPath, opts = {}) {
   return {
     ok: false,
     jsc: jscPath,
-    pipeline: pipelineId(opts.module),
+    pipeline: pipelineChoice(opts.module).spec,
+    pipelineSource: pipelineChoice(opts.module).source,
     stage: killed ? 'timeout' : 'crash',
     errorClass: killed ? 'TimeoutError' : 'ChildCrash',
     error: killed ? `killed after ${timeoutMs} ms` : `child exited ${r.status}${r.error ? ' ' + r.error.message : ''}`,

@@ -28,6 +28,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { spawnSync } from 'node:child_process';
+// The pipeline label is asked for, never written down here: a second copy of
+// the default's name is how the report came to claim it had measured
+// `src/decompiler.js` long after that stopped being the pipeline.
+import { pipelineChoice } from '../../src/verify/pipeline.mjs';
 
 const argv = process.argv.slice(2);
 const has = (f) => argv.includes(f);
@@ -217,7 +221,8 @@ say('| | |');
 say('|---|---|');
 say(`| generated | ${new Date().toISOString()} |`);
 say(`| mode | \`--${mode}\` (${(wallMs / 1000).toFixed(0)} s wall) |`);
-say(`| pipeline under test | \`${ft && !ft._failed ? ft.pipeline : (process.env.V8D_PIPELINE ?? 'src/decompiler.js')}\` |`);
+const choice = pipelineChoice();
+say(`| pipeline under test | \`${ft && !ft._failed ? ft.pipeline : choice.spec}\`${(ft && !ft._failed ? ft.pipelineSource : choice.source) === 'default' ? ' (nobody named one: `src/verify/pipeline.mjs` default)' : ''} |`);
 say(`| emitted-JS side of metrics 1-3 | ${outputsFrom === 'stored' ? '`decompiled_js/` (the archive)' : 'a fresh decompile of each sampled input'} |`);
 say(`| .jsc minter | ${ft && !ft._failed ? `${ft.minter.label} (V8 ${ft.minter.v8 ?? '?'})` : 'n/a'} |`);
 say(`| bytecode engine | ${ft && !ft._failed ? path.basename(ft.engine) : 'n/a'} |`);
