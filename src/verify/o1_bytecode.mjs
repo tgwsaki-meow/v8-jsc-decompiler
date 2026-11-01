@@ -274,11 +274,20 @@ export function o1Identity(entry, opts = {}) {
  *
  * Discrimination tries mutation candidates until one is visible in the
  * bytecode, and records the ones that were not. That list is not noise -- it
- * is O1's blind spot, measured: V8 prints an array or object literal as
+ * is this path's blind spot, measured: V8 prints an array or object literal as
  * `<ArrayBoilerplateDescription PACKED_SMI_ELEMENTS, <FixedArray[3]>>` and
  * never prints the element values, on either engine (verified in
  * tools/probes/probe_pool.mjs), so a change confined to literal element values
- * does not appear in any listing. O3 sees those; O1 cannot.
+ * does not appear in any listing.
+ *
+ * It is a property of the LISTING, which is why it binds THIS path and not the
+ * corpus path. Here stream A is the engine's own text, so a value the engine
+ * did not print is not recoverable at any later layer -- nothing below can
+ * invent it. `o1_corpus.mjs` builds both of its streams from `src/disasm`
+ * instead, which decodes those values, and since neither of its streams has to
+ * match a real listing it renders them; see docs/O1.md 3.5. So the blind spot
+ * below is still real, still unfixable here, and no longer a property of O1 as
+ * a whole. O3 sees these; fixture O1 cannot.
  */
 export function o1SelfCheck(entries, opts = {}) {
   const identity = [], discrimination = [];
@@ -311,6 +320,14 @@ export function o1SelfCheck(entries, opts = {}) {
       what: 'values inside boilerplate constants (array / object literals)',
       why: 'V8 prints the boilerplate descriptor, never the element values -- on node (pool dumped) as well as d8 (pool partial)',
       evidence: 'tools/probes/probe_pool.mjs',
+      // Scope matters as much as the fact: this is a limit of the TEXT this
+      // path reads, not of bytecode equivalence as a method.
+      scope: 'this path only. Stream A is V8\'s own listing, so a value V8 did not print cannot be '
+        + 'recovered later. src/verify/o1_corpus.mjs does not share it: both of its streams come from '
+        + 'src/disasm, which decodes the element values, and it renders them on both sides '
+        + '(toParsedForm {literalValues:true}; docs/O1.md 3.5). Residual there: the elements of an '
+        + 'all-double array literal, which no layer decodes because a FixedDoubleArray\'s stride is not '
+        + 'in the profile.',
       invisibleMutations: disc.flatMap((d) => d.invisibleMutations.map((m) => `${d.id}: ${m}`)),
     },
   };

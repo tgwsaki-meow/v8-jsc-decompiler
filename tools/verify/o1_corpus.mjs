@@ -128,6 +128,7 @@ const T = {
   byStatus: {}, byPairingMode: {}, pairsByMode: {}, exactByMode: {},
   simByMode: {}, histogram: Array.from({ length: 11 }, () => 0),
   erasureA: {}, erasureB: {}, decodeWarningsA: {}, decodeWarningsB: {},
+  literalA: {}, literalB: {}, literalRefusedA: {}, literalRefusedB: {},
   o2Reached: 0, o2Stable: 0, o2Unstable: 0, o2NotReached: 0,
   simSum: 0, simN: 0, isimSum: 0, isimN: 0,
   flagHashDiffers: 0,
@@ -164,6 +165,13 @@ for (const f of files) {
   }
   for (const [k, v] of Object.entries(r.erasureA ?? {})) bump(T.erasureA, k, v);
   for (const [k, v] of Object.entries(r.erasureB ?? {})) bump(T.erasureB, k, v);
+  for (const side of ['A', 'B']) {
+    const lit = r[`literal${side}`] ?? {};
+    for (const [k, v] of Object.entries(lit)) {
+      if (k === 'refused') { for (const [rk, rv] of Object.entries(v ?? {})) bump(T[`literalRefused${side}`], rk, rv); }
+      else bump(T[`literal${side}`], k, v);
+    }
+  }
   for (const [k, v] of Object.entries(r.aDecodeWarnings ?? {})) bump(T.decodeWarningsA, k, v);
   for (const [k, v] of Object.entries(r.bDecodeWarnings ?? {})) bump(T.decodeWarningsB, k, v);
   if (r.pairingMode) bump(T.byPairingMode, r.pairingMode);
@@ -396,6 +404,30 @@ say(`| **value erased** (presence compared, value not: feedback slots) | ${EA.va
 say(`| **encoding erased** (value survives in another spelling) | ${EA.encodingErased ?? 0} | ${EB.encodingErased ?? 0} |`);
 say(`| constants the engine left unresolved (\`K#n\`, untrustworthy) | ${EA.unresolvedConstant ?? 0} | ${EB.unresolvedConstant ?? 0} |`);
 say();
+say('### Literal element values: what is compared, and what is still not');
+say();
+say('Both streams are rendered with `toParsedForm(…, {literalValues: true})`, so an array or object');
+say('literal is compared by its CONTENTS and not only by its length — the argument is in the header of');
+say('`src/verify/o1_corpus.mjs`. The default renderer still prints V8\'s text, which is why');
+say('`tools/disasm/oracle_agreement.mjs` is unaffected. Every case the rendering refuses is named below,');
+say('and a refusal means two different literals of that shape still compare equal.');
+say();
+say('| | stream A | stream B |'); say('|---|---:|---:|');
+const LA = T.literalA, LB = T.literalB;
+for (const [k, label] of [
+  ['constants', 'constant operands rendered'],
+  ['deepened', '&nbsp;&nbsp;of those, carrying more than the default rendering would'],
+  ['functions', 'functions rendered'],
+  ['functionsDeepened', '&nbsp;&nbsp;with at least one deepened constant'],
+  ['functionsRefused', '&nbsp;&nbsp;with at least one refusal'],
+  ['hashed', 'containers compared by sha256 of their contents (above the inline cap)'],
+  ['idsOmitted', 'container-internal object ids omitted (`#*`, see `renderConstantDeep`)'],
+]) {
+  say(`| ${label} | ${LA[k] ?? 0} | ${LB[k] ?? 0} |`);
+}
+say();
+table('Literal contents REFUSED, by reason, stream A', T.literalRefusedA);
+table('Literal contents REFUSED, by reason, stream B', T.literalRefusedB);
 table('Decoder warnings, stream A', T.decodeWarningsA);
 table('Decoder warnings, stream B', T.decodeWarningsB);
 

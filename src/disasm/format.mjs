@@ -11,6 +11,12 @@
 //                      to the shared parseOperand() in src/listing/operands.mjs.
 //                      Classification therefore cannot drift from the parser's.
 //
+// There is one deliberate exception, `toParsedForm(result, {literalValues:
+// true})`, which renders literal element values -- text V8 does NOT print. It
+// exists for an oracle that compares two of OUR renderings against each other
+// and is forbidden to anything that compares against a real listing; the
+// argument is the block comment on renderConstantDeep below.
+//
 // Both the renderer here and the parser in src/verify/bytecode_parser.mjs sit
 // on src/listing/operands.mjs. This file must NOT import from src/verify/:
 // src/verify/ is the oracle harness, which may spawn a real V8, and no
@@ -30,6 +36,7 @@
 // byte) and the parser discards it; we print a synthetic base so the column
 // exists and lines up.
 
+import { createHash } from 'node:crypto';
 import { parseOperand, splitOperands } from '../listing/operands.mjs';
 
 /**
@@ -75,6 +82,197 @@ export function renderConstant(c) {
   }
 }
 
+// ===========================================================================
+// renderConstantDeep -- the same vocabulary, plus the CONTENTS of a literal
+// ===========================================================================
+//
+// WHY THE DEFAULT RENDERER ABOVE CANNOT CHANGE
+//
+// `renderConstant` prints an array or object literal by its LENGTH and never
+// its element values. That is not an oversight: it is what V8 prints.
+// BytecodeDecoder::Decode hands a constant to Object::ShortPrint, which for a
+// boilerplate prints `<ArrayBoilerplateDescription PACKED_SMI_ELEMENTS,
+// <FixedArray[3]>>` -- the elements kind and the backing store's length, no
+// element values (verified on node with the pool dumped and on d8 with it
+// partial: tools/probes/probe_pool.mjs).
+//
+// `tools/disasm/oracle_agreement.mjs` compares `toParsedForm`'s output against
+// the parse of V8's own `--print-bytecode` listing and requires
+// INSTRUCTION-EXACT agreement, currently 1680/1680 functions. Printing a value
+// V8 does not print would make every instruction that names a literal
+// disagree, and that measurement is the single reason the corpus oracle is
+// credible at all: both of its streams go through this one decoder, so a
+// decoder bug cancels instead of biasing -- an argument that only holds while
+// the decoder is independently measured against the engine.
+//
+// So the values are rendered by a SEPARATE function that the caller has to ask
+// for, and the V8-agreement path does not ask. Two consequences, stated
+// because they are the whole point of the design:
+//
+//   * the default path's text is produced by exactly the code that produced it
+//     before, so it is unchanged BY CONSTRUCTION rather than by review;
+//   * `renderConstantDeep`'s output is NOT V8's text and must never be fed to
+//     anything that compares against a real listing. The one legitimate
+//     consumer is `src/verify/o1_corpus.mjs`, whose two streams are both OUR
+//     renderings of two caches; it is free to choose a richer vocabulary as
+//     long as it chooses the same one on both sides.
+//
+// PER-CACHE IDS INSIDE A CONTAINER
+//
+// `renderConstant` prints `<SharedFunctionInfo #12 foo>`, where `#12` is
+// src/heap's object id: the slot that object happens to occupy in THAT cache's
+// object graph. At the top level it is harmless, because
+// `o1_corpus.mjs::eraseAllocationIds` rewrites it to `#*` on both streams.
+// Inside a container it is not harmless. A `DeclareGlobals` declaration array
+// carries one SharedFunctionInfo per declared function (measured, not assumed:
+// `{t:'array', className:'FixedArray', values:[sfi, slot, sfi, slot, "topVar",
+// ...]}`), and a long container is hashed (below), which would bury an
+// unerasable per-cache counter inside the hash. Container-internal
+// heap-object references are therefore printed with the id ALREADY erased, in
+// the exact spelling `eraseAllocationIds` produces, so the vocabulary of a
+// normalised stream does not grow; the count is reported as `idsOmitted` so
+// the loss is visible rather than silent.
+//
+// What that leaves visible for `DeclareGlobals`: the declared NAME of every
+// var (it is a string in the array) and the position and arity of every
+// declared function. Which function, by name, stays invisible, because
+// `src/heap/index.mjs` gives a `{t:'sfi'}` an id and no name -- the name lives
+// on the SharedFunctionInfo, which this operand only points at. That residual
+// is named (`idsOmitted`) and counted rather than guessed at.
+//
+// LONG CONTAINERS ARE HASHED, NEVER TRUNCATED
+//
+// A bundled data table can be a ten-thousand-element literal, and rendering it
+// in full into every normalised instruction stream is memory the corpus scan
+// does not have. Truncating it would be a new undeclared blind spot, so above
+// LITERAL_INLINE_ELEMENTS elements or LITERAL_INLINE_CHARS characters the
+// contents are replaced by a sha256 prefix OF THE RENDERED CONTENTS: a
+// difference is still detected, only illegible. `hashed` is counted.
+
+/**
+ * Beyond these, a container's contents are compared by hash instead of inline.
+ * Arbitrary budget numbers, not facts about V8 -- written as a power of two so
+ * that tools/disasm/selftest.mjs check A, which forbids a 3-digit literal
+ * anywhere in this directory to keep version-specific constants out of it,
+ * still reads clean.
+ */
+const LITERAL_INLINE_ELEMENTS = 48;
+const LITERAL_INLINE_CHARS = 2 ** 11;
+/** Nesting cap. Literal nesting is bounded by source nesting; this only stops a cycle. */
+const LITERAL_MAX_DEPTH = 16;
+
+/** A fresh counter set for renderConstantDeep. */
+export function literalStats() {
+  return { constants: 0, deepened: 0, hashed: 0, idsOmitted: 0, refused: {} };
+}
+
+/** Name a value the decoder could not produce. Never a guess, never silent. */
+function refuse(reason, stats) {
+  if (stats) stats.refused[reason] = (stats.refused[reason] ?? 0) + 1;
+  return `!undecoded:${reason}`;
+}
+
+/** The decoder's own `why`, as a short stable token. */
+function reasonOf(c) {
+  if (c.elementsClass) return c.elementsClass;
+  if (c.why) return String(c.why).replace(/[^A-Za-z0-9_.:-]+/g, '-').replace(/-+$/, '').slice(0, 48);
+  return 'unknown';
+}
+
+const sha16 = (s) => 'sha256:' + createHash('sha256').update(s).digest('hex').slice(0, 16);
+
+/** `[a, b, c]`, or `sha256:…` when that would be too long. The count stays outside. */
+function wrap(parts, stats, open, close) {
+  const joined = parts.join(', ');
+  if (parts.length > LITERAL_INLINE_ELEMENTS || joined.length > LITERAL_INLINE_CHARS) {
+    if (stats) stats.hashed++;
+    return sha16(open + joined + close);
+  }
+  return open + joined + close;
+}
+
+function contentsOf(items, stats, depth, open = '[', close = ']') {
+  return wrap(items.map((v) => renderDeep(v, stats, depth + 1, true)), stats, open, close);
+}
+
+function renderDeep(c, stats, depth, inContainer) {
+  if (c === null || c === undefined || typeof c === 'number' || typeof c === 'string') return renderConstant(c);
+  if (depth > LITERAL_MAX_DEPTH) return `<${c.t ?? 'object'} ${refuse(`nesting-deeper-than-${LITERAL_MAX_DEPTH}`, stats)}>`;
+  switch (c.t) {
+    case 'arrayBoilerplate': {
+      // The elements kind is information the default rendering drops too, and
+      // it is semantics: `[1,,3]` is HOLEY_SMI_ELEMENTS where `[1,2,3]` is
+      // PACKED_SMI_ELEMENTS, and `[1.5]` is PACKED_DOUBLE_ELEMENTS.
+      const kind = c.elementsKind ?? `flags=${c.flags ?? '?'}`;
+      if (Array.isArray(c.elements)) return `<ArrayBoilerplateDescription ${kind}[${c.elements.length}] ${contentsOf(c.elements, stats, depth)}>`;
+      return `<ArrayBoilerplateDescription ${kind} ${refuse(reasonOf(c), stats)}>`;
+    }
+    case 'objectBoilerplate': {
+      if (!Array.isArray(c.rawEntries)) return `<ObjectBoilerplateDescription[${c.entries?.length ?? '?'}] ${refuse(c.length === null ? 'boilerplate-length-not-serialized' : 'no-raw-entries', stats)}>`;
+      // Rendered from the FLAT array, so an odd entry count -- a key whose
+      // value is missing, which decodeObjectBoilerplate warns about -- is
+      // visible instead of dropped with the dangling key.
+      const pairs = [];
+      for (let i = 0; i < c.rawEntries.length; i += 2) {
+        const k = renderDeep(c.rawEntries[i], stats, depth + 1, true);
+        pairs.push(i + 1 < c.rawEntries.length ? `${k}: ${renderDeep(c.rawEntries[i + 1], stats, depth + 1, true)}` : `${k}: <no-value>`);
+      }
+      return `<ObjectBoilerplateDescription[${pairs.length}] ${wrap(pairs, stats, '{', '}')}>`;
+    }
+    case 'array':
+      // The DeclareGlobals operand, among others. The default rendering falls
+      // through to `<array>`, which is why which names a script declares has
+      // been invisible.
+      return `<${c.className ?? 'FixedArray'}[${c.values?.length ?? '?'}] ${Array.isArray(c.values) ? contentsOf(c.values, stats, depth) : refuse('no-values', stats)}>`;
+    case 'smiArray':
+      return `<${c.arrayClass ?? 'TrustedFixedArray'}[${c.values?.length ?? '?'}] jump table ${Array.isArray(c.values) ? contentsOf(c.values, stats, depth) : refuse('no-values', stats)}>`;
+    case 'templateObject': {
+      const side = (list, why) => (Array.isArray(list) ? contentsOf(list, stats, depth) : refuse(why ? String(why).slice(0, 48) : 'no-strings', stats));
+      return `<TemplateObjectDescription[${c.raw?.length ?? c.cooked?.length ?? '?'}] raw=${side(c.raw, c.rawWhy)} cooked=${side(c.cooked, c.cookedWhy)}>`;
+    }
+    case 'rootObject':
+      // A canonical empty instance, e.g. `{}`'s
+      // empty_object_boilerplate_description. The root NAME is the value; the
+      // default rendering falls through to `<rootObject>`.
+      return `<root ${c.rootName ?? refuse('unnamed-root', stats)}>`;
+    case 'byteArray':
+      // Not a literal value, and its bytes are not compared. Counted so that
+      // if one ever turns up as a literal element it is a named residual and
+      // not a silent equality.
+      return `<${c.className ?? 'ByteArray'}[${c.length ?? '?'}] ${refuse('byte-array-contents', stats)}>`;
+    case 'number':
+      // `-0` and `0` are different values and `String(-0)` is `"0"`. Only
+      // inside a container, where the default spelling is not V8's anyway.
+      if (inContainer && Object.is(c.v, -0)) return '-0';
+      break;
+    case 'sfi':
+      if (inContainer) { if (stats) stats.idsOmitted++; return '<SharedFunctionInfo #*>'; }
+      break;
+    case 'scopeInfo':
+      if (inContainer) { if (stats) stats.idsOmitted++; return `<ScopeInfo #*${c.scopeType ? ' ' + c.scopeType : ''}>`; }
+      break;
+    default:
+      break;
+  }
+  return renderConstant(c);
+}
+
+/**
+ * Render a constant with literal contents included.
+ *
+ * NOT V8's text -- see the block comment above. Opt in through
+ * `toParsedForm(result, {literalValues: true})`.
+ *
+ * @param {object} c      a constant-pool entry of the 8.1 union
+ * @param {object} [stats] counters from literalStats(), mutated in place
+ */
+export function renderConstantDeep(c, stats = null) {
+  if (stats) stats.constants++;
+  const text = renderDeep(c, stats, 0, false);
+  if (stats && text !== renderConstant(c)) stats.deepened++;
+  return text;
+}
+
 /** A register range as V8 prints it: `first-last`, `r0-r0` when empty. */
 function renderRange(frame, regs) {
   if (!regs || regs.length === 0) {
@@ -101,7 +299,9 @@ export function renderOperandV8(o, ctx) {
     case 'kRegPair': case 'kRegOutPair': case 'kRegOutTriple':
       return renderRange(frame, o.regs);
     case 'kConstantPoolIndex':
-      return `[${o.index}:${renderConstant(o.constant)}]`;
+      // `ctx.renderConstant` is the opt-in: absent means V8's spelling, which
+      // is what every caller that compares against a real listing must use.
+      return `[${o.index}:${(ctx.renderConstant ?? renderConstant)(o.constant)}]`;
     case 'kFeedbackSlot':
       return `FBV[${o.slot}]`;
     case 'kEmbeddedFeedback':
@@ -230,7 +430,13 @@ export function toParsedForm(result, opts = {}) {
   const { unit, instructions, frame } = result;
   const base = opts.base ?? DEFAULT_BASE;
   const addr = makeAddr(base);
-  const ctx = { frame, addr };
+  // `literalValues: true` swaps in the deep constant renderer, on operands and
+  // on the pool. Nothing that compares against V8's own listing may pass it;
+  // see the block comment on renderConstantDeep for why the default is the
+  // only text the oracle-agreement path can use.
+  const lit = opts.literalValues ? literalStats() : null;
+  const renderC = lit ? (c) => renderConstantDeep(c, lit) : renderConstant;
+  const ctx = { frame, addr, renderConstant: renderC };
   const out = {
     name: unit.name || '',
     headerName: unit.name || '',
@@ -250,7 +456,10 @@ export function toParsedForm(result, opts = {}) {
     sourcePositionTableSize: unit.sourcePositionTableSize ?? null,
   };
   (unit.constants ?? []).forEach((c, i) => {
-    const v = renderConstant(c);
+    // The pool is rendered without the counters on purpose: the counted
+    // population is "constant operands an instruction actually names", and a
+    // pool entry is usually also one of those.
+    const v = lit ? renderConstantDeep(c) : renderConstant(c);
     out.constantPool[i] = { index: i, value: v, raw: v };
   });
   for (const ins of instructions) {
@@ -280,6 +489,9 @@ export function toParsedForm(result, opts = {}) {
       operandText: operandTexts.join(', '),
     });
   }
+  // Present only when the caller asked for literal values, so a consumer that
+  // did not ask cannot read a number that does not apply to its stream.
+  if (lit) out.literalValues = lit;
   return out;
 }
 
@@ -338,4 +550,7 @@ export function renderRichListing(result, opts = {}) {
 }
 
 export { splitOperands };
-export default { renderV8Listing, toParsedForm, renderRichListing, renderConstant, renderOperandV8 };
+export default {
+  renderV8Listing, toParsedForm, renderRichListing,
+  renderConstant, renderConstantDeep, literalStats, renderOperandV8,
+};

@@ -16,6 +16,19 @@ keeps the program unrun and trusts the decoder, which
 functions. Numbers, erasure contract and ranked causes: **`docs/O1.md`**.
 Self-test: `node tools/verify/o1_corpus_selftest.mjs`.
 
+They also differ in **what they can see inside a literal**, and that follows
+from where stream A comes from. V8's listing prints an array or object literal
+as `<ArrayBoilerplateDescription PACKED_SMI_ELEMENTS, <FixedArray[3]>>` and
+never prints the element values (`tools/probes/probe_pool.mjs`), so for
+`o1_bytecode.mjs` — whose stream A *is* that listing — `f([1,2,3])` and
+`f([2,2,3])` are the same text, and nothing downstream can recover the
+difference. Its `blindSpot` declaration says so and stays. `o1_corpus.mjs`
+builds **both** streams from `src/disasm`, which decodes those values, so it
+renders them on both sides (`toParsedForm(…, {literalValues: true})`) and sees
+the difference; the residual is the elements of an all-double array literal,
+which no layer decodes because a `FixedDoubleArray`'s stride is not in the
+profile. `docs/O1.md` §3.5 carries the full argument and the per-file counts.
+
 ```
 original .jsc ──our decoder──────────────────────────────→ bytecode stream A
               └─our decompiler─→ JS' ──real V8 --print-bytecode──→ stream B
@@ -99,6 +112,13 @@ Deliberate cross-version consequence: V8 14.4 prints `FBV[n]` and 14.6 prints
 equal. The price is that a normalised stream says nothing about encoded
 instruction length across versions — read `bytes` from the structured form for
 that.
+
+`normalize.mjs` is shared with `tools/disasm/oracle_agreement.mjs`, which
+compares our rendering against a real V8 listing. Nothing in it may become
+richer than what V8 prints. The corpus O1's literal-value rendering is
+therefore **not** here: it is a second constant renderer in
+`src/disasm/format.mjs` (`renderConstantDeep`) that only
+`toParsedForm(…, {literalValues: true})` reaches.
 
 ## Self-test
 

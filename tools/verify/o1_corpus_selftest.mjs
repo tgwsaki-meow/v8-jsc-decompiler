@@ -1,6 +1,6 @@
 // tools/verify/o1_corpus_selftest.mjs
 //
-// Does the O1-corpus instrument work? Five checks, none of which involve the
+// Does the O1-corpus instrument work? Seven checks, none of which involve the
 // decompiler, so a failure here is an ORACLE defect and not a measurement.
 //
 //   node tools/verify/o1_corpus_selftest.mjs [--entries 12]
@@ -27,6 +27,14 @@
 //      corpus-derived artefact into the tree `corpus.mjs` marks executable.
 //   E  ERASURE ACCOUNTING is non-zero and the allocation-id rule actually
 //      fires (otherwise A would pass for the wrong reason).
+//   F  WHAT STREAM B CARRIES -- see the block comment at F itself.
+//   G  LITERAL ELEMENT VALUES ARE VISIBLE. `f([1,2,3])` against `f([2,2,3])`
+//      must come out UNEQUAL and be named, while `f([1,2,3])` against itself
+//      stays exact. This is the check for the one thing `docs/O1.md` §3.5 used
+//      to declare invisible on this path. It also PINS the residual: two
+//      different double literals still compare equal, because a
+//      FixedDoubleArray's stride is not in the profile, and that must stay
+//      counted under its own name rather than quietly become a pass.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -231,6 +239,106 @@ function mintCount(label, src, flags = ['--no-lazy']) {
   check(u.functions === 2, 'an inner declaration whose closure is never created is NOT carried',
     `${u.functions} (script + outer); so an A-side unpaired function means our text does not create that closure`);
 }
+
+// ---------------------------------------------------------------- G
+// G  LITERAL ELEMENT VALUES ARE VISIBLE ON THIS PATH.
+//
+// `docs/O1.md` §3.5 used to say a difference confined to literal element
+// values is invisible to O1, with V8's listing as the reason. That reason is
+// exact for the fixture path and wrong for this one: both streams here come
+// from our decoder, which decodes the values, and only the RENDERER was
+// dropping them. These cases are the proof that it no longer does -- and the
+// identity case next to each of them is what stops the proof from being "the
+// comparator now calls everything unequal".
+//
+// The last case is deliberately a PASS for an inequality that is NOT detected:
+// an all-double array literal lands in a FixedDoubleArray, whose stride is not
+// in the profile, so the decoder refuses it by name and two different double
+// literals still compare equal. If someone teaches `tools/profilegen` that
+// stride, this check fails and says so, which is the point -- the residual is
+// pinned, not hidden.
+say('\nG  literal element values are visible (the §3.5 blind spot, on the corpus path)');
+const LIT_CASES = [
+  {
+    label: 'f([1,2,3]) vs f([2,2,3])  =>  UNEQUAL, named literal-element-value',
+    left: 'function f(g) { return g([1, 2, 3]); }\nvar x = 1;\n',
+    right: 'function f(g) { return g([2, 2, 3]); }\nvar x = 1;\n',
+    want: 'literal-element-value',
+  },
+  {
+    label: 'f([1,2,3]) vs f([1,2,3])  =>  still EXACT (two caches, same program)',
+    left: 'function f(g) { return g([1, 2, 3]); }\nvar x = 1;\n',
+    right: 'function f(g) { return g([1, 2, 3]); }\nvar x = 1;\n',
+    want: 'exact',
+  },
+  {
+    label: 'a sparse hole: f([1,,3]) vs f([1,2,3])  =>  UNEQUAL',
+    left: 'function f(g) { return g([1, , 3]); }\nvar x = 1;\n',
+    right: 'function f(g) { return g([1, 2, 3]); }\nvar x = 1;\n',
+    want: 'literal-element-value',
+  },
+  {
+    label: 'an object literal value: {a:1,b:2} vs {a:1,b:3}  =>  UNEQUAL',
+    left: 'function f(g) { return g({ a: 1, b: 2 }); }\nvar x = 1;\n',
+    right: 'function f(g) { return g({ a: 1, b: 3 }); }\nvar x = 1;\n',
+    want: 'literal-element-value',
+  },
+  {
+    label: 'a string element that looks like an object id: ["#333"] vs ["#334"]',
+    left: 'function f(g) { return g(["#333"]); }\nvar x = 1;\n',
+    right: 'function f(g) { return g(["#334"]); }\nvar x = 1;\n',
+    want: 'literal-element-value',
+  },
+  {
+    label: 'the DeclareGlobals name list: var aaa vs var bbb  =>  array-constant-value',
+    left: 'var aaa = 1;\nfunction f(g) { return g(aaa); }\n',
+    right: 'var bbb = 1;\nfunction f(g) { return g(bbb); }\n',
+    want: 'array-constant-value',
+  },
+  {
+    label: 'RESIDUAL (expected): f([1.5]) vs f([2.5]) still compares EQUAL — FixedDoubleArray stride is not in the profile',
+    left: 'function f(g) { return g([1.5, 3.5]); }\nvar x = 1;\n',
+    right: 'function f(g) { return g([2.5, 3.5]); }\nvar x = 1;\n',
+    want: 'residual:FixedDoubleArrayMap',
+  },
+];
+LIT_CASES.forEach((c, i) => {
+  const r = compareSources(c.left, c.right, `lit${i}`);
+  if (!r.ok) { check(false, c.label, r.error?.slice(0, 160)); return; }
+  const fams = r.causes.map((x) => x.family);
+  if (c.want === 'exact') {
+    check(r.allExact, c.label, `${r.exact}/${r.paired} exact, unpaired ${r.leftOnly}/${r.rightOnly}, families: ${fams.join(', ') || '(none)'}`);
+    return;
+  }
+  if (c.want.startsWith('residual:')) {
+    const reason = c.want.slice('residual:'.length);
+    const refusedA = r.A.literal?.refused?.[reason] ?? 0;
+    const refusedB = r.B.literal?.refused?.[reason] ?? 0;
+    check(r.allExact && refusedA > 0 && refusedB > 0, c.label,
+      `allExact=${r.allExact}, refused ${reason}: A ${refusedA} B ${refusedB}`
+      + `${r.allExact ? '' : ` — families: ${fams.join(', ')}; if the stride is now known, docs/O1.md §3.5 and §7.3 must be updated with it`}`);
+    return;
+  }
+  check(!r.allExact && fams.includes(c.want), c.label,
+    `exact ${r.exact}/${r.paired}, families: ${fams.join(', ') || '(none)'}`);
+});
+// The switch is actually on, and the counters say so. Without this, every case
+// above could be passing for some other reason.
+{
+  const r = compareSources(
+    'function f(g) { return g([1, 2, 3], { a: 1 }); }\nvar x = 1;\n',
+    'function f(g) { return g([1, 2, 3], { a: 1 }); }\nvar x = 1;\n', 'litstats');
+  const la = r.ok ? r.A.literal : null;
+  check(Boolean(la) && la.deepened > 0 && la.constants > 0,
+    'G  the literal-value rendering is on, and counted',
+    la ? `${la.deepened} of ${la.constants} constant operands carry more than the default, over ${la.functions} functions` : 'no stream');
+  check(Boolean(la) && la.idsOmitted > 0,
+    'G  container-internal object ids are omitted, and counted',
+    la ? `${la.idsOmitted} (the DeclareGlobals list names one SharedFunctionInfo per declared function)` : 'no stream');
+}
+const qid = eraseAllocationIds('CreateArrayLiteral K(<ArrayBoilerplateDescription PACKED_ELEMENTS[2] ["#333", "#334"]>) FB[*] #25');
+check(qid.erased === 0 && qid.text.includes('"#333"'),
+  'G  eraseAllocationIds leaves a `#<digits>` that is inside a string alone', qid.text.slice(0, 120));
 
 say(`\n${failures === 0 ? 'ALL PASS' : failures + ' FAILURE(S)'}`);
 process.exitCode = failures === 0 ? 0 : 1;

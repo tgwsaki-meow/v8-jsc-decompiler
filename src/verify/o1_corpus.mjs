@@ -69,6 +69,73 @@
 // Nothing else is added. In particular NOT erased, though it would raise the
 // number: the function name inside a descriptor, boilerplate descriptor
 // lengths, flag immediates, parameter registers, register-range lengths.
+//
+// ===========================================================================
+// WHAT THIS PATH SEES THAT THE FIXTURE PATH CANNOT: LITERAL ELEMENT VALUES
+// ===========================================================================
+//
+// `o1_bytecode.mjs` declares a blind spot, and its reason is exact: V8 prints
+// an array or object literal as `<ArrayBoilerplateDescription
+// PACKED_SMI_ELEMENTS, <FixedArray[3]>>` and never prints the element values
+// (tools/probes/probe_pool.mjs), so on a path whose stream A IS a real V8
+// listing, `f([1,2,3])` and `f([2,2,3])` are the same text.
+//
+// That reason does not apply here. BOTH of this path's streams come from our
+// own decoder, and the decoder already reads the values:
+// `src/heap/objects.mjs::decodeArrayBoilerplate` returns `elements`,
+// `decodeObjectBoilerplate` returns `entries`, and the `DeclareGlobals`
+// declaration array arrives decoded as `{t:'array', className:'FixedArray',
+// values:[sfi, slot, "topVar", ...]}`. The values were being dropped one layer
+// later, in `src/disasm/format.mjs::renderConstant`, which prints a length and
+// no contents -- correctly, because that is V8's text and
+// `tools/disasm/oracle_agreement.mjs` measures that renderer against V8's own
+// listing instruction-exact on 1680/1680 functions. The blind spot on this
+// path was therefore self-inflicted by code reuse, not inherited from the
+// engine, and closing it costs no execution and no new oracle.
+//
+// `toParsedForm(d, {literalValues: true})` below renders the contents on both
+// streams through a SECOND renderer that the V8-agreement path never asks for.
+// The default renderer is untouched, which is why that measurement -- the one
+// the "both streams through one decoder" argument rests on -- is unaffected.
+// `normalize.mjs` is untouched too, for the same reason: oracle_agreement.mjs
+// normalises with it.
+//
+// Four residuals remain. Each is named and counted per file, in `literalA` /
+// `literalB`, so none of them is an unqualified claim:
+//
+//   `refused.FixedDoubleArrayMap`
+//        an array literal whose elements are all doubles. V8 stores those in a
+//        FixedDoubleArray, whose layout is `@cppObjectLayoutDefinition`, so
+//        `layouts.json` carries no class for it, and whose Torque element type
+//        (`float64_or_undefined_or_hole`) is a 9-byte struct against the
+//        8-byte on-heap double, so the stride cannot be taken from the profile
+//        either. The decoder refuses by map name instead of guessing a stride,
+//        and the renderer prints `!undecoded:FixedDoubleArrayMap`. Two
+//        different double literals therefore still compare equal, with that
+//        name attached. Fixing it is `tools/profilegen` work -- the stride is a
+//        fact about V8 and belongs in a profile derived from pinned sources,
+//        never a literal in a reader. The elements KIND is now rendered, so
+//        `[1.5]` against `[1,2]` is visible even here; `[1.5]` against `[2.5]`
+//        is not.
+//   `idsOmitted`
+//        a container-internal reference to a SharedFunctionInfo or a ScopeInfo.
+//        `src/heap` identifies those by per-cache object id and carries no
+//        name, so the id is erased at render time, in the same `#*` spelling
+//        `eraseAllocationIds` uses at top level (see renderConstantDeep).
+//        Consequence for `DeclareGlobals`: every declared VAR name is now
+//        compared (it is a string), and so are the position and arity of every
+//        declared function, but WHICH function a declaration points at is not.
+//   `hashed`
+//        a container above the inline cap is compared by a sha256 of its
+//        rendered contents. A difference is still detected; it is not legible
+//        in the diff.
+//   quoted `#<digits>` inside a literal string
+//        `eraseAllocationIds` used to rewrite them. `{color:"#333"}` is
+//        everywhere in bundled code, and with literal values rendered those
+//        strings now sit inside a `<...>` descriptor, which is the only context
+//        the erasure looks at. It is therefore quote-aware now, and the one
+//        case it still cannot resolve -- a string containing an unescaped `"`,
+//        which V8's own PrintUC16 does not escape -- is noted at the function.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -168,12 +235,50 @@ export function assertCompileOnlySpawn(argv) {
 const ALLOC_ID_RE = /(<[^<>]*?)#\d+/g;
 
 /**
+ * The [start, end) spans of double-quoted runs in one normalised instruction.
+ *
+ * Needed because a `#<digits>` inside a STRING is content, not an allocation
+ * id: `{color:"#333"}` is everywhere in bundled code, and now that literal
+ * element values are rendered, such a string sits inside a `<...>` descriptor
+ * -- the only context the id erasure looks at. Erasing it would be
+ * deterministic on both streams, so it would not break an equality; it would
+ * make `["#333"]` and `["#334"]` compare EQUAL, which is a blind spot and the
+ * thing this change exists to remove.
+ *
+ * Limit: `renderConstant` escapes a string the way V8's String::PrintUC16
+ * does, and that does not escape `"`, so a string value containing a quote
+ * makes the spans after it ambiguous. The scan stays deterministic (same text
+ * in, same spans out, on both streams), so the cost is precision inside such a
+ * string, never a false equality between two different streams.
+ */
+function quotedSpans(text) {
+  const spans = [];
+  let start = -1;
+  for (let i = 0; i < text.length; i++) {
+    if (text[i] !== '"') continue;
+    let bs = 0;
+    for (let j = i - 1; j >= 0 && text[j] === '\\'; j--) bs++;
+    if (bs % 2 === 1) continue;                 // an escaped quote
+    if (start < 0) start = i; else { spans.push([start, i + 1]); start = -1; }
+  }
+  if (start >= 0) spans.push([start, text.length]);
+  return spans;
+}
+
+/**
  * Rewrite per-cache object ids inside heap-object descriptors to `#*`.
  * @returns {{text: string, erased: number}}
  */
 export function eraseAllocationIds(text) {
+  if (!text.includes('#')) return { text, erased: 0 };
+  const spans = text.includes('"') ? quotedSpans(text) : null;
   let erased = 0;
-  const out = text.replace(ALLOC_ID_RE, (m, head) => { erased++; return head + '#*'; });
+  const out = text.replace(ALLOC_ID_RE, (m, head, at) => {
+    const hash = at + head.length;
+    if (spans && spans.some(([s, e]) => hash >= s && hash < e)) return m;
+    erased++;
+    return head + '#*';
+  });
   return { text: out, erased };
 }
 
@@ -279,6 +384,13 @@ export function normalizedFunctionsFromJsc(jscPath, opts) {
   const out = [];
   const warnings = {};
   const erasure = {};
+  // What the literal-value rendering did on this file: how much it showed, and
+  // every case it refused, by name. Reported per file so that "literal values
+  // are compared now" is a counted statement and not a claim.
+  const literal = {
+    constants: 0, deepened: 0, hashed: 0, idsOmitted: 0,
+    functions: 0, functionsDeepened: 0, functionsRefused: 0, refused: {},
+  };
   let decodeFailures = 0;
   const failures = [];
   for (const u of units) {
@@ -292,8 +404,24 @@ export function normalizedFunctionsFromJsc(jscPath, opts) {
       continue;
     }
     for (const w of d.warnings) warnings[w.code] = (warnings[w.code] ?? 0) + 1;
-    const parsed = toParsedForm(d);
+    // `literalValues: true` is the whole fix for §3.5's blind spot on this
+    // path, and it is legal here for one reason only: both streams are OUR
+    // rendering, so both get the same richer vocabulary. The V8-agreement path
+    // must keep the default -- see renderConstantDeep in src/disasm/format.mjs.
+    const parsed = toParsedForm(d, { literalValues: true });
     addInto(erasure, erasureProfile(parsed));
+    const lv = parsed.literalValues;
+    if (lv) {
+      literal.constants += lv.constants;
+      literal.deepened += lv.deepened;
+      literal.hashed += lv.hashed;
+      literal.idsOmitted += lv.idsOmitted;
+      literal.functions++;
+      if (lv.deepened) literal.functionsDeepened++;
+      let refusedHere = 0;
+      for (const [k, v] of Object.entries(lv.refused)) { literal.refused[k] = (literal.refused[k] ?? 0) + v; refusedHere += v; }
+      if (refusedHere) literal.functionsRefused++;
+    }
     const n = normalizeFunction(parsed);
     // `stream` is a second full copy of `perInstruction`; nothing below reads
     // it and a 10 MB input has ~2e6 instructions.
@@ -312,7 +440,7 @@ export function normalizedFunctionsFromJsc(jscPath, opts) {
   }
   erasure.allocationIds = out.reduce((a, f) => a + f.allocationIdsErased, 0);
   return {
-    functions: out, erasure, warnings, decodeFailures, failures,
+    functions: out, erasure, literal, warnings, decodeFailures, failures,
     units: units.length,
     header: read?.header ?? null,
     profileVersion: profile?.version ?? null,
@@ -469,18 +597,84 @@ function classifyOpcodePair(A, B) {
   return 'opcode-substitution';
 }
 
+/**
+ * Tokenise a normalised instruction on TOP-LEVEL spaces.
+ *
+ * A plain `split(' ')` cut a constant at every space inside it, so one
+ * constant that differed showed up as several differing tokens of mixed kinds
+ * and the hunk was classified `operand-value` rather than by the constant.
+ * With literal values rendered a constant contains spaces routinely
+ * (`K(<ObjectBoilerplateDescription[2] {"x": 1, "y": 2}>)`), which would have
+ * made the literal-value families unnameable. Bracket- and quote-aware, so
+ * one operand is one token; `->L3` is special-cased because its `>` is not a
+ * closing bracket.
+ */
+function splitTokens(s) {
+  const out = [];
+  let depth = 0, quote = false, cur = '';
+  for (let i = 0; i < s.length; i++) {
+    const c = s[i];
+    if (quote) { cur += c; if (c === '"' && s[i - 1] !== '\\') quote = false; continue; }
+    if (c === '"') { quote = true; cur += c; continue; }
+    if (c === '-' && s[i + 1] === '>') { cur += '->'; i++; continue; }
+    if (c === '(' || c === '[' || c === '{' || c === '<') { depth++; cur += c; continue; }
+    if (c === ')' || c === ']' || c === '}' || c === '>') { depth = Math.max(0, depth - 1); cur += c; continue; }
+    if (c === ' ' && depth === 0) { if (cur) out.push(cur); cur = ''; continue; }
+    cur += c;
+  }
+  if (cur) out.push(cur);
+  return out;
+}
+
 /** opcode of a normalised instruction string (skipping any `Ln:` label). */
 function opcodeOf(s) {
-  const t = s.split(' ');
+  const t = splitTokens(s);
   let i = 0;
   if (t[i] && /^L\d+:$/.test(t[i])) i++;
   return t[i] ?? '';
 }
 function operandsOf(s) {
-  const t = s.split(' ');
+  const t = splitTokens(s);
   let i = 0;
   if (t[i] && /^L\d+:$/.test(t[i])) i++;
   return t.slice(i + 1);
+}
+
+// --- the two families that only exist because literal values are rendered ---
+
+/** A boilerplate descriptor: an array, object or tagged-template literal. */
+const LITERAL_DESCRIPTOR_RE = /<(?:Array|Object|Template)[A-Za-z]*Description/;
+/** A bare FixedArray constant. In a script's pool this is the DeclareGlobals list. */
+const ARRAY_CONSTANT_RE = /<(?:Trusted|Protected)?FixedArray\[/;
+
+/**
+ * The SHAPE of a rendered container constant: class, elements kind, length and
+ * any refusal -- never the values.
+ *
+ * The ranked table is keyed by `family | detail`, so a detail built from the
+ * values themselves would turn every distinct literal in the corpus into its
+ * own row. The values are in the minimal repro instead.
+ */
+function literalShape(tok) {
+  const m = /<([A-Za-z]+)\s*([A-Z_]+)?(\[[\d?]+\])?/.exec(tok);
+  if (!m) return 'K?';
+  const u = /!undecoded:([A-Za-z0-9_.:-]+)/.exec(tok);
+  return `${m[1]}${m[2] ? ' ' + m[2] : ''}${m[3] ?? ''}${u ? ' !undecoded:' + u[1] : ''}`;
+}
+
+/** Name a constant-vs-constant difference that is a literal's CONTENTS. */
+function literalFamily(opcode, left, right) {
+  const both = left + '\u0000' + right;
+  const family = LITERAL_DESCRIPTOR_RE.test(both) ? 'literal-element-value'
+    : ARRAY_CONSTANT_RE.test(both) ? 'array-constant-value'   // in practice the DeclareGlobals list
+    : null;
+  if (!family) return null;
+  const sa = literalShape(left), sb = literalShape(right);
+  // Same class, kind and length, different contents, is the commonest case and
+  // the one the shape string cannot show by itself -- say so rather than print
+  // `X vs X`. The values are in the minimal repro.
+  const detail = sa === sb ? `${opcode} ${sa} contents differ` : `${opcode} ${sa} vs ${sb}`;
+  return { family, detail: detail.slice(0, 160) };
 }
 
 const CAP = 4_000_000;   // n*m ceiling for the full edit script
@@ -581,6 +775,11 @@ export function classifyHunk(h) {
         return { family: 'register-class', detail: A };
       }
       if (kinds.length === 1 && kinds[0] === 'constant->constant') {
+        // A literal's CONTENTS get their own families: before this change they
+        // could not differ at all (§3.5's blind spot), so folding them into
+        // `constant-value` would hide the one thing the fix exposes.
+        const lit = literalFamily(A, diff[0][0], diff[0][1]);
+        if (lit) return lit;
         return { family: 'constant-value', detail: `${A} ${diff[0][0]} vs ${diff[0][1]}`.slice(0, 160) };
       }
       if (kinds.length === 1 && kinds[0] === 'jumpTarget->jumpTarget') return { family: 'jump-target', detail: A };
@@ -822,6 +1021,7 @@ export function o1CorpusOne(jscPath, opts) {
   row.aDecodeFailures = A.decodeFailures;
   row.aHeader = A.header ? { versionHash: A.header.versionHash, flagHash: A.header.flagHash } : null;
   row.erasureA = A.erasure;
+  row.literalA = A.literal;
   if (A.functions.length === 0) { row.status = 'no-functions-A'; return row; }
 
   // ---------------------------------------------------- our output
@@ -873,6 +1073,7 @@ export function o1CorpusOne(jscPath, opts) {
   row.bDecodeWarnings = B.warnings;
   row.bDecodeFailures = B.decodeFailures;
   row.erasureB = B.erasure;
+  row.literalB = B.literal;
 
   // ---------------------------------------------------- pair + compare
   const nameBySfi = new Map(Object.entries(d1.nameBySfi ?? {}).map(([k, v]) => [Number(k), v]));
