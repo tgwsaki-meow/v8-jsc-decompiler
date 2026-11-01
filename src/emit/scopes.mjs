@@ -75,8 +75,16 @@
 // allocation avoids, file-wide, every parameter name, every global any
 // function reads, every emitted function name and this layer's own internal
 // names, and on the current path every binding an ancestor already declared.
-// None of that is visible to O1: a context slot is an index in the bytecode,
-// so renaming a binding cannot change one instruction.
+//
+// This used to claim the spelling is invisible to O1, on the grounds that a
+// context slot is an index in the bytecode. The INDEX is invisible; the NAME
+// is not. `ThrowReferenceErrorIfHole` takes the variable's name as a
+// constant-pool operand, so every TDZ-guarded read prints whatever this
+// function chose, and a `$s<n>` suffix is a measurable divergence -- 47 hunks
+// of `K("e")` vs `K("e$s2")` on the 16-file set of docs/EMIT.md 9.11, where
+// declaring at the store site made those hole checks appear. Preferring the
+// ScopeInfo's own spelling over a suffix wherever a hole check can reach the
+// binding is the open item; see that section.
 
 import { sanitise } from './names.mjs';
 

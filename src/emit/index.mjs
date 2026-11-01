@@ -48,6 +48,7 @@ import { structureFacts } from '../structure/facts.mjs';
 import { terminatorInputs } from '../structure/conditions.mjs';
 import { planNames, declarationPrologue, sanitise } from './names.mjs';
 import { planScopes } from './scopes.mjs';
+import { planDeclarationSites } from './declsite.mjs';
 import { expr, nameOf } from './expr.mjs';
 import { regionStatements } from './region.mjs';
 import { holeExpr, holeStmt, noteStmt, mark, HOLE_IDENTIFIER } from './holes.mjs';
@@ -87,14 +88,17 @@ function newReport() {
     namesReadTwice: 0,
     forInRebuilt: 0, forInNotRebuilt: 0,
     catchContextBindings: 0, catchContextBindingsAmbiguous: 0,
+    declarationSitesWithADifferentSpelling: 0, declarationSitesEmittedTwice: 0,
   };
 }
 
 /** The per-function emit context every other module in this directory takes. */
-function makeContext({ rec, sf, unit, facts, plan, file, resolveFn, resolveClass, opts }) {
+function makeContext({ rec, sf, unit, facts, plan, file, resolveFn, resolveClass, opts, sites }) {
   const report = newReport();
   const ctx = {
     rec, sf, ir: sf.ir, unit, facts, plan, file, report, opts,
+    declarationSites: sites ?? { byStmt: new Map(), byBinding: new Map() },
+    declaredAtStore: [],
     depth: 0, regionCount: 0,
     isAsync: !!unit.isAsync, isGenerator: !!unit.isGenerator,
     allowSuper: false,
@@ -121,6 +125,10 @@ function makeContext({ rec, sf, unit, facts, plan, file, resolveFn, resolveClass
       return n;
     },
     nameOfExpr(e) { return nameOf(ctx, e); },
+    /** stmt.mjs emitted a binding's declaration at its store (docs/EMIT.md 9.11). */
+    noteDeclarationAtStore(site, node, target, value) {
+      ctx.declaredAtStore.push({ site, node, target, value });
+    },
     forceAsync() { ctx.isAsync = true; report.forcedAsync++; },
     forceGenerator() { ctx.isGenerator = true; report.forcedGenerator++; },
 
@@ -243,10 +251,20 @@ export function emit(recovered, structured, opts = {}) {
     order, childrenOf, roots, reserved: reservedSpellings(order, emitName, taken),
   });
 
+  // ------------------------------ and WHERE in that function it is declared
+  //
+  // Also one pass over the whole file, and after `planScopes` because it is a
+  // statement about a BINDING: whether the binding is stored exactly once, in
+  // the function that owns it, at a position that encloses every read -- in
+  // which case the declaration moves to that store and carries the
+  // initialiser, which is the only shape that gets `LdaImmutableContextSlot`
+  // back at the reads. See declsite.mjs and docs/EMIT.md 9.11.
+  const declSites = planDeclarationSites({ order, scopes });
+
   const state = {
     emitted: new Set(), claimed: new Set(), inProgress: new Set(),
     perFunction: [], report: fileReport(), byId, childrenOf, emitName, scopes,
-    positions: [], opts, file, sourceName,
+    declSites, positions: [], opts, file, sourceName,
   };
 
   // ------------------------------------------------- emit, roots first
@@ -312,6 +330,7 @@ export function emit(recovered, structured, opts = {}) {
   r.invariants = summariseInvariants(state.perFunction);
   r.unitTree = treeSource;
   r.scopePlan = scopes.stats;
+  r.declarationSitePlan = declSites.stats;
   r.metrics = fileMetrics(state, r);
 
   return { code, map, ast, perFunction: state.perFunction, report: r };
@@ -429,7 +448,11 @@ function fileReport() {
     contextBindingsOwned: 0, contextBindingsInherited: 0,
     contextBindingsUnplaceable: 0, constBindingsEmittedAsLet: 0,
     functionsRefusedForAnUnplaceableBinding: 0, refusalsByWhy: {}, refusalSamples: [],
-    scopePlan: {},
+    scopePlan: {}, declarationSitePlan: {},
+    contextBindingsDeclaredAtTheStoreSite: 0,
+    declarationSitesByKeyword: { const: 0, let: 0, var: 0 },
+    declarationSitesRevertedAfterEmission: 0, declarationSiteRevertsByWhy: {},
+    declarationSitesWithADifferentSpelling: 0, declarationSitesEmittedTwice: 0,
     forcedAsync: 0, forcedGenerator: 0,
     blocksWithoutStatements: 0, regionKindsNot112: {}, unknownRegionKinds: {},
     monotonicity: { functions: 0, monotone: 0, inversions: 0 },
@@ -451,7 +474,7 @@ function foldReport(file, fn) {
     'unresolvedNames', 'globalReads', 'forcedAsync', 'forcedGenerator',
     'blocksWithoutStatements', 'loopTestChainsMaterialised', 'loopTestChainStatements',
     'forInRebuilt', 'forInNotRebuilt', 'catchContextBindings', 'catchContextBindingsAmbiguous',
-    'namesReadTwice',
+    'namesReadTwice', 'declarationSitesWithADifferentSpelling', 'declarationSitesEmittedTwice',
     'declarationsWithoutAnInitialiser', 'catchWithoutAParam', 'sharedExprWithNoValue',
     'loopsWithoutAnInit', 'endlessLoops', 'triesWithoutAFinalizer', 'switchGuardBlocks']) {
     file[k] = (file[k] ?? 0) + (fn[k] ?? 0);
@@ -603,8 +626,9 @@ function emitUnitInner(state, rec0, how) {
   }
 
   const facts = structureFacts(rec.ir.profile ?? sf.ir.profile);
+  const sites = state.declSites.forUnit(rec0.sfiId);
   const plan = planNames(rec, rec.ir, unit, joinExprs(rec, sf), how.inherited ?? new Set(),
-    state.scopes.forUnit(rec0.sfiId));
+    state.scopes.forUnit(rec0.sfiId), sites);
 
   // ---- names for the children, before the body is built: `{e:'fn'}` emits a
   //      reference to one of them, so the spelling has to exist first. A child
@@ -672,7 +696,7 @@ function emitUnitInner(state, rec0, how) {
   };
 
   const ctx = makeContext({
-    rec, sf, unit, facts, plan, file: state.file, resolveFn, resolveClass, opts: state.opts,
+    rec, sf, unit, facts, plan, file: state.file, resolveFn, resolveClass, opts: state.opts, sites,
   });
   ctx.allowSuper = !!how.allowSuper;
 
@@ -738,8 +762,16 @@ function emitUnitInner(state, rec0, how) {
       + dropped.blocks.map((b) => `${b.block}:${b.kind}`).join(' ')));
   }
 
+  // ---- docs/EMIT.md 9.11: which planned declaration sites really landed in
+  //      the body's own statement list. Checked by node identity on the
+  //      emitted array, so clause 7's region-tree model is verified rather
+  //      than believed; a site that did not land is turned back into an
+  //      assignment and keeps its prologue row.
+  const declaredAtStore = verifyDeclarationSites(ctx, body, state);
+
   // ---- the prologue: the declaration lists, then the nested functions
-  const prologue = declarationPrologue(plan, [...ctx.extraDeclNames], { topLevel: how.role === 'script' });
+  const prologue = declarationPrologue(plan, [...ctx.extraDeclNames],
+    { topLevel: how.role === 'script', declaredAtStore });
   const nested = [];
   for (const c of children) {
     if (state.claimed.has(c.sfiId) || state.emitted.has(c.sfiId)) continue;
@@ -848,6 +880,109 @@ function emitUnitInner(state, rec0, how) {
     refused: refused ? refused.length : 0,
   }));
   return how.role === 'script' ? statements : node;
+}
+
+/**
+ * Is `name` read anywhere in the statements before index `index`?
+ *
+ * The companion to declsite.mjs clause 4, asked on the emitted text instead
+ * of on the CFG: dominance says the store runs before every read, and this
+ * says the store's STATEMENT is written before every read, which is the thing
+ * a TDZ actually depends on. Nested functions are included deliberately -- a
+ * `function` declaration's body does not run where it is written, so including
+ * it only ever costs a site, never admits a wrong one.
+ *
+ * Property positions are excluded for the same reason verify.mjs's
+ * `variableIdentifiers` excludes them: `o.x` is not a read of `x`, and
+ * treating it as one would refuse a site for an unrelated property of the
+ * same name.
+ */
+function readsNameBefore(body, index, name) {
+  const skip = new Set();
+  for (let i = 0; i < index; i++) {
+    let found = false;
+    walkAst(body[i], (n) => {
+      switch (n.type) {
+        case 'MemberExpression': case 'OptionalMemberExpression':
+          if (!n.computed) skip.add(n.property);
+          break;
+        case 'ObjectProperty': case 'ObjectMethod': case 'ClassMethod':
+        case 'ClassProperty': case 'ClassPrivateMethod':
+          if (!n.computed && n.key) skip.add(n.key);
+          break;
+        case 'MetaProperty': skip.add(n.meta); skip.add(n.property); break;
+        case 'LabeledStatement': skip.add(n.label); break;
+        case 'BreakStatement': case 'ContinueStatement': if (n.label) skip.add(n.label); break;
+        default: break;
+      }
+      if (n.type === 'Identifier' && n.name === name && !skip.has(n)) found = true;
+    });
+    if (found) return true;
+  }
+  return false;
+}
+
+/**
+ * `const x = <value>` -> `x = <value>`, in place.
+ *
+ * The node is mutated rather than spliced because it has already been handed
+ * to `ctx.positions` (sourcemap.mjs) and may already carry the `ctx[*][i]`
+ * marker; keeping the object identity keeps both. The comment travels from the
+ * declarator to the statement, since the declarator is going away.
+ */
+function revertDeclarationToAssignment(node) {
+  const d = node.declarations?.[0];
+  const id = d?.id ?? t.identifier('__hole');
+  const init = d?.init ?? t.identifier('undefined');
+  node.type = 'ExpressionStatement';
+  node.expression = t.assignmentExpression('=', id, init);
+  if (d?.leadingComments?.length) {
+    node.leadingComments = [...(node.leadingComments ?? []), ...d.leadingComments];
+  }
+  delete node.declarations;
+  delete node.kind;
+  return node;
+}
+
+/**
+ * The names whose declaration really is in the body, so the prologue must not
+ * declare them a second time.
+ *
+ * Two things are checked, both on the emitted array rather than on a model of
+ * it: the declaration is an element of the body's own statement list (so its
+ * lexical block is the one that encloses every read, including the reads in
+ * every descendant function, which index.mjs emits nested inside that list),
+ * and no read of the name is written before it. A site that fails either is
+ * reverted to the assignment it was and counted under its reason -- the
+ * residue stays attributable, and `declarationSitesRevertedAfterEmission`
+ * reading zero is the evidence that declsite.mjs clause 7 models the emitter
+ * correctly.
+ */
+function verifyDeclarationSites(ctx, body, state) {
+  const kept = new Set();
+  if (!ctx.declaredAtStore.length) return kept;
+  const r = state.report;
+  for (const row of ctx.declaredAtStore) {
+    const at = Array.isArray(body) ? body.indexOf(row.node) : -1;
+    const why = at < 0
+      ? 'emittedDeclarationIsNotAnOutermostStatement'
+      : (readsNameBefore(body, at, row.site.name) ? 'aReadIsEmittedBeforeTheDeclaration' : null);
+    if (why === null) {
+      kept.add(row.site.name);
+      r.contextBindingsDeclaredAtTheStoreSite++;
+      const k = row.site.keyword;
+      r.declarationSitesByKeyword[k] = (r.declarationSitesByKeyword[k] ?? 0) + 1;
+      continue;
+    }
+    revertDeclarationToAssignment(row.node);
+    r.declarationSitesRevertedAfterEmission++;
+    r.declarationSiteRevertsByWhy[why] = (r.declarationSiteRevertsByWhy[why] ?? 0) + 1;
+    // The binding is back on the prologue's two-statement shape, so if it is a
+    // `kConst` it is back to being emitted as `let` -- counted where every
+    // other one is counted.
+    if (row.site.declKind === 'const') r.constBindingsEmittedAsLet++;
+  }
+  return kept;
 }
 
 function countSwitchDispatch(ir, facts) {

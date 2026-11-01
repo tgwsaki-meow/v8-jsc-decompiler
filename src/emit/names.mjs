@@ -167,6 +167,9 @@ const NO_SCOPE = {
   slotName: new Map(), slotBinding: new Map(), unplaceable: [], inheritedCount: 0,
 };
 
+/** The empty declaration-site plan: every binding keeps the prologue shape. */
+const NO_SITES = { byStmt: new Map(), byBinding: new Map() };
+
 /**
  * Plan the names of one function.
  *
@@ -176,9 +179,11 @@ const NO_SCOPE = {
  * @param {object[]} extraExprs  Exprs reached outside `stmts` (Tests, Targets)
  * @param {Set<string>} inherited names an enclosing emitted function declares
  * @param {object} scope  this unit's view of the file-wide scope plan
+ * @param {object} sites  this unit's view of the declaration-site plan
  */
-export function planNames(rec, ir, unit, extraExprs, inherited = new Set(), scope = null) {
+export function planNames(rec, ir, unit, extraExprs, inherited = new Set(), scope = null, sites = null) {
   const sc = scope ?? NO_SCOPE;
+  const st = sites ?? NO_SITES;
   const { params, restName } = parameterNames(ir, rec, unit);
 
   // --- rule 2's parameter half: a parameter may not shadow a context binding
@@ -266,13 +271,30 @@ export function planNames(rec, ir, unit, extraExprs, inherited = new Set(), scop
   // every binding its descendants need even when its own body never mentions
   // one -- a catch context's slot is stored by the context-creating
   // instruction and so has no store op in the owner at all.
+  //
+  // A binding `declsite.mjs` proved can be declared AT ITS STORE still gets a
+  // row here -- the name has to be in `declaredNames` so a child function is
+  // not spelled like it and `exported` still carries it -- but the row says
+  // `atStore`, and `declarationPrologue` is told at the end of the body which
+  // of those actually landed in the body's own statement list. The prologue
+  // decision is therefore taken AFTER the body is built, which is what lets
+  // the placement be verified instead of predicted.
   let constAsLet = 0;
+  const plannedAtStore = [];
   for (const b of sc.owns) {
-    const kind = b.declKind === 'const' ? 'let' : b.declKind;
-    if (b.declKind === 'const') constAsLet++;
+    const site = st.byBinding.get(b) ?? null;
+    let kind;
+    if (site) {
+      kind = site.keyword;
+      plannedAtStore.push(site);
+    } else {
+      kind = b.declKind === 'const' ? 'let' : b.declKind;
+      if (b.declKind === 'const') constAsLet++;
+    }
     declared.set(b.name, {
       kind, origin: b.rawName ? 'scopeInfo' : 'synthetic',
       why: 'contextBinding', comment: b.comment ?? null, binding: b,
+      atStore: site !== null,
     });
   }
 
@@ -313,6 +335,7 @@ export function planNames(rec, ir, unit, extraExprs, inherited = new Set(), scop
     params, restName: finalRestName, paramNames,
     declared, declaredNames, rename, paramRename, globalNames,
     slotName: sc.slotName, visibleBindingNames: sc.visibleNames, unplaceable,
+    plannedAtStore,
     stats: {
       params: params.length,
       declarations: declared.size,
@@ -322,6 +345,7 @@ export function planNames(rec, ir, unit, extraExprs, inherited = new Set(), scop
       contextBindingsInherited: sc.inheritedCount,
       contextBindingsUnplaceable: unplaceable.length,
       constBindingsEmittedAsLet: constAsLet,
+      contextBindingsPlannedAtTheStoreSite: plannedAtStore.length,
     },
     /** Everything in scope inside this function, for the nested ones. */
     exported: new Set([...inherited, ...declaredNames, ...paramNames]),
@@ -341,14 +365,25 @@ export function planNames(rec, ir, unit, extraExprs, inherited = new Set(), scop
  * the FILE's top level `var` is not available: a top-level `var` is a property
  * of the global object, not a context slot, so the script unit declares
  * everything `let`.
+ *
+ * `opts.declaredAtStore` is the set of names that already have a declaration
+ * in the body, because `declsite.mjs` proved the binding is stored exactly
+ * once at a position that encloses every read and stmt.mjs emitted
+ * `const x = <value>` there (docs/EMIT.md 9.11). A second `let x;` here would
+ * be a SyntaxError, and for `var` it would re-introduce the very
+ * `maybe_assigned` the site exists to avoid. The set is passed in rather than
+ * read off `plan.declared` because it is only known once the body is built and
+ * index.mjs has checked, on the emitted array, that the declaration really
+ * landed in the body's own statement list.
  */
 export function declarationPrologue(plan, extraNames = [], opts = {}) {
   const topLevel = opts.topLevel === true;
+  const atStore = opts.declaredAtStore ?? new Set();
   const names = [...plan.declaredNames, ...extraNames.map((n) => sanitise(n))];
   const seen = new Set();
   const lists = new Map([['var', []], ['let', []]]);
   for (const n of names) {
-    if (seen.has(n) || plan.paramNames.has(n)) continue;
+    if (seen.has(n) || plan.paramNames.has(n) || atStore.has(n)) continue;
     seen.add(n);
     const info = plan.declared.get(n);
     const id = t.identifier(n);

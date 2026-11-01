@@ -180,6 +180,14 @@ copy — which is what SSA destruction needs. `{s:'decl'}` therefore emits the
 **initialiser as an assignment** and not a second declaration; the declaration
 moves, the initialiser does not.
 
+There is one exception, and it is the opposite move: a **context binding**
+whose single store is proved to dominate and lexically enclose every read is
+declared *at that store*, with the initialiser, because that is the only shape
+V8 compiles back to an immutable slot read. The proof, the seven clauses it
+rests on and the residue by reason are §9.11; `src/emit/declsite.mjs` is where
+it lives. Rule 1's own subject — a register-allocated local — is unaffected:
+its declaration still hoists.
+
 The list over-declares rather than leave a name free: every non-global,
 non-parameter, **non-slot** spelling a statement mentions gets a declaration
 even when T7's `declarations[]` has no row for it. An unused `let` is ugly; an
@@ -282,9 +290,16 @@ closure. The owner allocates the spelling once and every reader reads it from
 the table. The allocation avoids, file-wide, every parameter name, every global
 any function reads, every emitted function name and this layer's own internal
 names, and on the current path every binding an ancestor already declared;
-collisions take a `$s<n>` suffix. None of this is visible to O1 — a context
-slot is an index in the bytecode — so renaming a binding cannot change one
-instruction.
+collisions take a `$s<n>` suffix.
+
+This used to say that none of it is visible to O1, because a context slot is
+an index in the bytecode and renaming a binding therefore cannot change one
+instruction. **That is false**, and §9.11's measurement is what showed it:
+`ThrowReferenceErrorIfHole` carries the variable's name as a constant-pool
+operand, so every TDZ-guarded read prints the spelling this layer chose, and a
+`$s<n>` suffix shows up as a `constant-value` divergence (`K("e")` vs
+`K("e$s2")`, 47 hunks on a 16-file set). The slot index is invisible; the name
+is not, wherever a hole check can reach the binding.
 
 The declaration keyword is read off the ScopeInfo rather than chosen: a `kVar`
 binding is declared `var`, everything else `let`. It matters because V8
@@ -293,11 +308,13 @@ x;` costs `LdaTheHole; StaCurrentContextSlot` at scope entry plus
 `LdaUndefined; StaCurrentContextSlot` for the declaration, and `var x;` costs
 nothing. At the file's top level `var` is not available (a top-level `var` is a
 property of the global object, not a context slot), so the script unit declares
-everything `let`. A `kConst` binding is declared `let` and **counted**
-(`constBindingsEmittedAsLet`): rule 1 separates the declaration from the store,
-`const x;` is a `SyntaxError`, and the consequence is that V8 reads it with
-`LdaCurrentContextSlot` instead of the immutable form. That is a real residual,
-reported rather than hidden — §9.
+everything `let`. A `kConst` binding is declared **`const`** when §9.11's proof
+holds — the declaration then moves to the binding's single store and carries
+the initialiser, which is the only text shape V8 reads back as
+`maybe_assigned == kNotAssigned` — and falls back to `let` when it does not,
+where it is still **counted** (`constBindingsEmittedAsLet`) because `const x;`
+with a separate store is a `SyntaxError` and the fall-back costs the immutable
+slot read. The residue is tabulated by reason in §9.11.
 
 #### A binding that cannot be placed refuses the function
 
@@ -821,20 +838,182 @@ Everything here is counted by the tooling and appears in `report`.
     not used here: `@babel/generator`'s output is deterministic, which O2's
     round-trip fixpoint needs, and a second formatter is one more thing that
     could change the text between two runs.
-11. **A context binding is always `let` or `var`, never `const`, so V8 reads
-    it with the mutable opcode.** Rule 1 declares with no initialiser and
-    assigns separately, which makes every binding `maybe_assigned`;
-    `const x;` is not expressible. The original reads an unassigned context
-    variable with `LdaImmutableContextSlot` /
-    `LdaImmutableCurrentContextSlot`, and on
-    `r_commonKitComponentXkitXDialog.jsc` those two account for 299 of the
-    file's 363 slot reads against 64 stores (O1.md §6.5), so this is the
-    largest residual the rule-3 fix leaves behind. The same cause removes the
-    `ThrowReferenceErrorIfHole` the original emits for a TDZ-guarded read.
-    Fixing it means emitting `const x = <value>` / `let x = <value>` **at the
-    store site** for a binding with exactly one store that dominates every
-    read, which is a dominance analysis rule 1 deliberately avoided for phis
-    and a separate measurement. Counted as `constBindingsEmittedAsLet`.
+11. **A context binding is declared AT ITS STORE, with an initialiser,
+    whenever that is provable over the IR — so `const` is expressible and the
+    reads come back immutable.** `src/emit/declsite.mjs`. *Closed; the residue
+    is tabulated below.*
+
+    This gap used to state a defect. What it said was that rule 1 declares
+    every binding with no initialiser and assigns at the store site
+    separately, so `const x;` is a `SyntaxError` and a `kConst` binding came
+    out `let`. The keyword was never the point. The point is the opcode:
+    `AstNodeFactory::NewAssignment` marks a `VariableProxy` assigned for every
+    operator except `Token::kInit`, `ScopeInfo::Create` stores that bit as
+    `maybe_assigned_flag`, and `BytecodeGenerator::BuildVariableLoad:4756`
+    reads it back —
+
+    ```cpp
+    BytecodeArrayBuilder::ContextSlotMutability immutable =
+        (variable->maybe_assigned() == kNotAssigned)
+            ? BytecodeArrayBuilder::kImmutableSlot
+            : BytecodeArrayBuilder::kMutableSlot;
+    ```
+
+    — so a declaration plus a separate store made **every** binding we emit
+    `maybe_assigned`, and every read of it the mutable opcode. docs/O1.md §6.8
+    measured the consequence: family `load-form` 132 → 12 383 functions, whose
+    top shape — `LdaImmutableCurrentContextSlot →
+    LdaCurrentContextSlotNoCell`, 8 983 functions, 11 633 hunks — was the
+    largest single divergence in the whole comparison.
+
+    The fix is one statement instead of two, `const x = <value>` at the store,
+    and the whole of the work is the proof that it is legal: moving a
+    declaration later in a function can make a name invisible (`let` and
+    `const` are block-scoped), can turn a read of `undefined` into a TDZ
+    `ReferenceError`, and can claim single assignment for a binding the
+    original does not consider singly assigned.
+
+    #### The condition, as seven clauses over the IR
+
+    Each clause is an IR fact, each failure is named, and a binding that fails
+    any clause keeps the prologue shape and is counted under the clause that
+    refused it (`declsite.mjs::DECL_SITE_WHY`). No path through the file
+    declares at a store "probably".
+
+    1. **The original says so.** Every `ContextSlot` location of the binding
+       carries `maybeAssigned`, read out of the ScopeInfo's own
+       `maybe_assigned_flag` (`src/heap/objects.mjs`, `VariableProperties`),
+       and every one has to say `false`.
+    2. **One program store, file-wide.** Stores are counted over every
+       function, and V8's TDZ initialisation is not one of them:
+       `VisitVariableDeclaration:2158` emits `LoadTheHole().StoreContextSlot`
+       for a lexical binding that `binding_needs_init()`, which T7 already
+       recognises as `{s:'decl', tdzInitialisation:true}`
+       (`src/recover/patterns/misc.mjs`) and which emits no text.
+    3. **The store is in the owner**, not in a descendant.
+    4. **The store dominates every read in the owner.** `ir.dominators` is the
+       Cooper–Harvey–Kennedy tree; a read in the store's own block has to come
+       after the store's instruction. Reads in descendants need no dominance —
+       a closure body does not run where the closure is created, and the
+       original's answer for a cross-closure read of a TDZ binding is the hole
+       check V8 emits for it.
+    5. **The store is not inside a loop** (`ir.blocks[b].loopDepth`), where a
+       `let`/`const` declaration is a fresh binding per iteration and V8
+       allocates a per-iteration context.
+    6. **The stored value does not read the binding.** `const x = x + 1` is
+       what a compound assignment lowers to, and it is a TDZ self-reference.
+    7. **The store is an outermost statement of the body.** Dominance is
+       necessary and not sufficient: a declaration inside an `if` is invisible
+       after the `if` even though the `if` dominates what follows. The region
+       tree answers this before emission — the store's block must be a
+       `{r:'block'}` leaf reached from `sf.root` through `{r:'seq'}` nodes only
+       — and `index.mjs::verifyDeclarationSites` then VERIFIES it on the
+       emitted array by node identity, reverting the statement to an
+       assignment if the model was wrong.
+
+    #### Clause 1 is load-bearing, and it is not redundant
+
+    Clauses 2–7 prove something about OUR text: that the binding is written
+    once, at a place that encloses and precedes every read. They prove nothing
+    about the original. A source `let x; … x = f()` has exactly one program
+    store in our IR, it dominates every read, and the original reads it with
+    the MUTABLE opcode — because in the original the store is not a
+    declaration's initialiser either. Declaring that binding at its store
+    would emit `LdaImmutableCurrentContextSlot` where the original has
+    `LdaCurrentContextSlotNoCell`: the same diff, mirrored, in the same
+    family. Measured, clause 1 refuses **18** bindings of 281 that clauses 2–7
+    would admit, and **0** of the 18 bindings the original reads mutably were
+    declared at a store.
+
+    Clause 1 also covers a hole in clause 2 that nothing else could. Clause 2
+    counts the stores T6 found in the functions this file RECOVERED; a
+    descendant that failed to recover contributes no store. V8 computed
+    `maybe_assigned` over the whole original program including that
+    descendant, so a binding a lost function assigns is refused by clause 1
+    whatever clause 2 can see.
+
+    #### The placement is asked twice, on purpose
+
+    Clause 7 asks the region tree before emission, which is what attributes
+    the residue; `verifyDeclarationSites` asks the emitted array afterwards by
+    node identity and reverts the statement if the answer differs, which is
+    what makes it a proof rather than a model. The two have **not** disagreed
+    yet: `declarationSitesRevertedAfterEmission` is 0 over 360 functions, and
+    the check stays because a disagreement is a silent scoping bug.
+
+    #### What it costs and what it buys
+
+    `tools/emit/declsite_probe.mjs`, 5 corpus files, 360 functions,
+    281 context bindings:
+
+    | | bindings |
+    |---|---:|
+    | declared at their store site | **252 = 89.7%** |
+    | of the 263 the original reads immutably | **252 = 95.8%** |
+    | of the 18 the original reads mutably | **0** — clause 1 |
+    | refused: `scopeInfoSaysMaybeAssigned` | 18 |
+    | refused: `storeIsNotInAnOutermostBlock` | 7 |
+    | refused: `noProgramStore` | 4 |
+    | reverted after emission | 0 |
+    | §11.3 invariant violations | 0 |
+
+    Keyword at the store site: `const` 91, `let` 7, `var` 154.
+    `constBindingsEmittedAsLet` falls to 2. Stores per binding: 260 bindings
+    have exactly one, 17 have two or more, 4 have none.
+
+    O1 over 16 corpus files chosen from `scratch/o1both/results/` for carrying
+    the family, the same files before and after, 7 408 paired functions on
+    both sides and **no change in the paired count** — so none of this was
+    bought by emitting less:
+
+    | | before | after |
+    |---|---:|---:|
+    | exactly equal | 895 = 12.08% | **1 222 = 16.50%** |
+    | mean opcode similarity | 0.6897 | **0.7850** |
+    | functions in family `load-form` | 2 567 | **227 = 91.2% fewer** |
+
+    #### What it exposed: a binding's NAME is visible in the bytecode
+
+    Rule 3 and `scopes.mjs` both claimed that renaming a context binding
+    cannot change one instruction, because a context slot is an index. That is
+    false, and this measurement is what showed it:
+    `ThrowReferenceErrorIfHole` takes the variable's **name** as a
+    constant-pool operand. Declaring at the store makes TDZ-guarded reads
+    appear where our text previously had none, and with them the collision
+    suffix this layer allocates:
+
+    ```
+    constant-value / ThrowReferenceErrorIfHole K("e") vs K("e$s2")   47 hunks
+    reordered-block / ThrowReferenceErrorIfHole+Star                 34 hunks
+    ```
+
+    Both were 0 before. So `$s<n>` is not free after all, and the next item on
+    this list is to prefer the ScopeInfo's own spelling over a suffix wherever
+    a TDZ check can reach the binding. Recorded here rather than fixed because
+    it is a naming change and this gap was an opcode change.
+
+    #### The two relaxations that are available and were not taken
+
+    Both are for `var` only, and both are stated rather than taken because
+    each trades a clause of the proof for coverage:
+
+    * **Clause 7 does not apply to a `var`.** A `var` declaration is hoisted
+      to the closure scope, so `var x = <value>` inside an `if` or a `switch`
+      case still declares `x` for the whole body, and a `var` has no TDZ —
+      `binding_needs_init()` is false, so a read before the store gives
+      `undefined` exactly as it does today. The reason this is not taken is
+      the emitter, not soundness: a store in a loop's UPDATE region has to be
+      an expression (`region.mjs::asSequence`), and a declaration there turns
+      `for (;c;u)` into a counted `HOLE forUpdateNotAnExpression` with the
+      update appended to the body. That is a worse output than the diff it
+      would close, and modelling which placements are expression positions is
+      a second model to be wrong about.
+    * **Clause 5 does not apply to a `var` either**, for the same reason: no
+      per-iteration binding, and `maybe_assigned` is static, so one
+      `Token::kInit` assignment inside a loop is still `kNotAssigned`.
+
+    The residue they would recover is `storeIsNotInAnOutermostBlock` +
+    `storeIsInsideALoop` restricted to `kVar`.
 12. **A temp of an enclosing function can still shadow a descendant's global
     read.** Rule 2 renames a temp whose spelling is also a global *in the same
     function*, which is where the two storage classes are both visible. It

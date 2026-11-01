@@ -58,6 +58,11 @@ const R = {
   contextBindingsUnplaceable: 0, constBindingsEmittedAsLet: 0,
   functionsRefusedForAnUnplaceableBinding: 0, refusalsByWhy: {}, refusalSamples: [],
   scopePlan: {}, unreferencedClosures: 0,
+  // ---- 9.11: declare at the store site, and the residue by named reason
+  contextBindingsDeclaredAtTheStoreSite: 0, declarationSitesByKeyword: {},
+  declarationSitesRevertedAfterEmission: 0, declarationSiteRevertsByWhy: {},
+  declarationSitesWithADifferentSpelling: 0, declarationSitesEmittedTwice: 0,
+  declarationSitePlan: {},
   namesReadButNeverWritten: 0, namesDeclared: 0, unwrittenSamples: [],
   unresolvedNames: 0, globalReads: 0, blocksWithoutStatements: 0,
   regionKindsNot112: {}, unknownRegionKinds: {},
@@ -99,6 +104,8 @@ try {
     'localsRenamed', 'paramsRenamedForABinding', 'declarations',
     'contextBindingsOwned', 'contextBindingsInherited', 'contextBindingsUnplaceable',
     'constBindingsEmittedAsLet', 'functionsRefusedForAnUnplaceableBinding',
+    'contextBindingsDeclaredAtTheStoreSite', 'declarationSitesRevertedAfterEmission',
+    'declarationSitesWithADifferentSpelling', 'declarationSitesEmittedTwice',
     'namesReadButNeverWritten', 'namesDeclared', 'unresolvedNames', 'globalReads',
     'blocksWithoutStatements']) {
     R[k] = rep[k] ?? 0;
@@ -107,6 +114,9 @@ try {
   R.refusalsByWhy = rep.refusalsByWhy ?? {};
   R.refusalSamples = rep.refusalSamples ?? [];
   R.scopePlan = rep.scopePlan ?? {};
+  R.declarationSitePlan = rep.declarationSitePlan ?? {};
+  R.declarationSitesByKeyword = rep.declarationSitesByKeyword ?? {};
+  R.declarationSiteRevertsByWhy = rep.declarationSiteRevertsByWhy ?? {};
   R.loopForms = rep.loopForms;
   R.loopIdioms = rep.loopIdioms;
   R.triesByPrediction = rep.triesByPrediction;
