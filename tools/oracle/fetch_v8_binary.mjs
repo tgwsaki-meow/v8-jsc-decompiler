@@ -103,6 +103,20 @@ async function get(platform, version, { unzip = false } = {}) {
       const st = fs.statSync(f);
       console.log(`    ${String(st.size).padStart(12)}  ${path.relative(dir, f)}`);
     }
+    // The zip carries a POSIX mode but not every extractor applies it, and a
+    // d8 with no execute bit fails as an EACCES that reads like ENOENT, later,
+    // inside whichever suite reached for it -- the same hazard
+    // fetch_electron.mjs --binary already handles. One syscall here instead,
+    // and say what happened, because `tools/oracle/engines.mjs` will not
+    // offer a non-executable binary as a candidate.
+    if (process.platform !== 'win32') {
+      for (const stem of ['d8', 'mksnapshot']) {
+        const p = path.join(dir, stem);
+        if (!fs.existsSync(p)) continue;
+        fs.chmodSync(p, 0o755);
+        console.log(`  executable: ${p} (mode ${(fs.statSync(p).mode & 0o777).toString(8)})`);
+      }
+    }
   }
   return { zipPath, sha256: sha, size: buf.length, dir };
 }
