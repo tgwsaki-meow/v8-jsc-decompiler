@@ -22,11 +22,30 @@
 //     every phi operand of a live phi
 //     every context-slot store
 //     every instruction a pattern consumed (the pattern decided it matters)
+//     every value in `cx.extraRoots`
 //
 // Note what is NOT a root: a `Star` whose value is never read. V8 allocates a
 // register for every intermediate, so a function that computes `a.b.c` leaves
 // three dead copies behind; dropping them is the difference between readable
 // output and a transcript of the register file.
+//
+// `extraRoots` carries one class, and it is not an exception to the rule above
+// so much as a correction to what "no side effect" means for one opcode. A
+// value that turns a `SharedFunctionInfo` into a function object is the only
+// evidence in this function's bytecode that the program contains that
+// function: `bytecode-generator.cc::VisitFunctionDeclaration:2181` returns at
+// :2187 when the declaration's variable `is_used()` is false, so V8 emits no
+// `CreateClosure` for a function nothing reads, and nothing in the serialised
+// cache mentions it. Measured the other way round with the corpus's own V8
+// (`tools/probes/probe_closure.mjs form`): 100 unreferenced inner
+// declarations are carried 2 of 102 times, the same 100 written
+// `var h = function h(){}` are carried 102 of 102. So `CreateClosure` in the
+// input PROVES the original had a reader, and dropping it as "pure and
+// unused" deletes a whole function from the output -- which is not dead-code
+// elimination but output loss. `src/recover/index.mjs` repairs it by
+// materialising instead, and counts both ends:
+// `stats.functionLiteralRoots` and
+// `stats.emit.functionLiteralsMaterialisedForNoLiveUse`.
 
 export function deadValues(cx) {
   const { ir } = cx;
@@ -40,7 +59,10 @@ export function deadValues(cx) {
     work.push(id);
   };
 
-  const stats = { total: 0, live: 0, dead: 0, readOnlyDropped: 0, movesDropped: 0 };
+  const stats = {
+    total: 0, live: 0, dead: 0, readOnlyDropped: 0, movesDropped: 0,
+    functionLiteralRoots: 0,
+  };
 
   for (const v of values) {
     if (!v) continue;
@@ -64,6 +86,15 @@ export function deadValues(cx) {
   }
   // a value some pattern rewrote into an expression is live by construction
   for (const id of cx.patternValues) push(id);
+  // the function-literal roots. How many of them this root class really
+  // rescued is NOT asked here -- liveness has not propagated yet, so the
+  // answer would be "all of them". index.mjs asks the question that matters
+  // after the fixpoint: which of these has no live USE.
+  for (const id of cx.extraRoots ?? []) {
+    if (id === null || id === undefined || id < 0 || id >= values.length) continue;
+    stats.functionLiteralRoots++;
+    push(id);
+  }
 
   while (work.length) {
     const id = work.pop();

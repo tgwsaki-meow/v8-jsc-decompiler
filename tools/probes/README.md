@@ -1,8 +1,8 @@
 # Probes — the one-off measurements that published claims rest on
 
-Four scripts that each answered one question about the measurement rather than
+Five scripts that each answered one question about the measurement rather than
 about the decompiler. They are here, and not in `scratch/`, because
-`docs/O1.md`, `docs/METRICS.md`, `src/verify/HARNESS.md`,
+`docs/O1.md`, `docs/RECOVER.md`, `docs/METRICS.md`, `src/verify/HARNESS.md`,
 `src/verify/mutate.mjs` and `src/verify/o1_bytecode.mjs` all cite them as the
 evidence for a number, and `.gitignore` excludes `scratch/*`: for as long as
 they lived there the public repo cited evidence a reader could not get.
@@ -25,6 +25,7 @@ anything that mints has to mint with the corpus's own V8 (docs/O1.md 1).
 | `probe_gap.mjs` | corpus + minter | docs/O1.md 7.2 |
 | `probe_gap2.mjs` | minter | docs/O1.md 6.3 and 7.2, now self-test F |
 | `probe_rootcause.mjs` | corpus + minter | docs/O1.md 6.5 |
+| `probe_closure.mjs` | corpus (`fate`, `cause`), minter (`form`) | docs/RECOVER.md 9 |
 
 ## `probe_pool.mjs` — the blind spot is the printer's, not ours
 

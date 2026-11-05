@@ -434,7 +434,9 @@ function fileReport() {
   return {
     file: null, units: 0, compiledUnits: 0, functionsEmitted: 0, orphans: 0,
     functionsFailed: 0, functionsClaimedInline: 0, topLevelReturns: 0, emitFailures: [],
-    unreferencedClosures: 0,
+    unreferencedClosures: 0, unreferencedClosuresRebound: 0,
+    unreferencedClosuresAlreadyBound: 0, unreferencedClosuresAtTheTopLevel: 0,
+    unreferencedClosuresNotInTheInput: 0,
     holes: { total: 0, byWhy: {}, byKind: { expr: 0, stmt: 0, region: 0 } },
     loops: 0, loopForms: {}, loopIdioms: {}, tries: 0, triesByPrediction: {},
     finallyShapes: 0, finallyShapeKinds: {}, switches: 0, switchForms: {},
@@ -606,6 +608,15 @@ function emitUnitInner(state, rec0, how) {
   // ---- a unit with no usable pair still has to appear (11.5). Its children
   //      do too: a function is not lost because its parent could not be
   //      recovered, so they are emitted inside the stub body.
+  //
+  //      Every one of them is unreferenced BY CONSTRUCTION -- the stub body is
+  //      a `throw` and references nothing -- so each goes through
+  //      `unreferenced()` for its binding form, exactly like the children of a
+  //      refusal below. This was the one path that did not, and it is the one
+  //      path with no measured effect: `probe_closure.mjs cause` finds 0 units
+  //      of its 25-file sample reaching here, because all 23 of that sample's
+  //      failures are refusals. Closed anyway -- a child must not depend on
+  //      which kind of body its parent ended up with.
   if (!rec || !sf) {
     state.report.functionsFailed++;
     state.report.holes.total++;
@@ -615,7 +626,7 @@ function emitUnitInner(state, rec0, how) {
     for (const c of state.childrenOf.get(rec0.sfiId) ?? []) {
       if (state.claimed.has(c.sfiId) || state.emitted.has(c.sfiId)) continue;
       for (const s of asStatements(emitUnit(state, c, { role: 'declaration', inherited: how.inherited ?? new Set() }))) {
-        stubChildren.push(s);
+        stubChildren.push(unreferenced(state, c, s, how));
       }
     }
     const body = t.blockStatement([...stubChildren, ...failedBody(unit, failure)]);
@@ -777,18 +788,7 @@ function emitUnitInner(state, rec0, how) {
     if (state.claimed.has(c.sfiId) || state.emitted.has(c.sfiId)) continue;
     const node = emitUnit(state, c, { role: 'declaration', inherited: plan.exported, childName });
     for (const s of asStatements(node)) {
-      if (!referenced.has(c.sfiId)) {
-        // Measured consequence, counted because docs/O1.md 6.5 step 5 blamed
-        // it on the context-slot defect and the measurement says otherwise: a
-        // function this file declares but nothing REFERENCES is dropped by
-        // V8's scope analysis, so no CreateClosure is emitted, the SFI is
-        // unreachable from the parent's constant pool, and the function is
-        // absent from the recompiled cache. That -- not the scoping of its
-        // captured variables -- is what O1's A-side unpaired count measures.
-        state.report.unreferencedClosures++;
-        mark(s, `unreferenced closure (sfi ${c.sfiId})`);
-      }
-      nested.push(s);
+      nested.push(referenced.has(c.sfiId) ? s : unreferenced(state, c, s, how));
     }
   }
 
@@ -993,6 +993,85 @@ function countSwitchDispatch(ir, facts) {
     if (facts.isSwitch(ins.opcodeValue)) n++;
   }
   return n;
+}
+
+/**
+ * A child nothing in this body references, declared in a form V8 keeps.
+ *
+ * Measured consequence, counted because docs/O1.md 6.5 step 5 blamed it on the
+ * context-slot defect and the measurement says otherwise: a function this file
+ * declares but nothing REFERENCES is dropped by V8's scope analysis, so no
+ * `CreateClosure` is emitted, the SFI is unreachable from the parent's
+ * constant pool, and the function is absent from the recompiled cache. That --
+ * not the scoping of its captured variables -- is what O1's A-side unpaired
+ * count measures.
+ *
+ * The drop is in one statement of the bytecode generator:
+ * `src/interpreter/bytecode-generator.cc::VisitFunctionDeclaration:2181`
+ * returns at :2187 when `!variable->is_used()`, so the function literal is
+ * never visited and nothing in the cache mentions it.
+ * `VisitVariableDeclaration:2135` has the same early return at :2138, but it
+ * guards only the TDZ hole store -- V8's parser turns `var f = e` into a
+ * declaration plus an assignment statement, and `VisitAssignment` evaluates
+ * the right-hand side whether or not anything reads `f`.
+ *
+ * So the FORM decides, and the form is this layer's choice. Measured with the
+ * corpus's own V8, 100 unreferenced functions per script, one spelling per
+ * row (`tools/probes/probe_closure.mjs form`):
+ *
+ *     IN A FUNCTION   function h(){}                     2 of 102 carried
+ *     IN A FUNCTION   function* h(){}                    2 of 102
+ *     IN A FUNCTION   var h = function h(){}           102 of 102
+ *     IN A FUNCTION   let h = function h(){}           102 of 102
+ *     IN A FUNCTION   var h = function* h(){}          102 of 102
+ *     IN A FUNCTION   var h = async function h(){}     102 of 102
+ *     IN A FUNCTION   var h = (a)=>a                   102 of 102
+ *     IN A FUNCTION   function h(){} + one reference   102 of 102
+ *     TOP LEVEL       function h(){}                   101 of 101
+ *     TOP LEVEL       var h = function h(){}           101 of 101
+ *
+ * An arrow child was already emitted as `var f = () => {}` and so was never
+ * really lost; this gives every other unreferenced child the same protection,
+ * including a generator declaration, which the first two rows show is dropped
+ * for the same reason. The body, the name and the position are untouched --
+ * only the binding form changes -- so the parent gains the `CreateClosure` the
+ * original has and nothing that was equivalent stops being equivalent.
+ *
+ * Two cases keep the declaration, each with its own count:
+ *
+ *   * a child of the SCRIPT unit. The last two rows measure it: a top-level
+ *     declaration is carried either way, because it is UNALLOCATED and
+ *     `VisitGlobalDeclarations:2281` records it into the `DeclareGlobals` pair
+ *     array with no `is_used()` test at all -- it DCHECKs `var->is_used()` at
+ *     :2285 instead, a global binding being observable whether or not the
+ *     script reads it. Rebinding it would only move the script's own bytecode
+ *     away from the original. (A MODULE top level is the one place that does
+ *     skip them, `VisitModuleDeclarations:2258` at :2262; nothing here emits a
+ *     module.)
+ *   * a child with no bytecode in the input. Stream A does not contain it, so
+ *     forcing V8 to compile it would manufacture a function with no partner --
+ *     a B-side unpaired, which docs/O1.md 4 reads as a defect of its own.
+ */
+function unreferenced(state, child, s, how) {
+  state.report.unreferencedClosures++;
+  const keep = (why, counter) => {
+    state.report[counter]++;
+    mark(s, `unreferenced closure (sfi ${child.sfiId}); ${why}`);
+    return s;
+  };
+  if (how.role === 'script') return keep('top level, so DeclareGlobals carries it anyway', 'unreferencedClosuresAtTheTopLevel');
+  if (!child.unit.bytecode) return keep('not compiled in the input either', 'unreferencedClosuresNotInTheInput');
+  if (!t.isFunctionDeclaration(s) || !s.id) {
+    return keep('already declared with an initialiser', 'unreferencedClosuresAlreadyBound');
+  }
+  const fn = t.functionExpression(t.identifier(s.id.name), s.params, s.body, s.generator, s.async);
+  const node = t.variableDeclaration('var', [t.variableDeclarator(t.identifier(s.id.name), fn)]);
+  node.leadingComments = s.leadingComments ?? null;
+  node.loc = s.loc ?? null;
+  state.report.unreferencedClosuresRebound++;
+  mark(node, `unreferenced closure (sfi ${child.sfiId}); declared with an initialiser `
+    + 'because VisitFunctionDeclaration does not serialise a declaration nothing reads');
+  return node;
 }
 
 function droppedOnRemoved(rec, sf, ctx) {
