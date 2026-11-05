@@ -46,7 +46,24 @@ export const EMIT_HOLE_WHY = Object.freeze({
   unknownStmtTag: 'a Stmt tag outside 11.1',
   blockWithoutStatements: 'a {r:\'block\'} leaf T7 produced no statements for',
   templateObjectAsValue: 'a tagged template\'s raw/cooked pair survived to a value position',
-  classMembersNotDecoded: 'docs/RECOVER.md 8.1: %DefineClass\'s ClassBoilerplate is not decoded',
+  classMembersNotDecoded: '%DefineClass\'s args[0] is not a decoded ClassBoilerplate, so this '
+    + 'class has no member list at all (docs/RECOVER.md 8.1)',
+  // The member list IS decoded and one member still could not be placed. Each
+  // reason is its own why, because they fail for different reasons and lumping
+  // them together is what made the old single counter uninformative.
+  classMemberKindNotSpellable: 'a ClassBoilerplate member whose ValueKind this layer cannot '
+    + 'spell -- kAutoAccessor (`accessor x`) is the only one',
+  classMemberKeyKindNotSpellable: 'a class member keyed by a Symbol, which has no source spelling',
+  classMemberValueArgumentMissing: 'the boilerplate names an argument index the %DefineClass '
+    + 'call does not have',
+  classMemberKeyArgumentMissing: 'the boilerplate names a computed-key argument index the '
+    + '%DefineClass call does not have',
+  classMemberValueIsNotAClosure: 'a class member whose value reached this layer as something '
+    + 'other than a `{e:fn}`, so there is no body to put in the class',
+  classMemberAlreadyEmitted: 'a class member whose unit was already emitted elsewhere',
+  classMemberWithoutAUnit: 'a class member naming an SFI this file does not carry',
+  classMemberNotPlaced: 'a class member src/heap or T7 refused, under a reason this layer does '
+    + 'not have its own counter for',
   superOutsideAMethod: '`super` in a unit not emitted as a class method',
   awaitOutsideAnAsyncFunction: 'an {e:\'await\'} in a unit whose SFI is not async',
   yieldOutsideAGenerator: 'an {e:\'yield\'} in a unit whose SFI is not a generator',

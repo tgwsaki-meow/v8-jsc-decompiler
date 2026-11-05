@@ -74,6 +74,14 @@ export function constantExpr(c, where) {
       // the canonical empty boilerplate / empty fixed array root
       if (c.isEmpty) return { e: 'object', props: [] };
       return hole('rootObjectConstant', c.rootName ?? c.name ?? null, where);
+    case 'classBoilerplate':
+      // Not a value. It is `%DefineClass`'s descriptor of the class it is about
+      // to build, and `patterns/classes.mjs` reads it off the instruction
+      // rather than through here -- so reaching this branch means a
+      // `LoadConstantPoolEntry` of a boilerplate was read by something that is
+      // not a `%DefineClass`, which has no source form at all.
+      return hole('classBoilerplateAsValue',
+        `${c.entries?.length ?? 0} member(s), ${c.argumentsCount ?? '?'} argument(s)`, where);
     default: break;
   }
   switch (c.t) {

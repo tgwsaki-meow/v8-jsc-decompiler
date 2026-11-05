@@ -437,6 +437,11 @@ function fileReport() {
     unreferencedClosures: 0, unreferencedClosuresRebound: 0,
     unreferencedClosuresAlreadyBound: 0, unreferencedClosuresAtTheTopLevel: 0,
     unreferencedClosuresNotInTheInput: 0,
+    // A class member placed INSIDE its class body, and the dynamic arguments
+    // of a %DefineClass that no template describes -- which, since
+    // ClassBoilerplate::New puts no FIELD in a template, is the measure of the
+    // class fields this decode cannot reach (docs/RECOVER.md 8.1).
+    classMembersPlaced: 0, classArgumentsNoTemplateDescribes: 0,
     holes: { total: 0, byWhy: {}, byKind: { expr: 0, stmt: 0, region: 0 } },
     loops: 0, loopForms: {}, loopIdioms: {}, tries: 0, triesByPrediction: {},
     finallyShapes: 0, finallyShapeKinds: {}, switches: 0, switchForms: {},
@@ -692,17 +697,33 @@ function emitUnitInner(state, rec0, how) {
         members.push(t.classMethod('constructor', t.identifier('constructor'), fn.params, fn.body));
       }
     }
+    // Every member T7 placed, plus every one it could not: a refusal is a
+    // counted hole with the reason T7 or src/heap gave it, never a member
+    // guessed into a shape that happens to parse.
+    const refused = [...(e.membersNotPlaced ?? [])];
     for (const m of e.members ?? []) {
-      const mm = classMember(ctx, m);
-      if (mm) members.push(mm);
+      const mm = classMember(ctx, m, state);
+      if (mm.node) members.push(mm.node);
+      else refused.push({ why: mm.why, detail: mm.detail ?? null, key: typeof m.key === 'string' ? m.key : null });
     }
     const node = t.classExpression(id, superClass, t.classBody(members), []);
-    if (!(e.members ?? []).length) {
-      // docs/RECOVER.md 8.1: the ClassBoilerplate constant is not decoded, so
-      // the member list is empty and that has to be visible, not implied.
+    if (!e.membersDecoded) {
+      // docs/RECOVER.md 8.1: args[0] was not a decoded ClassBoilerplate, so
+      // there is no member list at all and that has to be visible, not implied.
       ctx.countHole('classMembersNotDecoded', 'expr');
       mark(node, `HOLE classMembersNotDecoded ${e.dynamicArguments ?? 0} dynamic argument(s)`);
     }
+    for (const r of refused) {
+      ctx.countHole(CLASS_MEMBER_HOLES.has(r.why) ? r.why : 'classMemberNotPlaced', 'expr');
+      mark(node, `HOLE ${r.why}${r.key ? ` ${r.key}` : ''}${r.detail ? ` (${r.detail})` : ''}`);
+    }
+    if (e.boilerplateArgumentsUnclaimed) {
+      // ClassBoilerplate::New describes no FIELD at all, and a computed-name
+      // field still costs one argument, so this is the measure of what the
+      // decode cannot reach rather than of anything going wrong here.
+      state.report.classArgumentsNoTemplateDescribes += e.boilerplateArgumentsUnclaimed;
+    }
+    state.report.classMembersPlaced += members.length;
     return node;
   };
 
@@ -1108,18 +1129,56 @@ function paramsOfUnit(unit) {
   return out;
 }
 
-function classMember(ctx, m) {
-  if (!m || !m.kind) return null;
+/**
+ * The three member kinds this layer can spell, and nothing else.
+ *
+ * `method`, `get` and `set` are exactly what a `ClassBoilerplate` entry's
+ * ValueKind can be once `kAutoAccessor` is excluded (src/heap's
+ * `decodeClassBoilerplate`), and the mapping is total: there is no default
+ * branch. A kind not in this table used to fall through to `method`, which
+ * would emit `x(){}` for a getter -- a different program with no marker.
+ */
+const CLASS_MEMBER_KINDS = new Set(['method', 'get', 'set']);
+
+/** The named refusals `resolveClass` counts under their own why. */
+const CLASS_MEMBER_HOLES = new Set([
+  'classMemberKindNotSpellable', 'classMemberKeyKindNotSpellable',
+  'classMemberValueArgumentMissing', 'classMemberKeyArgumentMissing',
+  'classMemberValueIsNotAClosure', 'classMemberAlreadyEmitted', 'classMemberWithoutAUnit',
+]);
+
+/**
+ * One `{e:'class'}.members` entry as a class body element.
+ *
+ * @returns {{node: object}|{why: string, detail?: string}}
+ */
+function classMember(ctx, m, state) {
+  if (!m || !CLASS_MEMBER_KINDS.has(m.kind)) {
+    return { why: 'classMemberKindNotSpellable', detail: String(m?.kind ?? 'absent') };
+  }
   const key = m.computed || (m.key && typeof m.key === 'object')
     ? expr(ctx, m.key) : t.identifier(sanitise(String(m.key ?? 'member')));
-  if (m.value?.e === 'fn') {
-    const fn = ctx.functionLike(m.value, 'method');
-    if (fn && fn.type === 'FunctionExpression') {
-      const kind = m.kind === 'get' || m.kind === 'set' ? m.kind : 'method';
-      return t.classMethod(kind, key, fn.params, fn.body, !!m.computed, !!m.static);
-    }
+  if (m.value?.e !== 'fn') {
+    // The boilerplate puts only METHOD / GETTER / SETTER in a template
+    // (ClassBoilerplate::New), and BuildClassLiteral fills their argument with
+    // `VisitForRegisterValue(property->value(), value)` on a FunctionLiteral,
+    // so the argument is a `CreateClosure`. Anything else means the closure was
+    // lost on the way here, and a `classProperty` holding it would be a class
+    // field -- a different program.
+    return { why: 'classMemberValueIsNotAClosure', detail: m.value?.e ?? 'absent' };
   }
-  return t.classProperty(key, m.value ? expr(ctx, m.value) : null, null, null, !!m.computed, !!m.static);
+  // `resolveFn` answers null for both "no such unit in this file" and "already
+  // emitted somewhere else", and they are different defects: the first is the
+  // input's, the second is this layer's.
+  if (!state.byId.has(m.value.sfiId)) {
+    return { why: 'classMemberWithoutAUnit', detail: `sfi ${m.value.sfiId}` };
+  }
+  const fn = ctx.functionLike(m.value, 'method');
+  if (!fn) return { why: 'classMemberAlreadyEmitted', detail: `sfi ${m.value.sfiId}` };
+  if (fn.type !== 'FunctionExpression') {
+    return { why: 'classMemberValueIsNotAClosure', detail: fn.type };
+  }
+  return { node: t.classMethod(m.kind, key, fn.params, fn.body, !!m.computed, !!m.static) };
 }
 
 /** T7's idiom claims, as 11.4's `perFunction[].patterns`. */
