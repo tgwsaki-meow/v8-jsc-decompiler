@@ -916,3 +916,59 @@ rather than a known quantity: a dictionary-shaped properties or elements
 template, `accessor x`, and a class FIELD — which is not an undecoded part of
 the boilerplate but an absent one, because `ClassBoilerplate::New:769`
 `continue`s on `ClassLiteral::Property::FIELD` before it writes any template.
+
+### 9.7 On the corpus: the shape is right and the exact count fell
+
+Both runs are the sharded O1 scan over all 1039 files
+(`gh workflow run scan.yml -f layer=o1 -f shards=12`), one on `main` and one on
+this branch, nothing executed either time.
+
+| | `main` | this branch |
+|---|---:|---:|
+| files `ok` / `decompile-timeout` / `output-does-not-compile` | 1035 / 3 / 1 | 1035 / 3 / 1 |
+| functions in stream A that reached a comparison | 184 672 | 184 672 |
+| **paired** | 184 672 | 184 672 |
+| **A-side unpaired** | **0** | **0** |
+| **B-side unpaired** | **0** | **0** |
+| `sfi` pairs (identity by construction) | 179 961 | 179 943 |
+| **exactly equal** | **33 463 = 18.1202%** | **32 777 = 17.7488%** |
+| mean opcode similarity | 0.780057 | 0.776664 |
+| **holes our emitter marked** | 105 319 | **100 317** |
+
+Both guards hold — neither unpaired count moves off zero, and the status counts
+are identical file for file — and the holes fall by 5 002. **The exact count
+falls by 686, which is the opposite of what this change was for, and it is
+reported rather than explained away.** What is known about it:
+
+* It is not a pairing artefact. The first run of this branch also scored
+  32 777 while 15 863 functions sat in the weaker `name` mode, because
+  `emitName` still held the sibling spelling; restoring the member's own name
+  put them back into `sfi` and moved the total by nothing. The same functions
+  are exact either way.
+* It is not the member bodies. A member's emitted text is byte-identical before
+  and after — verified on `r_20268.jsc`, where `get coverUrl`'s 38 bytes of
+  bytecode are identical instruction for instruction — and two files whose
+  members all moved lost no exact matches at all.
+* The family that grew is `load-form`, 8 637 → 13 892 functions, dominated by
+  one row: `LdaImmutableCurrentContextSlot → LdaImmutableContextSlot`, 5 827
+  functions. That is a context DEPTH difference with our side one level deeper.
+  Reproduced locally on a 36-file sample (604 → 578 exact), where `r_4672.jsc`
+  alone goes 39 → 26 with `load-form` 8 → 32 and the repro is
+  `get isInMacAudit`: stream A reads `LdaImmutableCurrentContextSlot [13]`,
+  we read `LdaImmutableContextSlot <context> [11] [1]`.
+* So the cost is the scope chain a class body interposes: a member used to be
+  hoisted to the top of its parent's body as `var m = function m(){}`, where
+  the nearest context is the parent's function context; it now sits where the
+  class expression sits. What makes our class scope hold a context is **not
+  yet identified** — every class in the sample is emitted anonymously, none
+  uses `super`, and a minimal mint (`class extends Object { m(){ return
+  captured } }`) reads `LdaImmutableCurrentContextSlot`, i.e. no interposed
+  context, so the minimal case does not reproduce it.
+
+Two defects were found and fixed on the way, both of which this measurement is
+what caught:
+
+* **`async` and `*` were dropped from a member**, which puts `await` inside a
+  non-async method — a `SyntaxError` that costs the whole file. 4 of a 20-file
+  sample stopped compiling; now 0 (docs/EMIT.md §9 gap 2).
+* **the pairing name** above.
