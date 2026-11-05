@@ -1071,3 +1071,165 @@ Reported, not fixed.
   `[166,166) -> @168`). T8 takes a whole-function fall-back with
   `why: 'blocksNotPlaced'`; this layer renders and counts those as
   `{r:'unstructured'}` and does not try to repair the IR.
+---
+
+## 10. An object literal's property order
+
+A new section rather than an edit to §9, so this does not collide with other
+work in flight.
+
+### 10.1 The divergence
+
+Property insertion order is observable — `Object.keys`, `for...in`,
+`JSON.stringify` all report it — so getting it wrong is a semantic
+divergence, not a cosmetic one. We were getting it wrong.
+
+[docs/O1.md §3.5](O1.md) made array and object literal element *values* visible
+to the corpus equivalence oracle for the first time. §6.9 reports what that
+found: a new cause family, `literal-element-value`, 298 functions, and its
+**top shape is not a value at all, it is an order** — 122 functions, repro
+`b_165background.jsc` sfi 941:
+
+```
+A  CreateObjectLiteral K(<ObjectBoilerplateDescription[2] {"fn": <the_hole>, "await": <false>}>)
+B  CreateObjectLiteral K(<ObjectBoilerplateDescription[2] {"await": <false>, "fn": <the_hole>}>)
+```
+
+Stream A is V8's listing of the input; stream B is V8's listing of *our output
+recompiled*. Same two keys, same two values, the other order. The source said
+`{fn: <computed>, await: false}` and we emitted `{await: false, fn: <computed>}`.
+
+Reproduced locally, outside the corpus, by minting five one-line scripts with
+the cached Electron (V8 14.4.258.16) and reading the boilerplate the decoder
+returns next to the literal we emit:
+
+| source | boilerplate order | emitted, before | emitted, after |
+|---|---|---|---|
+| `{fn: g(), await: false}` | `fn:<hole>, await` | `{await: false, fn: t}` | `{fn: t, await: false}` |
+| `{await: false, fn: g()}` | `await, fn:<hole>` | `{await: false, fn: t}` | unchanged |
+| `{a:1, b:g(), c:2, d:g(), e:3}` | `a, b:<hole>, c, d:<hole>, e` | `{a:1, c:2, e:3, b:t, d:u}` | `{a:1, b:t, c:2, d:u, e:3}` |
+| `{0: g(), 1: 2, x: g()}` | `0:<hole>, 1, x:<hole>` | `{[1]:2, [0]:t, x:u}` | `{[0]:t, [1]:2, x:u}` |
+| `{a: g(), b: 1, [k]: 2}` | `a:<hole>, b` | `{b:1, a:t, [k]:2}` | `{a:t, b:1, [k]:2}` |
+
+The second row is the reason this went unnoticed: when every constant property
+happens to precede every computed one, appending is accidentally right.
+
+### 10.2 Where the reorder actually came from
+
+Not from any of the three obvious places.
+
+**`src/emit/expr.mjs` was transcribing faithfully.** `case 'object'` mapped
+`e.props` in order; whatever order T7 handed it, it emitted.
+
+**`literals.mjs` was collecting the stores in the right order.** Effect-chain
+order *is* source order for the runtime stores, and that half was never wrong.
+
+**No `Map` or object-iteration-order assumption is involved.**
+`src/recover/index.mjs`'s `objectProps` is a `Map` from SSA value to an array,
+and the array is sorted by an explicit `order`. It is deterministic.
+
+The reorder is at the **join between the two halves**, and the information was
+destroyed one layer before it:
+
+1. `src/heap/objects.mjs::decodeObjectBoilerplate` returns `entries` in the
+   description's own order, including the placeholder-valued entries.
+2. `src/recover/expr.mjs::objectBoilerplateExpr:762` **drops** every
+   placeholder entry (`pending++; continue`), counting them as
+   `pendingEntries`. The constant properties survive, in order; the *positions*
+   of the runtime ones do not.
+3. `src/recover/index.mjs::withLiteralFolds:613` then
+   **appends** the fold's props after the constant ones:
+   `props: [...(base.props ?? []), ...extra.map(...)]`.
+
+So every runtime-valued property moved to the end of the literal. That is the
+whole defect, and it is one line of concatenation — but the fix is not to swap
+that line's operands, because neither order is right in general.
+
+### 10.3 What V8 actually guarantees
+
+`BytecodeGenerator::VisitObjectLiteral:4336` states it, in V8's own words: an
+object literal has two parts; the static part on the left contains no computed
+property names, so its map is computed ahead of time and "arranges for the map
+of the result to reflect the **static order in which the keys appear**", while
+the dynamic part — from the first computed name rightwards — is a series of
+stores that "will **preserve insertion order**".
+
+Two consequences, and they pull in opposite directions:
+
+* For the **dynamic** part, emission order *is* the answer. Appending is right.
+* For the **static** part, emission order is irrelevant. The order is the
+  boilerplate's key order, because the object is created with that map and a
+  `Define*OwnProperty` only fills a value into a position that already exists.
+
+And the static part's keys are *all* there, including the computed-value ones:
+`VisitObjectLiteral:4262`'s comment is "It is safe to use `[[Put]]` here
+because the boilerplate already contains computed properties with an
+uninitialized value". That placeholder is what the decoder renders as
+`<the_hole>` — the same placeholder visible in both streams of the repro
+above, which is how the diff became legible at all.
+
+The correspondence between placeholders and stores is total, not statistical:
+`VisitObjectLiteral:4247` walks the properties **once**, in source order,
+`continue`-ing past the ones that are compile-time values and emitting one
+store for each of the rest. So the k-th placeholder entry is filled by the k-th
+store, and their keys agree.
+
+### 10.4 The fix
+
+`src/recover/patterns/literals.mjs::staticPlan` rebuilds the positions and
+checks that correspondence; `src/emit/expr.mjs::staticOrder` applies it.
+
+`staticPlan` walks the boilerplate entries once and classifies each as a
+constant property, a placeholder, or an entry `objectBoilerplateExpr` already
+dropped for an undecodable key. It then pairs the placeholders with the stores
+in order and **requires the keys to match** — a named store against a string
+entry, a keyed store whose key resolves to a `{e:'lit'}` against a string or
+numeric entry. Each placed store carries two marks: `bpAt`, its position in the
+static block, and `bpBase`, how many constant properties precede the appended
+group. Stores past the last placeholder carry no mark: they are the dynamic
+part, where appending is already V8's order.
+
+`staticOrder` asserts the layout the marks describe — the marked props are one
+contiguous run starting exactly at `bpBase`, every `bpAt` is in range and no
+two claim one position — and then places each marked prop at its `bpAt`,
+filling the remaining slots from the constant properties in order and leaving
+the tail alone. A contradiction **throws** with a named reason
+(`objectLiteralStaticOrder/<assertion>`) rather than permuting a literal on a
+guess; those assertions describe an internal layout, so firing one means that
+layout changed and the fix needs re-deriving, not that an input was unusual.
+
+### 10.5 What is refused, by name
+
+Nothing is guessed. `ORDER_REFUSALS` in `literals.mjs` declares every reason
+the static order cannot be established; each one leaves the old append order
+untouched, warns under `objectLiteralStaticOrderUnclaimed` with the reason, and
+drops the `objectLiteral` claim's confidence from `exact` to `shape`. A
+self-test (group F, `tools/emit/selftest.mjs`) checks that every reason the
+code names is declared.
+
+| reason | what it means |
+|---|---|
+| `noBoilerplate` | not a refusal: `CreateEmptyObjectLiteral` or the canonical empty root has no static part, so every store is dynamic and appending is correct |
+| `entriesNotDecoded` | the boilerplate decoded to no entries |
+| `duplicateBoilerplateKey` | two static entries carry the same key. A later duplicate assigns into the property the earlier one created, so the key keeps its **first** position and its **last** value — and `ObjectLiteral::CalculateEmitStore` drops the store for the shadowed one, so which placeholder the surviving store belongs to is not in the bytecode |
+| `staticKeyNotDecoded` | a placeholder's key is neither a string nor a number, so no store can be matched to it |
+| `fewerStoresThanPlaceholders` | more placeholders than folded stores. The corpus shape behind this is an **accessor**: it gets a static entry, but `VisitObjectLiteral:4323` defines it with a runtime call that is not a `Define*` store, and `collectStores` stops there |
+| `storeKeyMismatch` | the k-th store's key is not the k-th placeholder's, contradicting §10.3 |
+| `keyedStoreKeyNotALiteral` | a keyed store in the static part has a non-literal key, which `VisitObjectLiteral:4247` cannot emit — a computed name breaks out of that loop |
+
+`fewerStoresThanPlaceholders` is the one with a real residual behind it. An
+object literal containing an accessor keeps the old order, because the
+accessor's property is contributed by a different pattern
+(`src/recover/patterns/accessor.mjs`) that `literals.mjs` cannot see, so the
+placeholder its static entry occupies cannot be paired. Closing it means giving
+the two patterns a shared view of one literal's static block; until then it is
+counted, not approximated.
+
+### 10.6 Pinned
+
+`tools/emit/selftest.mjs` group F, nine checks, no engine needed: §10.1's
+repro, the interleaved case, the no-static-part case the fix must not disturb,
+one check per refusal with its reason asserted by name, the `ORDER_REFUSALS`
+totality check, and a unit check that `staticOrder` throws on each
+contradictory plan instead of reordering and returns an unmarked list
+untouched.

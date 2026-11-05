@@ -21,12 +21,47 @@
 // into a register holding a freshly created literal is a property of that
 // literal and nothing else.
 //
-// Ordering is preserved exactly: a literal evaluates its property values in
-// source order after the (empty) object exists, which is the same order the
-// Define* stores appear in. The fold stops at the first effect-chain member
-// that is neither one of those stores nor part of computing one, so an
-// interleaved unrelated effect leaves the stores as statements instead of
-// being silently hoisted.
+// ---------------------------------------------------------------- ORDERING
+//
+// This file used to say "ordering is preserved exactly ... the same order the
+// Define* stores appear in", and that was wrong in a way docs/O1.md 6.9
+// measured: 122 corpus functions emitted the keys of an object literal in the
+// WRONG ORDER, which `Object.keys` / `for...in` / `JSON.stringify` observe.
+// `{fn: g(), await: false}` came back out as `{await: false, fn: g()}`.
+//
+// The store order is not the property order, because an object literal has
+// TWO parts and only the second is ordered by emission.
+// `VisitObjectLiteral:4336` says so in V8's own words: the static part on the
+// left carries no computed property names, so its map is computed ahead of
+// time and "arranges for the map of the result to reflect the static order in
+// which the keys appear"; the dynamic part, from the first computed name
+// rightwards, is a series of stores and "will preserve insertion order".
+//
+// So for the static part the boilerplate -- not the bytecode order -- IS the
+// authority, and it holds every static key, including the ones whose value is
+// computed at run time: `VisitObjectLiteral:4262` fills those in with
+// `DefineNamedOwnProperty` and its comment is "the boilerplate already
+// contains computed properties with an uninitialized value". The decoder keeps
+// those placeholder entries (`src/heap/objects.mjs::decodeObjectBoilerplate`
+// returns `entries` in the description's own order, hole value and all), and
+// `src/recover/expr.mjs::objectBoilerplateExpr:762` drops them -- counting
+// them as `pendingEntries` -- so by the time the stores are folded back the
+// POSITION each one belongs at is no longer in the expression. The literal
+// fold's props were then appended after the constant ones
+// (`src/recover/index.mjs::withLiteralFolds:613`), which is the reorder.
+//
+// `staticPlan` below recovers those positions and hands them to
+// `src/emit/expr.mjs::staticOrder`, which puts the two groups back in
+// boilerplate order. The correspondence is total and checked, never guessed:
+// the k-th placeholder entry must be filled by the k-th store and their KEYS
+// must agree, because `VisitObjectLiteral:4247` walks the properties once, in
+// source order, skipping only the compile-time-constant ones. Anything that
+// does not line up is refused by name (`ORDER_REFUSALS`), leaving the old
+// append order and a counted warning rather than a guess.
+//
+// The fold stops at the first effect-chain member that is neither one of those
+// stores nor part of computing one, so an interleaved unrelated effect leaves
+// the stores as statements instead of being silently hoisted.
 
 const DEFINE_NAMED = new Set(['DefineNamedOwnProperty']);
 const DEFINE_KEYED = new Set(['DefineKeyedOwnPropertyInLiteral', 'DefineKeyedOwnProperty']);
@@ -68,27 +103,179 @@ export function run(pc) {
 function foldObject(pc, ctor) {
   const stores = collectStores(pc, ctor, (op) => DEFINE_NAMED.has(op) || DEFINE_KEYED.has(op));
   if (!stores.length) return;
+  const plan = staticPlan(pc, ctor, stores);
+  // `noStatic` is not a refusal: `CreateEmptyObjectLiteral` and the canonical
+  // empty root have no static part at all, so every store belongs to the
+  // dynamic one and appending them IS V8's order (VisitObjectLiteral:4336).
+  if (plan.reason && !plan.noStatic) {
+    pc.warn('objectLiteralStaticOrderUnclaimed', {
+      reason: plan.reason, detail: plan.detail ?? null,
+      offset: pc.ir.instructions[ctor.instruction]?.offset ?? null,
+    });
+  }
   const consumed = [];
-  for (const s of stores) {
+  for (let i = 0; i < stores.length; i++) {
+    const s = stores[i];
     const sv = s.value;
-    // one entry per store, ordered by the store's own instruction index, so
-    // the literal's property order is the emission order and therefore the
-    // source order -- and so two runs produce the same list.
-    pc.addObjectProperty(ctor.id, sv.instruction, () => ({
-      key: s.named ? s.name : pc.E(s.keyValue),
-      computed: !s.named,
-      value: pc.E(pc.accInputOf(sv)),
-      kind: 'init',
-    }));
+    // The order is the store's own instruction index, which is the source
+    // order WITHIN each of the literal's two parts and is what the dynamic
+    // part needs. `at` is the static part's answer: the position the
+    // boilerplate recorded for this key, which src/emit/expr.mjs puts the
+    // property back at. A store with no `at` keeps today's append order --
+    // either because it belongs to the dynamic part, where append IS the
+    // answer, or because `staticPlan` refused.
+    const at = plan.at?.get(i);
+    pc.addObjectProperty(ctor.id, sv.instruction, () => {
+      const p = {
+        key: s.named ? s.name : pc.E(s.keyValue),
+        computed: !s.named,
+        value: pc.E(pc.accInputOf(sv)),
+        kind: 'init',
+      };
+      if (at !== undefined) { p.bpAt = at; p.bpBase = plan.base; }
+      return p;
+    });
     consumed.push(sv.instruction);
     pc.consume(sv.instruction);
   }
+  const placed = plan.at ? plan.at.size : 0;
   pc.claim({
     kind: 'objectLiteral', blocks: [ctor.block], values: [ctor.id],
-    instructions: consumed, confidence: 'exact',
-    cites: ['VisitObjectLiteral:4190', 'BuildCreateObjectLiteral:4179'],
-    detail: `${consumed.length} propert${consumed.length === 1 ? 'y' : 'ies'} defined at run time`,
+    instructions: consumed, confidence: (plan.reason && !plan.noStatic) ? 'shape' : 'exact',
+    cites: ['VisitObjectLiteral:4190', 'BuildCreateObjectLiteral:4179',
+      'VisitObjectLiteral:4247', 'VisitObjectLiteral:4336'],
+    detail: `${consumed.length} propert${consumed.length === 1 ? 'y' : 'ies'} defined at run time`
+      + `; ${placed} placed at the position the boilerplate recorded`
+      + ((plan.reason && !plan.noStatic) ? `; static order refused: ${plan.reason}` : ''),
   });
+}
+
+/**
+ * The reasons the static part's order cannot be established from the
+ * bytecode. Each one leaves the old append order in place and is warned about
+ * by name; none of them is a guess, and none of them is reachable without the
+ * boilerplate and the stores actually disagreeing.
+ */
+export const ORDER_REFUSALS = Object.freeze({
+  noBoilerplate: 'the constructor carries no ObjectBoilerplateDescription -- '
+    + '`CreateEmptyObjectLiteral` or the canonical empty root, so there is no static part '
+    + 'and every store belongs to the dynamic one',
+  entriesNotDecoded: 'the boilerplate decoded to no entries, so the static keys are unknown',
+  duplicateBoilerplateKey: 'two static entries carry the same key. A later duplicate assigns '
+    + 'into the property the earlier one created, so the key keeps its FIRST position and its '
+    + 'LAST value, and which placeholder the one store belongs to is not in the bytecode '
+    + '(`ObjectLiteral::CalculateEmitStore` drops the store for the shadowed one)',
+  staticKeyNotDecoded: 'a placeholder entry\'s key is neither a string nor a number, so it '
+    + 'cannot be matched against a store',
+  fewerStoresThanPlaceholders: 'the boilerplate has more placeholder entries than there are '
+    + 'folded stores to fill them. The usual cause is an accessor: it gets a static entry, but '
+    + 'VisitObjectLiteral:4323 defines it with a runtime call that is not a Define* store, and '
+    + 'collectStores stops at it',
+  storeKeyMismatch: 'the k-th store\'s key is not the k-th placeholder entry\'s key, which '
+    + 'contradicts VisitObjectLiteral:4247 walking the properties once in source order',
+  keyedStoreKeyNotALiteral: 'a keyed store in the static part has a non-literal key, which '
+    + 'VisitObjectLiteral:4247 cannot emit (a computed name breaks out of that loop)',
+});
+
+/** Is this decoded boilerplate value V8's uninitialized placeholder? */
+const isPlaceholder = (v) => !!v && (v.t === 'hole' || v.t === 'unresolved');
+
+/**
+ * An ObjectBoilerplateDescription key as a comparable signature.
+ *
+ * Mirrors `src/recover/expr.mjs::boilerplateKey` exactly, because the count of
+ * entries it accepts is the length of the props array it produced, and
+ * src/emit/expr.mjs cross-checks the two.
+ */
+function keySig(k) {
+  if (!k) return null;
+  if (k.t === 'string') return { t: 's', v: k.v };
+  if (k.t === 'number') return { t: 'n', v: k.v };
+  return null;
+}
+
+/** The ObjectBoilerplateDescription `ctor` was given, if it has one. */
+function boilerplateOf(pc, ctor) {
+  const ins = pc.ir.instructions[ctor.instruction];
+  for (const o of ins?.operands ?? []) {
+    if (o.constant?.t === 'objectBoilerplate') return o.constant;
+  }
+  return null;
+}
+
+/**
+ * Where each static store belongs in the emitted object literal.
+ *
+ * @returns {{at: Map<number,number>, base: number, reason?: string}}
+ *   `at` maps an index into `stores` to the property's position in the static
+ *   block; `base` is how many constant properties `objectBoilerplateExpr`
+ *   produced, which is where that block's appended part starts.
+ */
+function staticPlan(pc, ctor, stores) {
+  const bp = boilerplateOf(pc, ctor);
+  if (!bp) return { at: null, base: 0, reason: 'noBoilerplate', noStatic: true };
+  const entries = bp.entries ?? [];
+  if (!entries.length) return { at: null, base: 0, reason: 'entriesNotDecoded' };
+
+  // The static block, in the boilerplate's own order. An entry whose value is
+  // real is one of `objectBoilerplateExpr`'s props; an entry whose value is
+  // the placeholder is a property a store fills. An entry that is NEITHER --
+  // a real value under a key that does not decode -- is one that layer
+  // already dropped and counted as `pendingEntries`, so it occupies no
+  // position here either.
+  const slots = [];
+  const seen = new Set();
+  let base = 0;
+  for (const ent of entries) {
+    const sig = keySig(ent.key);
+    if (isPlaceholder(ent.value)) {
+      if (!sig) return { at: null, base: 0, reason: 'staticKeyNotDecoded' };
+      slots.push({ hole: true, sig });
+    } else if (sig) {
+      slots.push({ hole: false, sig });
+      base++;
+    } else {
+      continue;
+    }
+    const tag = `${sig.t}:${String(sig.v)}`;
+    if (seen.has(tag)) return { at: null, base: 0, reason: 'duplicateBoilerplateKey', detail: tag };
+    seen.add(tag);
+  }
+
+  const holes = [];
+  for (let i = 0; i < slots.length; i++) if (slots[i].hole) holes.push(i);
+  if (stores.length < holes.length) {
+    return {
+      at: null, base: 0, reason: 'fewerStoresThanPlaceholders',
+      detail: `${holes.length} placeholder(s), ${stores.length} store(s)`,
+    };
+  }
+
+  // The k-th store fills the k-th placeholder, and its key must say so.
+  const at = new Map();
+  for (let k = 0; k < holes.length; k++) {
+    const want = slots[holes[k]].sig;
+    const got = storeKeySig(pc, stores[k]);
+    if (got === null) return { at: null, base: 0, reason: 'keyedStoreKeyNotALiteral' };
+    if (got.t !== want.t || got.v !== want.v) {
+      return {
+        at: null, base: 0, reason: 'storeKeyMismatch',
+        detail: `store ${k} is ${got.t}:${String(got.v)}, entry is ${want.t}:${String(want.v)}`,
+      };
+    }
+    at.set(k, holes[k]);
+  }
+  return { at, base };
+}
+
+/** A folded store's key as the same signature `keySig` produces. */
+function storeKeySig(pc, s) {
+  if (s.named) return { t: 's', v: s.name };
+  const e = pc.exprOf(pc.canon(s.keyValue));
+  if (e?.e !== 'lit') return null;
+  if (typeof e.v === 'string') return { t: 's', v: e.v };
+  if (typeof e.v === 'number') return { t: 'n', v: e.v };
+  return null;
 }
 
 function foldArray(pc, ctor) {

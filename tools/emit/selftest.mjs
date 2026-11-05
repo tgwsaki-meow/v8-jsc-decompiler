@@ -44,6 +44,8 @@ import { sanitise } from '../../src/emit/names.mjs';
 import { SCOPE_REFUSAL_WHY } from '../../src/emit/scopes.mjs';
 import { walkAst } from '../../src/emit/verify.mjs';
 import { EMIT_HOLE_WHY } from '../../src/emit/holes.mjs';
+import { staticOrder } from '../../src/emit/expr.mjs';
+import { ORDER_REFUSALS } from '../../src/recover/patterns/literals.mjs';
 import { asm } from '../ir/asm.mjs';
 
 const TAGS = listProfiles();
@@ -745,6 +747,156 @@ check('E', 'nested functions are emitted inside their parent, so a closure slot 
       + `${tree.disagreed} disagreements, ${r.report.orphans} orphans`,
   };
 });
+
+// ==================================================== F  object literal order
+//
+// An object literal's property order is observable (`Object.keys`,
+// `for...in`, `JSON.stringify`), and docs/O1.md 6.9 measured 122 corpus
+// functions emitting it wrong: the constant properties came from the
+// boilerplate and the run-time ones were APPENDED after them, where V8 puts
+// the static part in the boilerplate's own key order
+// (`VisitObjectLiteral:4336`). These pin the fix and, just as much, pin the
+// refusals -- a case the bytecode does not answer must keep the old order
+// under a named reason, never be reordered on a guess.
+{
+  const P = 'F';
+  const profile = profiles.find((p) => p.tag === '14.4.258.16')?.profile ?? profiles[0].profile;
+  const HOLE = { t: 'hole' };
+
+  /**
+   * A literal whose static part is `entries` and whose placeholder entries are
+   * filled by one `DefineNamedOwnProperty` per `stores` name, in that order.
+   */
+  function literalUnit(entries, stores) {
+    const a = asm(profile);
+    const bp = a.constant({ t: 'objectBoilerplate', length: entries.length * 2, entries });
+    a.emit('CreateObjectLiteral', [{ const: bp }, { slot: 0 }, { u: 0 }]).emit('Star', [{ reg: 0 }]);
+    stores.forEach((name, i) => {
+      const k = a.constant({ t: 'string', v: name });
+      a.emit('LdaSmi', [{ imm: 10 + i }])
+        .emit('DefineNamedOwnProperty', [{ reg: 0 }, { const: k }, { slot: 1 + i }]);
+    });
+    a.emit('Ldar', [{ reg: 0 }]).emit('Return');
+    return run(a, profile, { name: 'lit' });
+  }
+
+  const ent = (key, value) => ({ key: { t: 'string', v: key }, value });
+  const literalOf = (code) => (/\{[^{}]*\}/.exec(code.replace(/\s+/g, ' ')) ?? ['(no literal)'])[0];
+  const refusals = (rec) => (rec.warnings ?? [])
+    .filter((w) => w.code === 'objectLiteralStaticOrderUnclaimed').map((w) => w.reason);
+
+  check(P, "docs/O1.md 6.9's repro: a run-time property before a constant one keeps its place", () => {
+    // {fn: <computed>, await: false} -- the boilerplate's order is fn, await,
+    // and appending the store produced {await: false, fn: ...}.
+    const { out, rec } = literalUnit(
+      [ent('fn', HOLE), ent('await', { t: 'boolean', v: false })], ['fn'],
+    );
+    const lit = literalOf(out.code);
+    return {
+      ok: /\{\s*fn:\s*10,\s*await:\s*false\s*\}/.test(lit) && refusals(rec).length === 0
+        && violationsOf(out) === 0 && !parses(out.code),
+      detail: `${lit}; refusals [${refusals(rec).join(',')}]`,
+    };
+  });
+
+  check(P, 'two run-time properties straddling three constants interleave, not append', () => {
+    const { out, rec } = literalUnit([
+      ent('a', { t: 'number', v: 1 }), ent('b', HOLE), ent('c', { t: 'number', v: 2 }),
+      ent('d', HOLE), ent('e', { t: 'number', v: 3 }),
+    ], ['b', 'd']);
+    const lit = literalOf(out.code);
+    return {
+      ok: /\{\s*a:\s*1,\s*b:\s*10,\s*c:\s*2,\s*d:\s*11,\s*e:\s*3\s*\}/.test(lit)
+        && refusals(rec).length === 0 && !parses(out.code),
+      detail: `${lit}; refusals [${refusals(rec).join(',')}]`,
+    };
+  });
+
+  check(P, 'a constant-only static part with a dynamic tail leaves the tail last', () => {
+    // The store's key is NOT in the boilerplate, so it is the dynamic part and
+    // appending it IS V8's order -- there is nothing to refuse and nothing to
+    // move. This is the case the fix must not break.
+    const { out, rec } = literalUnit([ent('a', { t: 'number', v: 1 })], []);
+    return {
+      ok: /\{\s*a:\s*1\s*\}/.test(literalOf(out.code)) && refusals(rec).length === 0,
+      detail: `${literalOf(out.code)}; refusals [${refusals(rec).join(',')}]`,
+    };
+  });
+
+  check(P, 'a duplicate static key is refused by name and keeps the old order', () => {
+    // `{a: g(), a: 1}`: a later duplicate assigns into the property the
+    // earlier one created, so the key keeps its FIRST position and its LAST
+    // value, and `CalculateEmitStore` drops the store for the shadowed one --
+    // so which placeholder the one store belongs to is not in the bytecode.
+    const { out, rec } = literalUnit(
+      [ent('a', HOLE), ent('a', { t: 'number', v: 1 })], ['a'],
+    );
+    return {
+      ok: refusals(rec).join(',') === 'duplicateBoilerplateKey' && !parses(out.code),
+      detail: `${literalOf(out.code)}; refusals [${refusals(rec).join(',')}]`,
+    };
+  });
+
+  check(P, 'more placeholders than stores is refused by name, not filled in by position', () => {
+    // The corpus shape behind this one is an accessor: it gets a static entry,
+    // VisitObjectLiteral:4323 defines it with a runtime call rather than a
+    // Define* store, and collectStores stops there.
+    const { out, rec } = literalUnit(
+      [ent('a', HOLE), ent('b', { t: 'number', v: 1 }), ent('c', HOLE)], ['a'],
+    );
+    return {
+      ok: refusals(rec).join(',') === 'fewerStoresThanPlaceholders' && !parses(out.code),
+      detail: `${literalOf(out.code)}; refusals [${refusals(rec).join(',')}]`,
+    };
+  });
+
+  check(P, "a store whose key is not the placeholder's is refused, not reordered", () => {
+    const { out, rec } = literalUnit(
+      [ent('a', HOLE), ent('b', { t: 'number', v: 1 })], ['zzz'],
+    );
+    return {
+      ok: refusals(rec).join(',') === 'storeKeyMismatch' && !parses(out.code),
+      detail: `${literalOf(out.code)}; refusals [${refusals(rec).join(',')}]`,
+    };
+  });
+
+  check(P, 'every refusal reason literals.mjs names is documented in ORDER_REFUSALS', () => {
+    const declared = new Set(Object.keys(ORDER_REFUSALS));
+    const src = fs.readFileSync('src/recover/patterns/literals.mjs', 'utf8');
+    const used = new Set();
+    for (const m of src.matchAll(/reason: '([A-Za-z]+)'/g)) used.add(m[1]);
+    const undocumented = [...used].filter((w) => !declared.has(w));
+    return {
+      ok: undocumented.length === 0 && used.size > 0,
+      detail: undocumented.length ? `undocumented: ${undocumented.join(', ')}`
+        : `${used.size} reasons, all documented`,
+    };
+  });
+
+  check(P, 'staticOrder throws on a contradictory plan instead of reordering', () => {
+    // The marks describe a layout withLiteralFolds produces; if that layout
+    // ever changes, the assertion has to fire rather than quietly permute a
+    // literal. One bad plan per assertion the function makes.
+    const bad = [
+      ['markedRunDoesNotStartAtBpBase', [{ key: 'x' }, { key: 'y', bpAt: 0, bpBase: 0 }]],
+      ['bpAtOutOfRange', [{ key: 'x' }, { key: 'y', bpAt: 9, bpBase: 1 }]],
+      ['twoPropsClaimOneBoilerplatePosition',
+        [{ key: 'x', bpAt: 0, bpBase: 0 }, { key: 'y', bpAt: 0, bpBase: 0 }]],
+    ];
+    const thrown = [];
+    for (const [, props] of bad) {
+      try { staticOrder(props); thrown.push('(did not throw)'); }
+      catch (e) { thrown.push(/objectLiteralStaticOrder\/(\w+)/.exec(e.message)?.[1] ?? e.message); }
+    }
+    const want = bad.map(([w]) => w);
+    // and an unmarked list is returned untouched
+    const plain = [{ key: 'a' }, { key: 'b' }];
+    return {
+      ok: thrown.join(',') === want.join(',') && staticOrder(plain) === plain,
+      detail: `${thrown.join(', ')}; an unmarked list is returned as-is`,
+    };
+  });
+}
 
 // ================================================================ summary
 say('');

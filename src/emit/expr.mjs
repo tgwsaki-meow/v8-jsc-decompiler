@@ -31,6 +31,12 @@
 // position. In a condition JavaScript applies ToBoolean itself, so
 // `JumpIfToBooleanFalse` with `negate` is `!x` and without it is plain `x`;
 // nothing is needed. Where a Test's value is used AS a value, `!!` is.
+//
+// `staticOrder` is the fourth, and the only one that fixes a semantic
+// divergence rather than a Babel requirement: an object literal's property
+// order is observable, T7 hands this layer the two halves of one literal in
+// the wrong relative order, and the comment on that function says why and
+// what the marks mean.
 
 import * as t from '@babel/types';
 import { holeExpr, mark } from './holes.mjs';
@@ -197,6 +203,67 @@ function objectProp(ctx, p) {
 }
 
 /**
+ * The property order V8's ObjectBoilerplateDescription fixed.
+ *
+ * An object literal has two parts and only the second is ordered by emission
+ * (`VisitObjectLiteral:4336`): the static part's order is the order its keys
+ * appear in the boilerplate, which is the map the literal is created with,
+ * while the dynamic part -- from the first computed name rightwards -- is a
+ * series of stores in insertion order.
+ *
+ * T7 cannot hand this layer one ordered list, because the two groups are
+ * produced by different places: the constant properties by
+ * `src/recover/expr.mjs::objectBoilerplateExpr`, which drops the boilerplate's
+ * placeholder entries, and the run-time ones by
+ * `src/recover/patterns/literals.mjs`, which
+ * `src/recover/index.mjs::withLiteralFolds` APPENDS after them. For
+ * `{fn: g(), await: false}` that append produced `{await: false, fn: g()}` --
+ * the same keys and values in the other order, which `Object.keys`,
+ * `for...in` and `JSON.stringify` all observe. docs/O1.md 6.9 measured it at
+ * 122 corpus functions and it was the first thing that section's new
+ * visibility found.
+ *
+ * So `literals.mjs` marks each store it can place with `bpAt`, the position
+ * the boilerplate recorded for that key, and `bpBase`, how many constant
+ * properties preceded the appended group. This puts the two back together.
+ *
+ * Nothing here is inferred from the shape of the array. The marks describe a
+ * layout, that layout is ASSERTED, and a contradiction throws with a named
+ * reason rather than reordering on a guess -- a wrong order here is a silently
+ * wrong program, which is the one outcome worth failing a unit over.
+ */
+function staticOrder(props) {
+  const marked = [];
+  for (let i = 0; i < props.length; i++) {
+    if (Number.isInteger(props[i]?.bpAt)) marked.push(i);
+  }
+  if (!marked.length) return props;
+  const base = props[marked[0]].bpBase;
+  const bad = (why) => new Error(`objectLiteralStaticOrder/${why}: ${marked.length} marked of `
+    + `${props.length} props, bpBase ${base}, bpAt [${marked.map((i) => props[i].bpAt).join(',')}]`);
+  // withLiteralFolds appends the fold's props after the boilerplate's, sorted
+  // by instruction, and the static stores all precede the dynamic ones -- so
+  // the marked props are one run starting exactly where the constants end.
+  if (!Number.isInteger(base) || base < 0) throw bad('bpBaseNotAnIndex');
+  if (marked[0] !== base) throw bad('markedRunDoesNotStartAtBpBase');
+  for (let k = 0; k < marked.length; k++) {
+    if (marked[k] !== base + k) throw bad('markedPropsAreNotContiguous');
+    if (props[marked[k]].bpBase !== base) throw bad('bpBaseDisagreesBetweenProps');
+  }
+  const slots = new Array(base + marked.length).fill(null);
+  for (const i of marked) {
+    const at = props[i].bpAt;
+    if (at < 0 || at >= slots.length) throw bad('bpAtOutOfRange');
+    if (slots[at] !== null) throw bad('twoPropsClaimOneBoilerplatePosition');
+    slots[at] = props[i];
+  }
+  let b = 0;
+  for (let i = 0; i < slots.length; i++) if (slots[i] === null) slots[i] = props[b++];
+  if (b !== base) throw bad('constantPropsLeftOver');
+  return [...slots, ...props.slice(base + marked.length)];
+}
+
+/**
  * An Expr -> a Babel expression node.
  * @param {object} ctx per-function context (index.mjs)
  */
@@ -218,7 +285,7 @@ export function expr(ctx, e) {
       case 'array': return t.arrayExpression((e.elements ?? []).map((x) => (
         x === null || x === undefined ? null : (x.spread ? t.spreadElement(expr(ctx, x.spread)) : expr(ctx, x))
       )));
-      case 'object': return t.objectExpression((e.props ?? []).map((p) => objectProp(ctx, p)));
+      case 'object': return t.objectExpression(staticOrder(e.props ?? []).map((p) => objectProp(ctx, p)));
       case 'fn': return ctx.functionLike(e, 'expression') ?? holeExpr(ctx, 'closureWithoutAUnit', `sfi ${e.sfiId}`);
       case 'class': return ctx.classLike(e) ?? holeExpr(ctx, 'classWithoutAUnit', `sfi ${e.sfiId}`);
       case 'unary': return t.unaryExpression(e.op === 'void' ? 'void' : e.op, expr(ctx, e.arg));
@@ -413,4 +480,6 @@ export function testValueExpr(ctx, test) {
   return e;
 }
 
-export default { expr, toPattern, testExpr, testValueExpr, nameOf };
+export { staticOrder };
+
+export default { expr, toPattern, testExpr, testValueExpr, nameOf, staticOrder };
