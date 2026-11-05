@@ -80,6 +80,25 @@ const INTERMEDIATE_TAGS = Object.freeze(new Set([
 ]));
 
 /**
+ * The reasons a function literal may reach no statement and still be COUNTED
+ * rather than refused (step 7d, docs/RECOVER.md 9.3). Each one is a gap this
+ * layer declares somewhere else and marks with its own hole, so the output
+ * already says "I don't know" where the function went. Anything outside this
+ * set is an inconsistency in this layer's own analysis and throws: a function
+ * must not leave the output silently.
+ */
+const UNPLACED_LITERAL_DECLARED_GAPS = Object.freeze(new Set([
+  // a pattern owns the instruction that holds the literal and placed no
+  // member for it -- 8.1's undecoded `ClassBoilerplate`, marked
+  // `classMembersNotDecoded`
+  'claimedByAPattern', 'claimedByAPatternThroughItsUser',
+  // the literal's only reader transcribes to a hole, so no statement can
+  // carry it -- `ownPropertyDefinitionNotFoldedIntoItsLiteral` and the other
+  // 6 reasons
+  'readByAValueWithNoStatement',
+]));
+
+/**
  * @param {object} ir an IRFunction from src/ir/index.mjs
  * @param {{maxExprDepth?:number, strict?:boolean}} opts
  */
@@ -319,6 +338,9 @@ export function recover(ir, opts = {}) {
   const consumedEdges = new Set();
   const consumedHandlerRanges = new Set();
   const forceMaterial = new Set();
+  // Why each forced value was forced. A pattern is the usual answer; step 5b
+  // adds the other one, and the two must not be reported as each other.
+  const forceMaterialWhy = new Map();    // ssaId -> reason
   const patternValues = new Set();
   const patterns = [];
   const tdzNames = new Map();
@@ -660,9 +682,86 @@ export function recover(ir, opts = {}) {
 
   phase('rewriteRefs');
 
+  // ------------------------------------------ 4b. the function literals
+  //
+  // Every instruction that turns a `SharedFunctionInfo` into a function
+  // object. Keyed on the CONSTANT and not on an opcode name, because
+  // `{t:'sfi'}` in the constant pool is the thing that matters: it is this
+  // function's only statement that the program contains that other function.
+  // `DeclareGlobals` carries its SFIs inside a `{t:'array'}` pair list and so
+  // is deliberately not matched -- V8 does not drop a top-level declaration.
+  //
+  // These are tracked as a set because losing one is not like losing any
+  // other value. See dce.mjs's header for the V8 site and the measurement:
+  // V8 emits no `CreateClosure` for a declaration nothing reads, so a
+  // `CreateClosure` in the input proves the original had a reader, and a
+  // `CreateClosure` that reaches no statement of ours deletes that whole
+  // function -- and its own children -- from the recompiled output.
+  const functionLiterals = [];
+  for (let i = 0; i < ir.instructions.length; i++) {
+    const ins = ir.instructions[i];
+    let sfiId = null;
+    for (const o of ins.operands) {
+      if (o.type !== 'kConstantPoolIndex') continue;
+      if (o.constant?.t === 'sfi') { sfiId = o.constant.sfiId; break; }
+    }
+    if (sfiId === null) continue;
+    functionLiterals.push({ at: i, vid: ir.instructionValue[i], sfiId });
+  }
+
   // ------------------------------------------------------------- 5. dce
-  const dce = deadValues({ ir, isMove, consumedIns, patternValues });
+  const dce = deadValues({
+    ir, isMove, consumedIns, patternValues,
+    extraRoots: functionLiterals.map((f) => f.vid),
+  });
   phase('dce');
+
+  // ------------------------------- 5b. a function literal nothing reads
+  //
+  // The statement pass has two branches for a value-producing instruction:
+  // name it, or emit it for its effect. A `CreateClosure` whose value has no
+  // live use fits neither -- `alloc()` leaves `hasEffect` false -- so it used
+  // to fall through both and vanish with no statement, no hole and no
+  // counter. Measured on 29 corpus files, 2 of 5 284
+  // (`tools/probes/probe_closure.mjs fate`), so this is a rare shape and not
+  // the corpus-wide defect it was suspected to be -- but each one costs a
+  // function and all of its descendants, so it is repaired rather than
+  // counted.
+  //
+  // The repair is to materialise it: `let fn = function ...`. That is not a
+  // guess, it is the inverse of the bytecode -- the original is
+  // `CreateClosure; Star rN` with `rN` never read again, and a `let` whose
+  // initialiser is the closure compiles back to exactly that pair. Refusing
+  // the function instead would be the other candidate, and it is the wrong
+  // trade: a refusal replaces the body with a `throw`, which un-references
+  // every closure the body created, and docs/O1.md 6.8 measured that cost --
+  // 1 483 paired functions lost to 23 refusals. Repair what the bytecode
+  // states; refuse only what it does not state.
+  //
+  // The repair is reported as its own reason and not as `forcedByPattern`,
+  // which is the only other way a value is forced out of the inlining plan:
+  // a duplication report has to be able to tell a pattern's decision from
+  // this one.
+  const literalStats = {
+    functionLiterals: functionLiterals.length,
+    functionLiteralsMaterialisedForNoLiveUse: 0,
+    functionLiteralsInAStatement: 0,
+    functionLiteralsNotInAnyStatement: 0,
+    byUnplacedFunctionLiteral: {},
+  };
+  for (const f of functionLiterals) {
+    if (f.vid === undefined || f.vid < 0) continue;
+    if (consumedIns.has(f.at)) continue;
+    const c = canon(f.vid);
+    if (usesOf(c).some((u) => !dce.dead.has(u))) continue;
+    forceMaterial.add(c);
+    forceMaterialWhy.set(c, 'forcedByAFunctionLiteralWithNoLiveUse');
+    literalStats.functionLiteralsMaterialisedForNoLiveUse++;
+    warn('functionLiteralWithNoLiveUse', {
+      at: ir.instructions[f.at]?.offset ?? f.at, sfiId: f.sfiId, value: c,
+    });
+  }
+  phase('functionLiterals');
 
   // ------------------------------------------------- 6. the inlining plan
   const isConsumedUser = (userId) => {
@@ -741,7 +840,7 @@ export function recover(ir, opts = {}) {
     if (plan.duplicable.has(id)) continue;
     plan.inlined.delete(id);
     plan.materialised.add(id);
-    plan.reasons.set(id, 'forcedByPattern');
+    plan.reasons.set(id, forceMaterialWhy.get(id) ?? 'forcedByPattern');
   }
 
   // Phis that survived and were not rewritten need a name and copies.
@@ -779,6 +878,12 @@ export function recover(ir, opts = {}) {
     holesInUnusedExprs: 0,
     materialisedStatements: 0, discardedResults: 0, phiCopies: 0,
     byHoleWhy: {}, byUnusedHoleWhy: {},
+    // 4.3 drops a pure definition nothing reads. That is correct for the
+    // register copies V8 leaves behind, and it is the one place in this
+    // layer where something leaves without a statement, so it is counted by
+    // opcode rather than left to be inferred from a value count.
+    droppedPureValues: 0, byDroppedPureOpcode: {},
+    ...literalStats,
   };
   const push = (bid, s) => {
     if (!s) return;
@@ -830,6 +935,12 @@ export function recover(ir, opts = {}) {
         if (v.hasEffect) {
           push(bid, { s: 'expr', expr: resolveForDefinition(vid), pos: posOf(i), values: [vid] });
           emitStats.discardedResults++;
+        } else {
+          // Pure, live (some root reaches it) and read by nothing: no
+          // statement is emitted. Counted by opcode -- this is the only exit
+          // from this pass that produces nothing.
+          emitStats.droppedPureValues++;
+          emitStats.byDroppedPureOpcode[v.op] = (emitStats.byDroppedPureOpcode[v.op] ?? 0) + 1;
         }
       }
     }
@@ -926,6 +1037,7 @@ export function recover(ir, opts = {}) {
 
   phase('exprs');
 
+  const mentionedSfis = new Set();
   countHoles();
   phase('holes');
   function countHoles() {
@@ -934,6 +1046,12 @@ export function recover(ir, opts = {}) {
       if (!x || typeof x !== 'object' || seen.has(x)) return;
       if (Array.isArray(x)) { for (const y of x) walk(y, into); return; }
       seen.add(x);
+      // which function literals the EMITTED statements really mention (the
+      // accounting below). An entry in `exprs` that no statement reaches
+      // cannot put a function into the output, so only `into === 'stmt'`
+      // counts.
+      if (into === 'stmt' && (x.e === 'fn' || x.e === 'class') && x.sfiId !== null
+        && x.sfiId !== undefined) mentionedSfis.add(x.sfiId);
       if (x.e === 'hole' || x.s === 'hole') {
         const why = x.why ?? 'unknown';
         if (into === 'unused') {
@@ -954,6 +1072,78 @@ export function recover(ir, opts = {}) {
     for (const l of stmts.values()) for (const s of l) walk(s, 'stmt');
     for (const id of testValues) walk(exprs.get(id), 'expr');
     for (const [id, e] of exprs) if (!testValues.has(id)) walk(e, 'unused');
+  }
+
+  // ------------------------------- 7d. every function literal, accounted for
+  //
+  // 11.5 says every function enters the output. The place that can break it
+  // silently is here, one layer earlier than it was ever looked for: a
+  // function literal whose `{e:'fn'}` appears in NO statement cannot reach
+  // T9, so T9 emits that function as a sibling declaration nothing
+  // references, and V8 then does not serialise it at all
+  // (`bytecode-generator.cc::VisitFunctionDeclaration:2181`, returning at
+  // :2187). That is what docs/O1.md 6.3's A-side unpaired count measures, and
+  // until this counter existed the loss was invisible in this layer's report.
+  //
+  // Every unplaced literal gets a named reason, and the reason decides
+  // whether it is counted or refused -- they are not the same defect.
+  // Measured on 29 corpus files, 747 of 5 284 literals reach no statement
+  // (`tools/probes/probe_closure.mjs fate`):
+  //
+  //   648  claimedByAPatternThroughItsUser:class
+  //    54  readByAValueWithNoStatement:DefineNamedOwnProperty
+  //    45  readByAValueWithNoStatement:Call*
+  //     0  everything else
+  //
+  // Both populated reasons are a gap this layer already declares somewhere
+  // else, with its own hole, so counting them here is the honest answer and
+  // refusing would delete correct output: the `class` row is §8.1's undecoded
+  // `ClassBoilerplate` (the pattern owns the instruction and places no member
+  // for it, `{e:'class'}` carries only the constructor), and the
+  // `readByAValueWithNoStatement` rows are a literal whose only reader
+  // transcribes to a hole -- `ownPropertyDefinitionNotFoldedIntoItsLiteral`
+  // for the `Define*OwnProperty` row -- so the output already says "I don't
+  // know" at that spot.
+  //
+  // Any other reason is an inconsistency in THIS layer's own analysis, not a
+  // gap it declared, and it throws. `noLiveUse` is the one the drop site in
+  // the statement pass used to produce silently; 5b repairs it, so reaching
+  // here with it means the repair did not hold. Nothing in the sample reaches
+  // these, which is the point: an assertion that costs nothing today and
+  // fires the moment the analysis breaks, instead of a function quietly
+  // leaving the output.
+  for (const f of functionLiterals) {
+    if (mentionedSfis.has(f.sfiId)) { emitStats.functionLiteralsInAStatement++; continue; }
+    emitStats.functionLiteralsNotInAnyStatement++;
+    const why = unplacedWhy(f);
+    emitStats.byUnplacedFunctionLiteral[why] = (emitStats.byUnplacedFunctionLiteral[why] ?? 0) + 1;
+    warn('functionLiteralNotInAnyStatement', {
+      at: ir.instructions[f.at]?.offset ?? f.at, sfiId: f.sfiId, why,
+    });
+    if (!UNPLACED_LITERAL_DECLARED_GAPS.has(why.replace(/:.*$/, ''))) {
+      throw new RecoverError(`a function literal reaches no statement: ${why}`, {
+        sfiId: f.sfiId, at: ir.instructions[f.at]?.offset ?? f.at, unit: unit?.sfiId ?? null,
+      });
+    }
+  }
+  phase('functionLiteralAccounting');
+
+  /** Why one function literal is in no statement. Named, never guessed. */
+  function unplacedWhy(f) {
+    const claimOf = (insIdx) => patterns.find((p) => p.instructions.includes(insIdx))?.kind ?? 'unknown';
+    if (consumedIns.has(f.at)) return `claimedByAPattern:${claimOf(f.at)}`;
+    if (f.vid === undefined || f.vid < 0) return 'instructionDefinesNoValue';
+    const c = canon(f.vid);
+    const live = usesOf(c).filter((u) => !dce.dead.has(u));
+    if (!live.length) return materialisedNames.has(c) ? 'materialisedButItsStatementIsMissing' : 'noLiveUse';
+    for (const u of live) {
+      const uv = values[u];
+      if (uv?.kind === 'Op' && consumedIns.has(uv.instruction)) {
+        return `claimedByAPatternThroughItsUser:${claimOf(uv.instruction)}`;
+      }
+    }
+    const uv = values[live[0]];
+    return `readByAValueWithNoStatement:${uv?.op ?? uv?.kind ?? 'unknown'}`;
   }
 
   // ---------------------------------------------------------- 8. assemble

@@ -564,3 +564,222 @@ Reported, not fixed.
   `SwitchOnGeneratorState` the resume block has no predecessor, gets no SSA
   value, and no `await` can match. A test that omits the prologue tests
   nothing.
+---
+
+## 9. Every function must enter the output
+
+§11.5 says every function the input contains appears in the output. O1 measures
+the other end of that promise and finds it broken on a third of the corpus:
+**65 013 of 184 672 functions, 35.20%**, are produced by V8 when it compiles
+the original and not when it compiles our text (docs/O1.md §6.3). The count had
+not moved under any fix, which is what made it worth attributing before
+touching anything: you cannot be equivalent on a function your text never
+references.
+
+The mechanism is V8's, measured in self-test F of
+`tools/verify/o1_corpus_selftest.mjs` and again here.
+`bytecode-generator.cc::VisitFunctionDeclaration:2181` returns at :2187 when
+the declaration's variable `is_used()` is false, so an inner function
+declaration nothing reads is never visited: no `CreateClosure`, no SFI in the
+parent's constant pool, nothing in the serialised cache.
+`VisitVariableDeclaration:2135` has the same early return at :2138, but it
+guards only the TDZ hole store — V8's parser turns `var f = e` into a
+declaration plus an assignment statement, and `VisitAssignment` evaluates the
+right-hand side whether or not anything reads `f`. `VisitGlobalDeclarations:2281`
+has no such test at all; it `DCHECK`s `var->is_used()` at :2285, because a
+top-level binding is observable whether or not the script reads it.
+
+Two consequences for this layer:
+
+1. a `CreateClosure` **in the input is proof the original had a reader** — V8
+   would not have emitted it otherwise. A `CreateClosure` whose value reaches
+   no statement of ours is therefore a reader *we* lost, not dead code.
+2. the **form** of the binding our text uses decides whether the function
+   survives a recompilation, and the form is `src/emit/index.mjs`'s choice.
+
+### 9.1 The attribution, before any behaviour change
+
+`tools/probes/probe_closure.mjs fate` classifies every `CreateClosure`
+instruction by which branch of the statement pass (§1 step 6) actually decided
+it. 29 corpus files, every 37th, profile `14.4.258.16`, 5 313 units, none
+failing to recover:
+
+| fate | count | share |
+|---|---:|---:|
+| `liveUse` — read by something we emit | 3 148 | 59.58% |
+| `materialised` — named, so emitted as `let f = …` | 2 134 | 40.39% |
+| `droppedByDce` | 2 | 0.04% |
+| `droppedNoLiveUse` | 0 | 0.00% |
+| **lost** (the last two) | **2** | **0.04%** |
+
+The drop site was real and is not the defect. Both losses are an arrow whose
+only user is a `Star` nothing reads again; `opcode_effects.mjs` classifies
+`CreateClosure` as an allocation, so `hasEffect` is false, the value is
+pure-and-unused, and §4.3 step 1 killed it. **0.04% is not 35.20%**, so the
+hypothesis that the readers are lost in this layer is refuted by two orders of
+magnitude.
+
+The same run answers the complementary question. Of 5 313 units, 5 284 —
+**99.45%** — are named by a `CreateClosure` somewhere in the file, and all 29
+that are not are the script units themselves, which `DeclareGlobals` carries
+instead. None is deeper than that. So the input really does create every
+function it contains, and the loss is downstream of here.
+
+`tools/probes/probe_closure.mjs cause` asks the same question one layer down,
+where `src/emit/index.mjs` counts the consequence as `unreferencedClosures`.
+25 corpus files, every 43rd, 2 531 units, before the fixes below: **544
+children our text declares and nothing references, 21.5% of the functions
+emitted**, and the reference went
+
+| where | count | share |
+|---|---:|---:|
+| `inUnusedExprOnly` — the `{e:'fn'}` is in `exprs` and in no statement | 502 | 92.28% |
+| `parentFailed` — the parent's body is a stub, so its statements were never visited | 41 | 7.54% |
+| `t7Missing` — no statement and no `exprs` entry mentions it | 1 | 0.18% |
+
+By the child's own kind: 384 methods, 101 getters, 58 arrows. The dominant row
+is one shape — the closure's user is a `Star` that the `%DefineClass` idiom
+claimed, so it emits no statement and §8.1's undecoded `ClassBoilerplate`
+leaves `{e:'class'}.members` empty. That `t7Missing` count of 1 is this layer's
+share of the whole defect, and it is the same instruction the `fate` table
+found.
+
+### 9.2 A function literal nothing reads (step 5b)
+
+Every instruction carrying an `{t:'sfi'}` constant pool entry is collected
+before DCE and passed to `dce.mjs` as `cx.extraRoots`, so no function literal
+is ever dropped as pure-and-unused. `DeclareGlobals` carries its SFIs inside a
+`{t:'array'}` pair list and is deliberately not matched: V8 does not drop a
+top-level declaration, and the mint table in §9.4 measures that rather than
+assuming it.
+
+Keeping the value alive only moves the problem, because the statement pass has
+two branches for a value-producing instruction — name it, or emit it for its
+effect — and a pure value with no live use fits neither. So step 5b forces such
+a literal to be materialised: `let fn = function …`. That is not a guess, it is
+the inverse of the bytecode. The original is `CreateClosure; Star rN` with `rN`
+never read again, and a `let` whose initialiser is the closure compiles back to
+exactly that pair. It is reported as its own inlining reason,
+`forcedByAFunctionLiteralWithNoLiveUse`, and not as `forcedByPattern`, so a
+duplication report can tell a pattern's decision from this one.
+
+Refusing the function was the other candidate and it is the wrong trade: a
+refusal replaces the body with a `throw`, which un-references every closure the
+body created, and docs/O1.md §6.8 measured that cost — 1 483 paired functions
+lost to 23 refusals. Repair what the bytecode states; refuse only what it does
+not state.
+
+Measured effect, same 29 files: `lost` 2 → **0**, `materialised` 2 134 → 2 136,
+`liveUse` unchanged at 3 148. Nothing else in the table moves, which is the
+whole claim for the root class.
+
+### 9.3 What is counted and what throws (step 7d)
+
+The drop site produced no statement, no hole and no counter, which is how it
+stayed invisible. Two counters now cover every exit:
+
+* **`stats.emit.droppedPureValues`**, with `byDroppedPureOpcode`. The one exit
+  from the statement pass that emits nothing: a pure value that some root keeps
+  live and nothing reads. Measured **0** across all 5 313 units — the only root
+  class that can produce such a value is the function literals, and 5b
+  materialises those first, so the branch is now exercised by nothing.
+* **`stats.emit.functionLiteralsNotInAnyStatement`**, with
+  `byUnplacedFunctionLiteral`. A literal whose `{e:'fn'}` appears in no
+  statement cannot reach T9 at all, so T9 emits that function as a sibling
+  declaration nothing references and V8 then does not serialise it. 747 of
+  5 284, **14.14%**:
+
+| reason | count |
+|---|---:|
+| `claimedByAPatternThroughItsUser:class` | 648 |
+| `readByAValueWithNoStatement:DefineNamedOwnProperty` | 54 |
+| `readByAValueWithNoStatement:CallProperty1` | 25 |
+| `readByAValueWithNoStatement:CallUndefinedReceiver2` | 7 |
+| `readByAValueWithNoStatement:CallUndefinedReceiver1` | 7 |
+| `readByAValueWithNoStatement:CallUndefinedReceiver` | 6 |
+| everything else | 0 |
+
+The reason decides whether the literal is counted or the function is refused,
+and the split is a closed set, `UNPLACED_LITERAL_DECLARED_GAPS`:
+
+* **counted** — `claimedByAPattern`, `claimedByAPatternThroughItsUser` and
+  `readByAValueWithNoStatement`. Each is a gap this layer already declares
+  somewhere else and marks with its own hole, so the output does say "I don't
+  know" where the function went: the `class` row is §8.1's undecoded
+  `ClassBoilerplate`, and the `readByAValueWithNoStatement` rows are a literal
+  whose only reader transcribes to a hole —
+  `ownPropertyDefinitionNotFoldedIntoItsLiteral` for the `Define*OwnProperty`
+  row (§6). Refusing them would delete every class in the corpus to report a
+  gap that is already reported.
+* **refused** — anything else, by `throw new RecoverError`, unconditionally
+  rather than under `opts.strict`. `noLiveUse`,
+  `materialisedButItsStatementIsMissing` and `instructionDefinesNoValue` are
+  not declared gaps; they are inconsistencies in this layer's own analysis.
+  `noLiveUse` in particular is what the drop site used to produce silently, so
+  reaching 7d with it means 5b did not hold. Nothing in the sample reaches any
+  of them, which is the point: an assertion that costs nothing today and fires
+  the moment the analysis breaks, instead of a function quietly leaving the
+  output.
+
+Every unplaced literal also raises a `functionLiteralNotInAnyStatement`
+warning carrying the offset, the SFI and the reason, whether it throws or not.
+
+### 9.4 The binding form, which is where the 35.20% is
+
+A child nothing in the body references is declared by
+`src/emit/index.mjs::emitUnitInner`'s prologue, and until now it was declared
+as `function f(){}` — the one form V8 drops. `tools/probes/probe_closure.mjs
+form` mints 100 unreferenced functions per script with the corpus's own V8 and
+`--no-lazy`, one spelling per row, and counts the units that come back with
+bytecode:
+
+| carried / expected | shape |
+|---:|---|
+| 2 / 102 | in a function: `function h(){}` |
+| 2 / 102 | in a function: `function* h(){}` |
+| 102 / 102 | in a function: `var h = function h(){}` |
+| 102 / 102 | in a function, strict: `var h = function h(){}` |
+| 102 / 102 | in a function: `let h = function h(){}` |
+| 102 / 102 | in a function: `var h = function* h(){}` |
+| 102 / 102 | in a function: `var h = async function h(){}` |
+| 102 / 102 | in a function: `var h = (a)=>a` |
+| 102 / 102 | in a function: `function h(){}` + one reference |
+| 101 / 101 | top level: `function h(){}` |
+| 101 / 101 | top level: `var h = function h(){}` |
+| 101 / 101 | top level, strict: `function h(){}` |
+| 101 / 101 | in a block at top level: `function h(){}` |
+
+So the fix is the form: an unreferenced child is emitted as
+`var f = function f(){}` instead of `function f(){}`. The body, the name, the
+position and the generator/async flags are untouched, the inner name keeps
+recursion legal, and the child's emitted name is already uniquified against
+every declaration, parameter and visible binding of the parent, so the `var`
+cannot collide. An arrow child was already emitted as `var f = () => {}` and so
+was never really lost; this gives every other unreferenced child the same
+protection.
+
+Two cases keep the plain declaration, each with its own counter, because
+rebinding them would make things worse rather than better:
+
+* `unreferencedClosuresAtTheTopLevel` — a child of the script unit. The last
+  four rows of the table measure it: a top-level declaration is carried either
+  way, so rebinding would only move the script's own bytecode away from the
+  original. (A module top level is the one place that does skip them,
+  `VisitModuleDeclarations:2258` at :2262; nothing here emits a module.)
+* `unreferencedClosuresNotInTheInput` — a child with no bytecode in the input.
+  Stream A does not contain it, so forcing V8 to compile it would manufacture a
+  function with no partner, which docs/O1.md §4 reads as a defect of its own.
+
+On the 25-file sample: 543 unreferenced children, **485 rebound**, 58 already
+bound (the arrows), 0 at the top level, 0 absent from the input. 485 of 2 531
+functions emitted, **19.2%**, go from a form V8 discards to one it keeps.
+
+### 9.5 What this does not fix
+
+The 648-strong `claimedByAPatternThroughItsUser:class` row is the largest
+remaining block and it is not a closure-scoping problem at all: it is §8.1's
+`ClassBoilerplate`. A class method is emitted as a sibling declaration rather
+than as a member of its class body, and the binding form of §9.4 is what keeps
+it in the output at all — but a method that has to be read off
+`class C { m(){} }` is a decoding gap in `src/heap`, and until it is closed
+those functions are carried as siblings with a wrong shape rather than lost.
