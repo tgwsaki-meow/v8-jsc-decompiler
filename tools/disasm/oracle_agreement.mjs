@@ -44,11 +44,18 @@
 //  2. Through src/verify/normalize.mjs + compare.mjs, requiring `exactMatch`,
 //     with constant values erased on both sides for the same reason.
 //
+// Every mode is REQUIRED by default and a missing engine is a failure, not a
+// skip: a run that measured nothing used to print the same green last line as
+// a run that measured everything, which is how the dual-reader claim stayed a
+// Windows-local fact while CI was green (see the comment on D8_144 below).
+//
 // Usage:
 //   node tools/disasm/oracle_agreement.mjs
 //   node tools/disasm/oracle_agreement.mjs --only switch_jumptable
 //   node tools/disasm/oracle_agreement.mjs --pair 14.6.202.34
 //   node tools/disasm/oracle_agreement.mjs --skip-big
+//   node tools/disasm/oracle_agreement.mjs --allow-skip   # a mode with no
+//                                 engine is reported and skipped, not failed
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -62,12 +69,21 @@ import { toParsedForm } from '../../src/disasm/format.mjs';
 import { parseBytecodeDump } from '../../src/verify/bytecode_parser.mjs';
 import { normalizeFunction } from '../../src/verify/normalize.mjs';
 import { compareFunctions } from '../../src/verify/compare.mjs';
-import { resolveEngine, printBytecode, DEFAULT_FLAGS } from '../oracle/engines.mjs';
+import { resolveEngine, printBytecode, findCachedEngine, DEFAULT_FLAGS } from '../oracle/engines.mjs';
 import { unitFromListing, poolsFromRawListing } from './unit_from_listing.mjs';
 import { SOURCES, WANTED } from './sources.mjs';
 
-const D8_144 = '.v8bin-cache/v8-win64-rel-14.4.258.17/d8.exe';
-const ELECTRON_144 = '.v8bin-cache/electron-v40.0.0-win32-x64/electron.exe';
+// The two 14.4 engines are FOUND, not named. They used to be
+// `.v8bin-cache/electron-v40.0.0-win32-x64/electron.exe` and
+// `.v8bin-cache/v8-win64-rel-14.4.258.17/d8.exe`, which is why the last green
+// `V8 oracle` run on ubuntu logged `SKIP: cache engine missing` for both 14.4
+// modes and measured only 14.6 -- see tools/oracle/engines.mjs's comment.
+// Either patch of 14.4.258 will do for the listing engine, because functions
+// are paired by their BYTECODE BYTES rather than by name: the Windows cache
+// carries .17 and the chromium-v8 bucket's linux64-rel build is .16.
+const D8_144 = findCachedEngine('d8', '14.4.258.');
+const ELECTRON_40 = findCachedEngine('electron', '40.');
+const ELECTRON_LABEL = 'electron 40 (v8 14.4.258.16, sandboxed)';
 
 const PAIRS = [
   {
@@ -75,12 +91,13 @@ const PAIRS = [
     profile: 'profiles/14.4.258.16',
     mode: 'cache',
     // Electron 40.0.0 carries V8 14.4.258.16, exactly the profile tag, and is
-    // a sandboxed build like the corpus. It cannot print a listing, because
-    // electron.exe is a Windows GUI-subsystem binary and V8's StdoutStream has
-    // nowhere to write; d8 14.4.258.17 does the printing, one patch ahead,
-    // which is why functions are paired by bytecode bytes.
-    cache: { exe: ELECTRON_144, label: 'electron 40.0.0 (v8 14.4.258.16, sandboxed)', env: { ELECTRON_RUN_AS_NODE: '1' } },
+    // a sandboxed build like the corpus. On Windows it cannot print a listing,
+    // because electron.exe is a GUI-subsystem binary and V8's StdoutStream has
+    // nowhere to write; d8 does the printing on both hosts, which is why
+    // functions are paired by bytecode bytes.
+    cache: { engine: ELECTRON_40, label: ELECTRON_LABEL, env: { ELECTRON_RUN_AS_NODE: '1' } },
     listing: D8_144,
+    required: true,
   },
   {
     // The same comparison, but with the FunctionUnits coming from T4's real
@@ -92,14 +109,16 @@ const PAIRS = [
     label: '14.4.258.16 (src/cache + src/heap)',
     profile: 'profiles/14.4.258.16',
     mode: 'cache-t4',
-    cache: { exe: ELECTRON_144, label: 'electron 40.0.0 (v8 14.4.258.16, sandboxed)', env: { ELECTRON_RUN_AS_NODE: '1' } },
+    cache: { engine: ELECTRON_40, label: ELECTRON_LABEL, env: { ELECTRON_RUN_AS_NODE: '1' } },
     listing: D8_144,
+    required: true,
   },
   {
     tag: '14.6.202.34',
     profile: 'profiles/14.6.202.34',
     mode: 'listing',
     listing: 'node',
+    required: true,
     // node's V8 is a patched, non-sandboxed build (14.6.202.34-node.40), and
     // its FOR_EACH_INTRINSIC expansion differs from the pristine
     // 14.6.202.34 the profile was generated from: profile id 273 is
@@ -135,7 +154,8 @@ fs.mkdirSync(WORK, { recursive: true });
 
 const hex = (bytes) => Buffer.from(bytes).toString('hex');
 
-function makeCache(engine, srcFile, outFile) {
+function makeCache(cache, srcFile, outFile) {
+  const engine = { exe: cache.engine.found.exe, env: cache.env };
   const r = spawnSync(engine.exe, [...CACHE_FLAGS, path.resolve('tools/disasm/make_jsc.cjs'),
     path.resolve(srcFile), path.resolve(outFile)], {
     env: { ...process.env, ...engine.env },
@@ -326,6 +346,35 @@ const say = (s = '') => { L.push(s); console.log(s); };
 let hardFailures = 0;
 const featuresSeen = new Set();
 const summary = [];
+const skipped = [];
+const ALLOW_SKIP = process.argv.includes('--allow-skip');
+
+/**
+ * Report a mode that cannot run.
+ * @returns {boolean} true if the caller may carry on anyway (it cannot)
+ */
+function record(pair, why) {
+  const name = pair.label ?? `profile ${pair.tag}`;
+  const hard = pair.required && !ALLOW_SKIP && !ONLY_PAIR;
+  skipped.push({ name, mode: pair.mode, why, hard });
+  if (hard) {
+    hardFailures++;
+    say(`::error::NOT MEASURED (\`${pair.mode}\`): ${why}`);
+    say(`FAIL: ${name} -- input mode \`${pair.mode}\` did not run, and this mode is required.`);
+    say('      Pass --allow-skip to downgrade this to a skip.');
+  } else {
+    say(`SKIP: ${why}`);
+  }
+  return false;
+}
+
+/** A `findCachedEngine` result -> run it, or report why not. */
+function skipPair(pair, what, found) {
+  if (found === null) return true;           // this mode needs no such engine
+  if (found.found) return true;
+  return record(pair, `${what}: ${found.why}`
+    + (found.considered.length ? `; considered ${found.considered.join(', ')}` : ''));
+}
 
 for (const s of SOURCES) fs.writeFileSync(path.join(CORPUS_DIR, `${s.name}.js`), s.source);
 say('# src/disasm oracle agreement');
@@ -339,18 +388,36 @@ for (const pair of PAIRS) {
   say('='.repeat(78));
   say(`## ${pair.label ?? `profile ${pair.tag}`} -- input mode \`${pair.mode}\``);
   say('');
-  if (pair.mode.startsWith('cache') && !fs.existsSync(pair.cache.exe)) { say(`SKIP: cache engine missing: ${pair.cache.exe}`); continue; }
+  // A skip must not read as a pass. `required` modes count a missing engine
+  // as a hard failure, because the whole point of this file is that the claim
+  // is defended wherever it runs -- and a green job that measured nothing is
+  // worse than a red one. `--allow-skip` is for a developer with one of the
+  // two engines, and it says so in the output.
+  if (!skipPair(pair, 'cache engine', pair.mode.startsWith('cache') ? pair.cache.engine : null)) continue;
   if (pair.mode === 'cache-t4' && !(await haveRealCachePath())) {
-    say('SKIP: src/cache + src/heap are not available yet (that is the point of adapter_legacy)');
-    continue;
+    if (!record(pair, 'src/cache + src/heap are not available yet (that is the point of adapter_legacy)')) continue;
   }
+  if (!skipPair(pair, 'listing engine', typeof pair.listing === 'string' ? null : pair.listing)) continue;
   let listingEngine;
-  try { listingEngine = resolveEngine(pair.listing); } catch (e) { say(`SKIP: ${e.message}`); continue; }
+  try {
+    listingEngine = resolveEngine(typeof pair.listing === 'string' ? pair.listing : pair.listing.found.exe);
+    // `d8` alone does not say which build ran, and "which build ran" is the
+    // whole question this file was failing to answer on CI.
+    if (typeof pair.listing !== 'string') {
+      const f = pair.listing.found;
+      listingEngine.label = `d8 ${f.version} (${f.platform})`;
+    }
+  } catch (e) {
+    if (!record(pair, `listing engine: ${e.message}`)) continue;
+  }
+  if (!listingEngine) continue;
   const profile = loadProfile(pair.profile);
   const jscDir = path.join(WORK, pair.tag);
   fs.mkdirSync(jscDir, { recursive: true });
-  if (pair.mode.startsWith('cache')) say(`cache engine  : ${pair.cache.label}`);
-  else say('cache engine  : none -- FunctionUnits are reconstructed from the listing (see tools/disasm/unit_from_listing.mjs)');
+  if (pair.mode.startsWith('cache')) {
+    const f = pair.cache.engine.found;
+    say(`cache engine  : ${pair.cache.label} -- ${f.exe} (v${f.version}, ${f.platform})`);
+  } else say('cache engine  : none -- FunctionUnits are reconstructed from the listing (see tools/disasm/unit_from_listing.mjs)');
   say(`unit source   : ${pair.mode === 'cache' ? 'src/disasm/adapter_legacy.mjs'
     : pair.mode === 'cache-t4' ? 'src/cache + src/heap (T4)' : 'tools/disasm/unit_from_listing.mjs'}`);
   say(`listing engine: ${listingEngine.label}`);
@@ -513,9 +580,63 @@ say(`features the corpus claims : ${WANTED.length}`);
 say(`features actually observed : ${featuresSeen.size}`);
 say(`claimed but never observed : ${missing.length ? missing.join(', ') : '(none)'}  ${missing.length === 0 ? 'PASS' : 'FAIL'}`);
 if (missing.length && !ONLY && !SKIP_BIG) hardFailures++;
+
+// --------------------------------------------------------------- assertions
+//
+// docs/DISASM.md 10 and legacy/README.md both cite this file for a specific
+// claim: TWO independent FunctionUnit readers, `cache` through
+// src/disasm/adapter_legacy.mjs and `cache-t4` through src/cache + src/heap,
+// agree with V8's own listing instruction-exact over the same functions. The
+// table above used to be the only statement of that, which meant a mode that
+// never ran still printed a green last line. These turn it into a check.
+say('');
+say('## asserted');
+say('');
+let assertionFailures = 0;
+const assert = (ok, what, detail) => {
+  if (!ok) { assertionFailures++; hardFailures++; }
+  say(`* ${ok ? 'PASS' : '**FAIL**'} -- ${what}${detail ? `: ${detail}` : ''}`);
+};
+
+for (const pair of PAIRS) {
+  if (ONLY_PAIR && pair.tag !== ONLY_PAIR && pair.label !== ONLY_PAIR) continue;
+  const name = pair.label ?? `profile ${pair.tag}`;
+  const row = summary.find((r) => r.mode === pair.mode && r.tag === pair.tag);
+  if (!pair.required) continue;
+  assert(!!row, `the required mode \`${pair.mode}\` of ${name} ran`,
+    row ? `${row.totalFns} functions` : (skipped.find((s) => s.mode === pair.mode)?.why ?? 'no row'));
+  if (!row) continue;
+  assert(row.totalFns > 0, `\`${pair.mode}\` paired at least one function`, `${row.totalFns}`);
+  assert(row.totalDiffs === 0, `\`${pair.mode}\` has no direct per-instruction diff`, `${row.totalDiffs}`);
+  assert(row.exactFns === row.totalFns, `\`${pair.mode}\` is normalised-exact on every function`,
+    `${row.exactFns}/${row.totalFns}`);
+  assert(row.unpaired === 0, `\`${pair.mode}\` left no V8 function unpaired`, `${row.unpaired}`);
+}
+
+// The dual-reader claim itself: the two 14.4 modes read the SAME .jsc files
+// through two different front ends, so they must see the same functions and
+// the same instruction count. Different numbers would mean one reader is
+// silently dropping units and the per-mode PASS lines above would both still
+// be green.
+const dual = summary.filter((r) => r.mode === 'cache' || r.mode === 'cache-t4');
+if (!ONLY_PAIR) {
+  assert(dual.length === 2, 'both 14.4 input paths ran',
+    dual.length ? dual.map((r) => r.mode).join(' + ') : 'neither did');
+  if (dual.length === 2) {
+    assert(dual[0].totalFns === dual[1].totalFns && dual[0].totalInstr === dual[1].totalInstr,
+      'adapter_legacy and src/cache + src/heap read the same functions and instructions',
+      dual.map((r) => `${r.mode} ${r.totalFns}/${r.totalInstr}`).join(' vs '));
+  }
+}
+if (skipped.length) {
+  say('');
+  say(`modes not measured: ${skipped.map((s) => `${s.mode} (${s.hard ? 'FAILED' : 'skipped'})`).join(', ')}`);
+}
+
 say('');
 say('='.repeat(78));
-say(hardFailures === 0 ? 'ORACLE AGREEMENT: ALL CHECKS PASSED' : `ORACLE AGREEMENT: ${hardFailures} CHECK(S) FAILED`);
+say(hardFailures === 0 ? 'ORACLE AGREEMENT: ALL CHECKS PASSED' : `ORACLE AGREEMENT: ${hardFailures} CHECK(S) FAILED`
+  + (assertionFailures ? ` (${assertionFailures} of them asserted above)` : ''));
 
 fs.writeFileSync('scratch/t5/ORACLE_AGREEMENT.md', L.join('\n') + '\n');
 console.log('\nwrote scratch/t5/ORACLE_AGREEMENT.md');

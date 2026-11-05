@@ -49,20 +49,38 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .v8bin-cache
-          key: v8bin-linux-14.4.258.16-electron40-v1
+          # bumped with `--binary`: the old key's entry holds a snapshot-only
+          # Electron, and a hit on it would restore a cache with no executable
+          # and put the 14.4 modes straight back to skipping.
+          key: v8bin-linux-14.4.258.16-electron40-binary-v2
 
       # Both CLIs are positional/flag forms taken from the scripts' own usage
       # lines, not guessed: `--get <platform-channel> <version> [--unzip]` and
-      # `<version> <platform>`. The platform is `linux64-rel`, with the channel
-      # suffix -- the bucket has no bare `linux64`.
+      # `<version> <platform> [--binary]`. The platform is `linux64-rel`, with
+      # the channel suffix -- the bucket has no bare `linux64`.
       - name: fetch d8 14.4.258.16 (linux64-rel)
         run: node tools/oracle/fetch_v8_binary.mjs --get linux64-rel 14.4.258.16 --unzip
 
-      # This extracts only v8_context_snapshot.bin and snapshot_blob.bin, which
-      # is all the read-only table needs. It does NOT give an electron
-      # executable, so nothing here mints a .jsc with Electron.
-      - name: fetch Electron 40.0.0's snapshots (linux-x64)
-        run: node tools/oracle/fetch_electron.mjs 40.0.0 linux-x64
+      # `--binary` unpacks the whole archive and proves the executable runs as
+      # a node before anything depends on it. WITHOUT it this step extracted
+      # only the two snapshot blobs, and that is why the last green `V8 oracle`
+      # run logged
+      #
+      #   SKIP: cache engine missing: .v8bin-cache/electron-v40.0.0-win32-x64/electron.exe
+      #
+      # for BOTH 14.4 modes of tools/disasm/oracle_agreement.mjs -- a Windows
+      # path on an ubuntu runner, asking for a file this job never downloaded.
+      # Only the 14.6 `listing` mode ran, so the dual-reader agreement
+      # docs/DISASM.md 10 rests on was a developer-machine measurement that CI
+      # could not have defended. Relocating the prototype into legacy/ already
+      # broke it once (41 failures locally, CI green throughout).
+      - name: fetch Electron 40.0.0 (linux-x64) including the executable
+        run: node tools/oracle/fetch_electron.mjs 40.0.0 linux-x64 --binary
+
+      # Fail here, with the cache listed and the fetch command named, rather
+      # than inside a suite that would report the same miss as a skip.
+      - name: both 14.4 engines are present and runnable on this host
+        run: node tools/oracle/require_engines.mjs d8@14.4.258. electron@40.
 
       # tests/t4/acceptance.mjs mints its .jsc with the RUNNING node and
       # therefore needs a profile for the running node's V8, built with
@@ -117,8 +135,25 @@ jobs:
       - name: O1 — our decode vs --print-bytecode, both engines
         run: node tools/oracle/selftest.mjs
 
+      # No --allow-skip: every mode is required, so a missing engine fails the
+      # step instead of printing SKIP under a green tick. The run asserts its
+      # own numbers (0 diffs, normalised-exact on every paired function, 0
+      # unpaired) and asserts that the two 14.4 input paths -- adapter_legacy
+      # and src/cache + src/heap -- read the same functions and the same
+      # instruction count.
       - name: the disassembler agrees with V8's listing instruction for instruction
         run: node tools/disasm/oracle_agreement.mjs
+
+      # The two rows docs/DISASM.md 10 cites, lifted back out of the report so
+      # they are visible in the log without opening an artifact. If either 14.4
+      # row is missing the step above already failed; this is what a reader
+      # looks at.
+      - name: the two 14.4 rows
+        if: always()
+        run: |
+          set -euo pipefail
+          grep -E '^\| 14\.4' scratch/t5/ORACLE_AGREEMENT.md || true
+          grep -E '^\* (PASS|\*\*FAIL\*\*)' scratch/t5/ORACLE_AGREEMENT.md || true
 
       - name: T4 acceptance — 1200 assertions against V8's own listing
         run: node tests/t4/acceptance.mjs
@@ -134,5 +169,6 @@ jobs:
           path: |
             tests/t4/ACCEPTANCE.txt
             /tmp/ro-heap-ci.txt
+            scratch/t5/ORACLE_AGREEMENT.md
             scratch/**/*.md
           if-no-files-found: ignore

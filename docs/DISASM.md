@@ -517,8 +517,58 @@ Three input modes:
 The `.jsc` for 14.4 comes from Electron 40.0.0, which carries V8 14.4.258.16 —
 exactly the profile tag, and a sandboxed build like the corpus. `electron.exe`
 cannot print a listing (it is a Windows GUI-subsystem binary, so V8's
-`StdoutStream` has nowhere to write), so `d8` 14.4.258.17 does the printing,
-one patch ahead. Pairing by bytecode bytes is what makes that safe.
+`StdoutStream` has nowhere to write), so `d8` does the printing: 14.4.258.17
+on a Windows cache, one patch ahead, and 14.4.258.16 — the same patch as
+Electron's V8 — from the `linux64-rel` build the runner fetches. Pairing by
+bytecode bytes is what makes either safe.
+
+#### This runs on CI, and a skip is a failure
+
+The table above is **not** a developer-machine measurement. It used not to be
+anything else: `oracle_agreement.mjs` named its two 14.4 engines as
+`.v8bin-cache/electron-v40.0.0-win32-x64/electron.exe` and
+`.v8bin-cache/v8-win64-rel-14.4.258.17/d8.exe`, and the platform in a cache
+directory's name is the **downloader's**, which on CI is the runner. So on
+`ubuntu-latest` both 14.4 modes printed
+
+```
+SKIP: cache engine missing: .v8bin-cache/electron-v40.0.0-win32-x64/electron.exe
+```
+
+— a Windows path, for a file the job had never downloaded, because
+`.github/workflows/oracle.yml` ran `fetch_electron.mjs 40.0.0 linux-x64`
+**without `--binary`** and so extracted only the two snapshot blobs. Only the
+14.6 `listing` mode ran, the job went green, and the dual-reader claim this
+section rests on was something CI could not have defended. It nearly cost a
+real break: moving the prototype into `legacy/` separated `profile.js` from
+`rules/`, this file caught it locally with 41 failures, and CI was green
+throughout.
+
+Three things changed, and together they mean a green `V8 oracle` run has
+actually measured all three rows:
+
+* **The engines are found, not named.** `tools/oracle/engines.mjs::
+  findCachedEngine(kind, versionPrefix)` scans `.v8bin-cache` for an unpacked
+  `d8` or Electron whose version matches and whose platform is **this host's**,
+  and checks it is executable. A foreign-platform build is not a candidate at
+  all: unlike a snapshot blob, an executable is not portable, and
+  preferring-but-accepting one only moves the failure into `spawn`.
+* **The workflow fetches the executable** (`fetch_electron.mjs 40.0.0
+  linux-x64 --binary`, which also proves it runs as a node before anything
+  depends on it), and a step before the suites —
+  `tools/oracle/require_engines.mjs d8@14.4.258. electron@40.` — fails with the
+  cache contents and the fetch command if either is missing. The binary cache
+  key was bumped, because a hit on the old key would restore a
+  snapshot-only Electron and put the 14.4 modes straight back to skipping.
+* **A skip is no longer a pass.** Every mode is `required`; a missing engine is
+  a hard failure that prints `::error::NOT MEASURED`, and `--allow-skip`
+  exists for a developer who has only one of the two engines and says so in
+  the output. The run then **asserts** its own numbers rather than printing
+  them — per mode, 0 direct diffs, normalised-exact on every paired function
+  and 0 unpaired — plus the dual-reader claim itself: that `cache` and
+  `cache-t4` read the **same** function count and the **same** instruction
+  count (102 / 31 919), which is the one thing two independently green per-mode
+  rows would not tell you.
 
 The 14.6 run picks up node's own bootstrap internals as well as the corpus
 source, which is why it compares 15× more functions.
