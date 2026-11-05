@@ -1083,6 +1083,23 @@ Everything here is counted by the tooling and appears in `report`.
     `GetNamedProperty -> CreateClosure` 2 231,
     `CreateClosure -> LdaUndefined` 1 260,
     `missing-allocation CreateClosure` 1 174). O2's 0/257 is downstream of it.
+14. **The language mode used to be discarded — closed.** Every ScopeInfo states
+    it, `src/heap/objects.mjs:197` decodes it, and this layer emitted every
+    function as sloppy code regardless: 5 135 of a 29-file sample's 5 313 units
+    are `kStrict` in the original. A directive emits no bytecode, but it
+    decides the bytecode around it, because a class body is strict
+    (`ClassScope::ClassScope:199`) and
+    `Scope::ForceContextForLanguageMode` (`scopes.h:423`) gives a scope that is
+    stricter than its outer scope a context it would otherwise not have — so
+    every slot a class member captured was read one `PREVIOUS_INDEX` hop too
+    deep. A function now emits `'use strict'` iff its own ScopeInfo says
+    `kStrict` and no emitted ancestor already has; the full account, the
+    citations and the corpus before/after are docs/RECOVER.md §9.7.
+    `unitsStrictInTheOriginal`, `strictDirectivesEmitted`,
+    `strictDirectivesNotExpressible` (a directive prologue is a `SyntaxError`
+    in a function with a rest parameter — 0 of 193 strictness roots) and
+    `unitsSloppyUnderAStrictAncestor` (0, the inheritance invariant the
+    placement rests on) are the counters.
 
 ### Found in other layers while building this one
 

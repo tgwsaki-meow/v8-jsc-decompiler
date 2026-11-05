@@ -1267,15 +1267,18 @@ const CLASS_MEMBER_HOLES = new Set([
  * it is a scoping change and not a cosmetic one: the identifier binds to the
  * class instead of to the outer variable it was resolved from.
  *
- * It is also the whole of the first measurable regression this change caused.
  * V8 allocates a context slot for a class variable only when it is used
- * (`ClassScope`), so capturing one member's read turns the class scope into a
- * context and every OTHER read in that member goes from
- * `LdaImmutableCurrentContextSlot [i]` to `LdaImmutableContextSlot [i] [1]`.
- * On the 1 039-file corpus that one row was 5 827 functions of a `load-form`
- * family that grew by 5 255, and the exact count fell by 686 while the shape
- * was right; on a 36-file sample reproduced locally, `r_4672.jsc` alone went
- * 39 exact -> 26 with `load-form` 8 -> 32.
+ * (`ClassScope`), so capturing one member's read would turn the class scope
+ * into a context and push every OTHER read in that member one
+ * `PREVIOUS_INDEX` hop deeper. Keeping the id off the members' spellings costs
+ * nothing and removes that hazard.
+ *
+ * It was once claimed here to be the whole of the 5 827-function depth
+ * regression docs/RECOVER.md 9.7 measures. It is not, and that attribution was
+ * never measured: with the corpus's own V8 a class body interposes a context
+ * whether or not it is named, because a class body is strict code and sloppy
+ * code around it forces one (see STRICT above). The suffixing stays because the
+ * shadowing it prevents is real; the depth regression was the language mode.
  *
  * The identifier set is over-approximated on purpose: every `Identifier` and
  * `PrivateName` anywhere in the member subtrees, property keys included.

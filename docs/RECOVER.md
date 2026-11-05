@@ -917,53 +917,154 @@ template, `accessor x`, and a class FIELD — which is not an undecoded part of
 the boilerplate but an absent one, because `ClassBoilerplate::New:769`
 `continue`s on `ClassLiteral::Property::FIELD` before it writes any template.
 
-### 9.7 On the corpus: the shape is right and the exact count fell
+### 9.7 On the corpus: the shape is right, and the cost was not the class
 
 Both runs are the sharded O1 scan over all 1039 files
-(`gh workflow run scan.yml -f layer=o1 -f shards=12`), one on `main` and one on
-this branch, nothing executed either time.
+(`gh workflow run scan.yml -f layer=o1 -f shards=12`), nothing executed either
+time: `main` at `300c1be` — both §9.6's change and `literal-order` merged — as
+run `42018138145`, against this branch as run `42021949756`. They are one
+baseline and one head of the same scan; the single-branch runs quoted in
+earlier drafts of this section were three different runs and do not subtract.
 
-| | `main` | this branch |
+| | `main` @ `300c1be` | this branch |
 |---|---:|---:|
 | files `ok` / `decompile-timeout` / `output-does-not-compile` | 1035 / 3 / 1 | 1035 / 3 / 1 |
 | functions in stream A that reached a comparison | 184 672 | 184 672 |
 | **paired** | 184 672 | 184 672 |
 | **A-side unpaired** | **0** | **0** |
 | **B-side unpaired** | **0** | **0** |
-| `sfi` pairs (identity by construction) | 179 961 | 179 943 |
-| **exactly equal** | **33 463 = 18.1202%** | **32 777 = 17.7488%** |
-| mean opcode similarity | 0.780057 | 0.776664 |
-| **holes our emitter marked** | 105 319 | **100 317** |
+| `sfi` pairs (identity by construction) | 179 943 | 179 943 |
+| **exactly equal** | **32 830 = 17.7775%** | **33 596 = 18.1923%** |
+| exactly equal, `sfi` mode alone | 32 501 | 33 267 |
+| mean opcode similarity | 0.776664 | 0.782407 |
+| mean whole-instruction similarity | 0.518320 | 0.519905 |
+| instructions in stream B | 11 444 351 | 11 430 826 |
+| **holes our emitter marked** | 100 317 | 100 317 |
+| `load-form` | 13 905 | **6 169** |
+| its top row, `LdaImmutableCurrentContextSlot → LdaImmutableContextSlot` | 5 831 | **60** |
+| the same row with register moves, `(+1/+2/+3 move)` | 2 312 | **0** |
+| `extra-context-push` | 1 345 | **268** |
 
-Both guards hold — neither unpaired count moves off zero, and the status counts
-are identical file for file — and the holes fall by 5 002. **The exact count
-falls by 686, which is the opposite of what this change was for, and it is
-reported rather than explained away.** What is known about it:
+The exact count **rises by 766** and the rate rises with it; holes do not move,
+both unpaired counts stay at 0, and the status counts are identical file for
+file. 33 596 is 80 above 33 516 — the highest this measurement had ever read,
+`literal-order` alone — and 133 above the 33 463 of `main` before either
+branch. So §9.6's 5 002 holes are kept and the 686 exact matches the class body
+cost are paid back with interest.
 
-* It is not a pairing artefact. The first run of this branch also scored
-  32 777 while 15 863 functions sat in the weaker `name` mode, because
-  `emitName` still held the sibling spelling; restoring the member's own name
-  put them back into `sfi` and moved the total by nothing. The same functions
-  are exact either way.
-* It is not the member bodies. A member's emitted text is byte-identical before
-  and after — verified on `r_20268.jsc`, where `get coverUrl`'s 38 bytes of
-  bytecode are identical instruction for instruction — and two files whose
-  members all moved lost no exact matches at all.
-* The family that grew is `load-form`, 8 637 → 13 892 functions, dominated by
-  one row: `LdaImmutableCurrentContextSlot → LdaImmutableContextSlot`, 5 827
-  functions. That is a context DEPTH difference with our side one level deeper.
-  Reproduced locally on a 36-file sample (604 → 578 exact), where `r_4672.jsc`
-  alone goes 39 → 26 with `load-form` 8 → 32 and the repro is
-  `get isInMacAudit`: stream A reads `LdaImmutableCurrentContextSlot [13]`,
-  we read `LdaImmutableContextSlot <context> [11] [1]`.
-* So the cost is the scope chain a class body interposes: a member used to be
-  hoisted to the top of its parent's body as `var m = function m(){}`, where
-  the nearest context is the parent's function context; it now sits where the
-  class expression sits. What makes our class scope hold a context is **not
-  yet identified** — every class in the sample is emitted anonymously, none
-  uses `super`, and a minimal mint (`class extends Object { m(){ return
-  captured } }`) reads `LdaImmutableCurrentContextSlot`, i.e. no interposed
-  context, so the minimal case does not reproduce it.
+#### The 686 was never the class body. It was the language mode.
+
+A class body is strict code: `ClassScope::ClassScope:195` calls
+`set_language_mode(LanguageMode::kStrict)` at :199, unconditionally.
+`Scope::ForceContextForLanguageMode` (`scopes.h:423`) returns false only for a
+FUNCTION_SCOPE or a script scope and otherwise answers
+`language_mode() > outer_scope_->language_mode()`; a class scope is neither
+(`Scope::is_class_scope:375`). `Scope::AllocateVariablesRecursively`
+(`scopes.cc:2621`) folds that into `must_have_context` at :2646/:2651, which
+suppresses the `num_heap_slots_ = 0` shortcut at :2662, so `NeedsContext()`
+(`scopes.h:434`) is true. `BytecodeGenerator::VisitClassLiteral:3836` then
+takes its :3838 branch and emits `BuildNewLocalBlockContext` at :3852.
+
+**A class body in sloppy text therefore sits behind a context that the same
+class body in strict text does not**, and every slot a member captures from an
+enclosing scope is read one `PREVIOUS_INDEX` hop further out. Minted both ways
+with the corpus's own V8 (`.v8bin-cache/v8-win64-rel-14.4.258.17/d8.exe`,
+`--no-lazy --print-bytecode`), the same two function bodies capturing the same
+variable, differing only in the directive at the top of the file:
+
+| enclosing code | the body as a class member | the same body as a sibling |
+|---|---|---|
+| sloppy | `LdaImmutableContextSlot <context>, [2], [1]` | `LdaImmutableCurrentContextSlot [2]` |
+| strict | `LdaImmutableCurrentContextSlot [2]` | `LdaImmutableCurrentContextSlot [2]` |
+
+Nothing about the class decides it. §9.6 did not cause this row; it made it
+visible, by moving 648 functions into the one position where an interposed
+context can be seen. `tools/probes/probe_class.mjs context` counts the rest of
+the exposure on §9.6's own 29-file sample: **5 135 of 5 313 units are `kStrict`
+in the original** and this layer emitted all 5 313 as sloppy; all 72 classes
+that carry a member sit in a `kStrict` holder; and **296 of the 648 members
+read a slot of an enclosing context**, which is the set that pays.
+
+#### What the earlier account got wrong, and why
+
+The paragraph this replaces said a minimal mint did not reproduce the
+interposed context, and treated that as grounds for looking elsewhere. **The
+probe behind it ran under `node`, not under the corpus's V8** — the exact
+substitution docs/O1.md §1 exists to forbid. Re-minted with d8 14.4.258.17,
+that probe's own file reproduces on the first try: `probeInside` (anonymous
+class) and `probeNamed` (named class) both read
+`LdaImmutableContextSlot <context>, [2], [1]`, while `probeBeside` — the same
+body as a sibling — reads `LdaImmutableCurrentContextSlot [2]`. Under `node`
+all three read the shallow form, which is what sent the search after the class
+instead of after the mode.
+
+Three hypotheses are refuted rather than untested:
+
+* **The class's own name.** `src/emit/index.mjs::classId` keeps the id off
+  every spelling a member uses, and that is worth keeping, but it is not this:
+  under 14.4 a named and an anonymous class interpose the same context, and
+  §9.7's named repro is anonymous — `fn$8 = class extends r$3.Vue`, with no
+  `super` property access, no private name, no computed key and no static
+  member anywhere in its body.
+* **Placement in a block of its own.** The class expression is emitted at
+  exactly the statement position, and the same nesting depth, that
+  `var get_isInMacAudit = function …` occupied before it.
+* **`src/emit/scopes.mjs`'s frame ownership.** The binding is the same binding:
+  the same `scopeInfoId`, the same `localIndex`, the same owner, the same
+  spelling, and no refusal moved. Only the DEPTH the emitted text implies
+  changed, which is not a property of the plan.
+
+#### The fix: emit the language mode the input states
+
+Every ScopeInfo carries it and `src/heap/objects.mjs:197` already decodes it
+(the frontend self-test pins the enum, `C++ LanguageMode = {kSloppy: 0,
+kStrict: 1}`, because Torque's declaration order is the other way round). This
+layer discarded it. It now emits `'use strict'` on a function iff that
+function's own ScopeInfo says `kStrict` and no emitted ancestor already has.
+
+Strictness is inherited in the original by construction — a parser cannot put
+a sloppy scope inside a strict one — so one directive at the outermost strict
+unit reproduces the mode for its whole subtree. That is measured, not assumed:
+`unitsSloppyUnderAStrictAncestor` counts every unit our emitted nesting would
+make strict that the original compiled sloppy, and it is **0** over the
+sample's 5 313 units. The one thing that can refuse the directive is V8's own
+syntax — a directive prologue is illegal in a function with a non-simple
+parameter list, and the only non-simple form this layer emits is a rest
+parameter — counted as `strictDirectivesNotExpressible`, **0** of the sample's
+193 strictness roots.
+
+On `r_4672.jsc`, this section's named repro: 168 of 171 units are strict, 8
+directives carry them, and `get isInMacAudit` goes from
+`LdaImmutableContextSlot <context> [11] [1]` to
+`LdaImmutableCurrentContextSlot [11]` — instruction for instruction the
+bytecode `main` produced for the SIBLING form, verified by minting `main`'s own
+text. On the 36-file local sample the loss closes exactly: 578 → **605** exact
+against a pre-§9.6 baseline of 604, `r_4672.jsc` 26 → **39**, which is the 39
+it had before §9.6, and holes unchanged at 1 830.
+
+#### What this does not close
+
+* **1 073 functions still disagree about a context, in the other direction.**
+  60 of the 5 831 keep the original row, and
+  `LdaImmutableContextSlot → LdaImmutableCurrentContextSlot` — the original
+  deeper than us — grows 711 → 1 013. A class scope can need a context for
+  reasons of its own, a private brand among them
+  (`ClassScope::ClassScope:210` reads `ScopeInfo::ClassScopeHasPrivateBrand`),
+  and this layer emits no private names at all. Not measured further here.
+* **The families that grew are reclassification, not regression.** Only a
+  function's first hunk is independent (docs/O1.md §7.3), so a function whose
+  first divergence WAS the depth row now reports whatever came next:
+  `operand-value` +2 662, `extra-temp-materialisation` +2 302, `call-form`
+  +1 752 against `load-form` −7 736, `replaced-block` −1 728,
+  `extra-context-push` −1 077 and `undefined-for-a-value` −621. The net on the
+  one number that is not a classification is +766 exact and −13 525
+  instructions emitted.
+* **The repro's slot INDEX is a different defect.** Stream A reads
+  `LdaImmutableCurrentContextSlot [13]` where we read `[11]`, before this
+  change and after it, and in `main`'s sibling form too — so
+  `get isInMacAudit` was not an exact match before §9.6 either. Our emitted
+  context layout for that scope is two slots short of the original's; nothing
+  here touches it.
 
 Two defects were found and fixed on the way, both of which this measurement is
 what caught:
@@ -971,4 +1072,8 @@ what caught:
 * **`async` and `*` were dropped from a member**, which puts `await` inside a
   non-async method — a `SyntaxError` that costs the whole file. 4 of a 20-file
   sample stopped compiling; now 0 (docs/EMIT.md §9 gap 2).
-* **the pairing name** above.
+* **the pairing name**: the first run of §9.6's branch left 15 863 functions in
+  the weaker `name` mode because `emitName` still held the sibling spelling.
+  Restoring the member's own name put them back into `sfi` and moved the exact
+  total by nothing, which is how that run established the loss was not a
+  pairing artefact.
