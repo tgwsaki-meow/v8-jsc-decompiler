@@ -44,7 +44,7 @@
 // unused" deletes a whole function from the output -- which is not dead-code
 // elimination but output loss. `src/recover/index.mjs` repairs it by
 // materialising instead, and counts both ends:
-// `stats.dce.functionLiteralRoots` and
+// `stats.functionLiteralRoots` and
 // `stats.emit.functionLiteralsMaterialisedForNoLiveUse`.
 
 export function deadValues(cx) {

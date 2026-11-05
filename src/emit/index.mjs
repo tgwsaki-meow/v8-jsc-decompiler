@@ -608,6 +608,15 @@ function emitUnitInner(state, rec0, how) {
   // ---- a unit with no usable pair still has to appear (11.5). Its children
   //      do too: a function is not lost because its parent could not be
   //      recovered, so they are emitted inside the stub body.
+  //
+  //      Every one of them is unreferenced BY CONSTRUCTION -- the stub body is
+  //      a `throw` and references nothing -- so each goes through
+  //      `unreferenced()` for its binding form, exactly like the children of a
+  //      refusal below. This was the one path that did not, and it is the one
+  //      path with no measured effect: `probe_closure.mjs cause` finds 0 units
+  //      of its 25-file sample reaching here, because all 23 of that sample's
+  //      failures are refusals. Closed anyway -- a child must not depend on
+  //      which kind of body its parent ended up with.
   if (!rec || !sf) {
     state.report.functionsFailed++;
     state.report.holes.total++;
@@ -617,7 +626,7 @@ function emitUnitInner(state, rec0, how) {
     for (const c of state.childrenOf.get(rec0.sfiId) ?? []) {
       if (state.claimed.has(c.sfiId) || state.emitted.has(c.sfiId)) continue;
       for (const s of asStatements(emitUnit(state, c, { role: 'declaration', inherited: how.inherited ?? new Set() }))) {
-        stubChildren.push(s);
+        stubChildren.push(unreferenced(state, c, s, how));
       }
     }
     const body = t.blockStatement([...stubChildren, ...failedBody(unit, failure)]);

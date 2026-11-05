@@ -1205,6 +1205,7 @@ export function recover(ir, opts = {}) {
       dead: dce.stats.dead,
       live: dce.stats.live,
       movesDropped: dce.stats.movesDropped,
+      functionLiteralRoots: dce.stats.functionLiteralRoots,
       inline: plan.stats,
       duplicable: duplicable.size,
       materialised: materialisedNames.size,
