@@ -424,6 +424,59 @@ for (const { tag, profile } of profiles) {
     };
   });
 
+  // `async` and `*` on a class member are not decoration. A `t.classMethod`
+  // built without them puts `await` inside a non-async method, which is a
+  // SyntaxError -- and a SyntaxError anywhere takes the whole FILE with it.
+  // Measured while the member placement above was being built: 4 of a 20-file
+  // corpus sample stopped compiling, each one an `async` class method.
+  check(P, 'async and generator travel with a class member', () => {
+    const rid = profile.runtimeId ? profile.runtimeId('DefineClass') : null;
+    if (rid === null || rid === undefined) return { skip: true, detail: 'profile has no DefineClass runtime id' };
+    const kid = (sfiId, name, extra) => {
+      const c = asm(profile);
+      c.emit('LdaUndefined').emit('Return');
+      return c.build({ sfiId, parentSfiId: 1, name, ...extra });
+    };
+    const kids = [
+      kid(7, 'Job', {}),
+      kid(11, 'run', { isAsync: true }),
+      kid(12, 'items', { isGenerator: true }),
+    ];
+    const a = asm(profile);
+    const bp = a.constant({
+      t: 'classBoilerplate',
+      argumentsCount: 5, firstDynamicArgumentIndex: 3, descriptorsRead: 3,
+      argumentsUnclaimed: 0, synthesised: [], refusals: [],
+      entries: [
+        { side: 'instance', keyKind: 'name', key: 'run', kind: 'data', valueIndex: 3, keyIndex: null },
+        { side: 'instance', keyKind: 'name', key: 'items', kind: 'data', valueIndex: 4, keyIndex: null },
+      ],
+    });
+    a.emit('LdaConstant', [{ const: bp }]).emit('Star', [{ reg: 0 }])
+      .emit('CreateClosure', [{ const: a.constant({ t: 'sfi', sfiId: 7 }) }, { slot: 0 }, { u: 0 }]).emit('Star', [{ reg: 1 }])
+      .emit('LdaTheHole').emit('Star', [{ reg: 2 }])
+      .emit('CreateClosure', [{ const: a.constant({ t: 'sfi', sfiId: 11 }) }, { slot: 1 }, { u: 0 }]).emit('Star', [{ reg: 3 }])
+      .emit('CreateClosure', [{ const: a.constant({ t: 'sfi', sfiId: 12 }) }, { slot: 2 }, { u: 0 }]).emit('Star', [{ reg: 4 }])
+      .emit('CallRuntime', [{ u: rid }, { regList: [0, 5] }, { count: 5 }])
+      .emit('Return');
+    const all = [a.build({ sfiId: 1, name: 'makeJob', registerCount: 6 }), ...kids];
+    const recs = [];
+    const sfs = [];
+    for (const b of all) {
+      const ir = buildIR(b.unit, { profile });
+      recs.push(recover(ir));
+      sfs.push(structure(ir, { profile, verify: true }));
+    }
+    const out = emit(recs, sfs, { file: 'selftest.jsc', units: all.map((b) => b.unit), verify: true });
+    const code = String(out.code);
+    return {
+      ok: /\basync\s+run\s*\(\)/.test(code) && /\*\s*items\s*\(\)/.test(code)
+        && out.report.classMembersPlaced === 3
+        && violationsOf(out) === 0 && !parses(code),
+      detail: code.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\s+/g, ' ').slice(0, 170),
+    };
+  });
+
   check(P, 'two runs over the same input produce identical text (O2 precondition)', () => {
     const build = () => {
       const a = asm(profile);

@@ -62,6 +62,8 @@ export const EMIT_HOLE_WHY = Object.freeze({
     + 'other than a `{e:fn}`, so there is no body to put in the class',
   classMemberAlreadyEmitted: 'a class member whose unit was already emitted elsewhere',
   classMemberWithoutAUnit: 'a class member naming an SFI this file does not carry',
+  classAccessorIsAsyncOrAGenerator: 'a class getter or setter whose unit is async or a '
+    + 'generator; `async get x(){}` and `get *x(){}` are both SyntaxErrors',
   classMemberNotPlaced: 'a class member src/heap or T7 refused, under a reason this layer does '
     + 'not have its own counter for',
   superOutsideAMethod: '`super` in a unit not emitted as a class method',

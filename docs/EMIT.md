@@ -532,19 +532,22 @@ reject anything.
 ### 8.1 `tools/emit/selftest.mjs` — engine-free, both profiles
 
 ```
-node tools/emit/selftest.mjs      ->  78 passed, 0 failed
-npm test                          ->  the `emit` slot runs the same 78
+node tools/emit/selftest.mjs      ->  80 passed, 0 failed
+npm test                          ->  the `emit` slot runs the same 80
 ```
 
-Groups: 5 layering, 6 closed-set, 11 per profile × 2 profiles = 22 assembled
+Groups: 5 layering, 6 closed-set, 12 per profile × 2 profiles = 24 assembled
 shapes, 25 fixtures (one named check per source construct, plus the closure
-check below), 20 invariant and rendering checks. One of the assembled shapes is
-a four-unit file whose parent holds a `%DefineClass` with a
-`{t:'classBoilerplate'}` naming a method and a getter; it reads the emitted
-text back through a parser and asserts the class body holds
+check below), 20 invariant and rendering checks. Two of the assembled shapes are
+four-unit files whose parent holds a `%DefineClass` with a
+`{t:'classBoilerplate'}`. The first names a method and a getter and reads the
+emitted text back **through a parser**, asserting that the class body holds
 `constructor`, `area` and `get size`, that no `area`/`size` sibling declaration
 exists anywhere in the file, that `classMembersPlaced` is 3 and that no
-`class*` hole was counted. Over the 24 minted fixtures in
+`class*` hole was counted. The second names an `async` method and a generator
+method and asserts both keywords survive, because dropping them is a
+`SyntaxError` that costs the whole file (§9 gap 2). Over the 24 minted fixtures
+in
 `tests/t8/fixtures/`:
 
 | | |
@@ -803,11 +806,20 @@ Everything here is counted by the tooling and appears in `report`.
    `classMemberKeyKindNotSpellable` (a Symbol key),
    `classMemberValueIsNotAClosure`, `classMemberWithoutAUnit`,
    `classMemberAlreadyEmitted`, `classMemberValueArgumentMissing`,
-   `classMemberKeyArgumentMissing`, and `classMemberNotPlaced` for a `src/heap`
-   refusal this layer has no counter of its own for. A member whose kind cannot
-   be determined is **not** emitted as a plain method:
-   `CLASS_MEMBER_KINDS` is a closed set of three with no default branch, which
-   is the one line that used to turn a getter into `x(){}`.
+   `classMemberKeyArgumentMissing`, `classAccessorIsAsyncOrAGenerator`, and
+   `classMemberNotPlaced` for a `src/heap` refusal this layer has no counter of
+   its own for. A member whose kind cannot be determined is **not** emitted as a
+   plain method: `CLASS_MEMBER_KINDS` is a closed set of three with no default
+   branch, which is the one line that used to turn a getter into `x(){}`.
+
+   `async` and `*` travel with the member, which is not a detail: a
+   `t.classMethod` built without them emits `await` inside a non-async method,
+   which is a `SyntaxError` and takes the whole *file* with it. Measured while
+   building this — 4 of a 20-file sample stopped compiling, each one an `async`
+   class method — which is why the accessor case is a refusal rather than a
+   flag: `async get x(){}` and `get *x(){}` are both `SyntaxError`s, and
+   `function-kind.h` gives an accessor its own kind, so the combination means
+   the flag did not come from the SFI.
 
    Two counters go with it. `classMembersPlaced` is how many members landed
    inside a class body; `classArgumentsNoTemplateDescribes` is how many dynamic

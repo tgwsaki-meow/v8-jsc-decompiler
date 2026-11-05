@@ -1145,6 +1145,7 @@ const CLASS_MEMBER_HOLES = new Set([
   'classMemberKindNotSpellable', 'classMemberKeyKindNotSpellable',
   'classMemberValueArgumentMissing', 'classMemberKeyArgumentMissing',
   'classMemberValueIsNotAClosure', 'classMemberAlreadyEmitted', 'classMemberWithoutAUnit',
+  'classAccessorIsAsyncOrAGenerator',
 ]);
 
 /**
@@ -1178,7 +1179,25 @@ function classMember(ctx, m, state) {
   if (fn.type !== 'FunctionExpression') {
     return { why: 'classMemberValueIsNotAClosure', detail: fn.type };
   }
-  return { node: t.classMethod(m.kind, key, fn.params, fn.body, !!m.computed, !!m.static) };
+  // `async`/`*` travel with the member, and they are not decoration: dropping
+  // them emits `await` inside a non-async method, which is a SyntaxError and
+  // takes the WHOLE FILE with it. Measured on a 20-file sample: 4 files stopped
+  // compiling, each one an `async` class method.
+  //
+  // An accessor cannot carry either -- `async get x(){}` and `get *x(){}` are
+  // both SyntaxErrors, and function-kind.h gives an accessor its own kind, so
+  // the combination means the flag came from somewhere other than the SFI
+  // (`ctx.forceAsync`). Refused rather than emitted.
+  if ((fn.async || fn.generator) && (m.kind === 'get' || m.kind === 'set')) {
+    return {
+      why: 'classAccessorIsAsyncOrAGenerator',
+      detail: `${m.kind} ${fn.async ? 'async' : ''}${fn.generator ? '*' : ''}`.trim(),
+    };
+  }
+  return {
+    node: t.classMethod(m.kind, key, fn.params, fn.body, !!m.computed, !!m.static,
+      !!fn.generator, !!fn.async),
+  };
 }
 
 /** T7's idiom claims, as 11.4's `perFunction[].patterns`. */
