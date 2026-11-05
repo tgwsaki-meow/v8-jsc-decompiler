@@ -56,6 +56,16 @@ tests/t4/out/
 # ============================================================================
 scratch/*
 !scratch/*.mjs
+# `!scratch/**/*.md` alone could never work: git does not descend into an
+# excluded directory, so no file inside `scratch/<dir>/` was ever reconsidered
+# and every report the docs cite as the raw output behind a published number
+# was unreachable. The two lines below are what make the exception reachable --
+# un-exclude the directories themselves so git descends, then exclude their
+# contents again, leaving `*.md` as the only thing the negation below keeps.
+# Depth 2 only, deliberately: it is where the reports are, and it keeps git out
+# of the ~124 MB of per-file JSON and out of nested worktrees under scratch/.
+!scratch/*/
+scratch/*/*
 !scratch/**/*.md
 scratch/**/corpus/
 scratch/*/out/
