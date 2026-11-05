@@ -190,15 +190,37 @@ export function constantsAgree(mine, printed) {
     }
     case 'templateObject':
       return m.t === 'templateObject' ? ok() : fail(`we say ${m.t}, V8 printed a TemplateObjectDescription`);
-    case 'classBoilerplate':
-      // ClassBoilerplate's layout is @cppObjectLayoutDefinition, so
-      // layouts.json has no class for it and the decoder reports the map name
-      // instead of decoding with a guessed stride. Accept the honest report,
-      // but require that it names the class rather than saying nothing.
-      if (m.t === 'unresolved' && /class_boilerplate|ClassBoilerplate/i.test(JSON.stringify(m.detail ?? {}) + (m.why ?? ''))) {
-        return { ok: null, why: 'ClassBoilerplate: reported by map name, not decoded (no layouts.json class)' };
+    case 'classBoilerplate': {
+      // V8 prints the bare `<ClassBoilerplate>`, so there is no printed detail
+      // to compare a member list against. What is checkable is that the decode
+      // holds together as a `%DefineClass` argument list, which is a property
+      // of `ClassBoilerplate::New` and not of this source: every member's value
+      // index is a real dynamic argument of the call, and a computed member's
+      // key index is exactly one below its value index (New:769-793 hands the
+      // key the index before the value). These are the same assertions
+      // tests/t4/selftest.mjs makes on a corpus file; the point of making them
+      // here too is that this profile is the kTaggedSize=8 one.
+      if (m.t !== 'classBoilerplate') {
+        return fail(`V8 printed a ClassBoilerplate and we say ${m.t} (${JSON.stringify(m.detail ?? m.why ?? null)})`);
       }
-      return fail(`V8 printed a ClassBoilerplate and we say ${m.t} (${JSON.stringify(m.detail ?? m.why ?? null)})`);
+      if (m.refusals?.length) {
+        return fail(`ClassBoilerplate decoded with refusals: ${m.refusals.map((r) => r.why).join(', ')}`);
+      }
+      if (typeof m.argumentsCount !== 'number') return fail('ClassBoilerplate has no arguments_count');
+      if (typeof m.firstDynamicArgumentIndex !== 'number') {
+        return fail('ClassBoilerplate has no kFirstDynamicArgumentIndex');
+      }
+      for (const e of m.entries ?? []) {
+        if (e.valueIndex < m.firstDynamicArgumentIndex || e.valueIndex >= m.argumentsCount) {
+          return fail(`member ${e.key} -> args[${e.valueIndex}] is outside `
+            + `[${m.firstDynamicArgumentIndex}, ${m.argumentsCount})`);
+        }
+        if (e.keyKind === 'computed' && e.keyIndex !== e.valueIndex - 1) {
+          return fail(`computed key args[${e.keyIndex}] is not args[${e.valueIndex}] - 1`);
+        }
+      }
+      return ok(`${(m.entries ?? []).length} member(s) in args[${m.firstDynamicArgumentIndex}, ${m.argumentsCount})`);
+    }
     case 'symbol':
       return m.t === 'symbol' ? ok() : fail(`we say ${m.t}, V8 printed a Symbol`);
     case 'undefined': return m.t === 'undefined' ? ok() : fail(`we say ${m.t}, V8 printed undefined`);

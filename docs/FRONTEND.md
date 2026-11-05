@@ -703,6 +703,15 @@ Per matched function the harness asserts `parameterCount`, `registerCount`,
 length, every resolved constant value, the handler table rows, and the source
 position entries against the `NN S>` / `NN E>` markers.
 
+V8 prints a `ClassBoilerplate` as the bare `<ClassBoilerplate>`, so there is no
+printed member list to compare against. Until profilegen derived the class, the
+decoder answered with the map name and the comparison was recorded as not
+comparable; it now decodes, and the comparison asserts the same property of
+`ClassBoilerplate::New` the self-test does — every member's value index is a
+real dynamic argument of the `%DefineClass` call and a computed member's key
+index is exactly one below its value index — with no refusal. That makes this
+the only place those assertions run against a `kTaggedSize == 8` profile.
+
 Note that the oracle runs against a **`kTaggedSize == 8`** profile while the
 corpus run uses a `kTaggedSize == 4` one. The local node is built without
 pointer compression and without the sandbox
