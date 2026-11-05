@@ -1273,12 +1273,17 @@ const CLASS_MEMBER_HOLES = new Set([
  * `PREVIOUS_INDEX` hop deeper. Keeping the id off the members' spellings costs
  * nothing and removes that hazard.
  *
- * It was once claimed here to be the whole of the 5 827-function depth
- * regression docs/RECOVER.md 9.7 measures. It is not, and that attribution was
- * never measured: with the corpus's own V8 a class body interposes a context
- * whether or not it is named, because a class body is strict code and sloppy
- * code around it forces one (see STRICT above). The suffixing stays because the
- * shadowing it prevents is real; the depth regression was the language mode.
+ * The hazard is measured, in both V8 versions this repository pins: a method
+ * that really reads the class's own name binding reads the deep form even in
+ * STRICT code, while a named class no member reads does not
+ * (docs/RECOVER.md 9.7, the `probeUsesOwnName` row).
+ *
+ * What was NOT measured is the claim this header used to make: that the
+ * captured name was the whole of the 5 827-function depth regression 9.7
+ * reports. It was not. A class body interposes a context whether or not it is
+ * named, because a class body is strict code and sloppy code around it forces
+ * one (see STRICT above). The suffixing stays because the shadowing it
+ * prevents is real; the depth regression was the language mode.
  *
  * The identifier set is over-approximated on purpose: every `Identifier` and
  * `PrivateName` anywhere in the member subtrees, property keys included.

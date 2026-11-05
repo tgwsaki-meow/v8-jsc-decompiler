@@ -988,15 +988,32 @@ read a slot of an enclosing context**, which is the set that pays.
 #### What the earlier account got wrong, and why
 
 The paragraph this replaces said a minimal mint did not reproduce the
-interposed context, and treated that as grounds for looking elsewhere. **The
-probe behind it ran under `node`, not under the corpus's V8** — the exact
-substitution docs/O1.md §1 exists to forbid. Re-minted with d8 14.4.258.17,
-that probe's own file reproduces on the first try: `probeInside` (anonymous
-class) and `probeNamed` (named class) both read
-`LdaImmutableContextSlot <context>, [2], [1]`, while `probeBeside` — the same
-body as a sibling — reads `LdaImmutableCurrentContextSlot [2]`. Under `node`
-all three read the shallow form, which is what sent the search after the class
-instead of after the mode.
+interposed context, and treated that as grounds for looking elsewhere. It does
+reproduce. **The probe that said otherwise was run with `node <file>.js`
+instead of through a minter, and this repository declares `"type": "module"`,
+so its file was loaded as an ES MODULE — and a module body is strict code.**
+The harness had silently set the one variable under test. Re-minted with
+d8 14.4.258.17, which compiles a `.js` file as a script, that probe's own file
+reproduces on the first try: `probeInside` (anonymous class) and `probeNamed`
+(named class) both read `LdaImmutableContextSlot <context>, [2], [1]`, while
+`probeBeside` — the same body as a sibling — reads
+`LdaImmutableCurrentContextSlot [2]`.
+
+The control is one engine and one source, differing only in how the file is
+loaded. Under `node`'s own V8 (14.6.202.34), the same file as `.js` under
+`"type": "module"` reads the shallow form for both classes and as `.cjs` reads
+the deep form for both. So the mechanism also holds in a second V8 version —
+`Scope::ForceContextForLanguageMode` is `scopes.h:433` there, unchanged — and
+the earlier refutation was not an engine difference but a language-mode
+difference in the probe itself. docs/O1.md §1's rule that anything minted is
+minted with the corpus's own V8 would have caught it either way: the minter
+compiles a script, which is what the corpus is.
+
+One row of that probe survives the correction and is worth keeping:
+`probeUsesOwnName`, a method that reads the class's own name binding, reads the
+DEEP form in strict code too, in both engines. That is the hazard
+`src/emit/index.mjs::classId` guards against, and it is why the id is kept off
+every spelling a member uses even though it is not what cost the 686.
 
 Three hypotheses are refuted rather than untested:
 
