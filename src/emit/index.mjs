@@ -190,6 +190,56 @@ function flavour(unit, ctx) {
 }
 
 /**
+ * THE LANGUAGE MODE IS THE ORIGINAL'S, NOT OURS.
+ *
+ * Every ScopeInfo states the language mode of its scope, and `src/heap`
+ * decodes it (`objects.mjs:197`, `ScopeFlags.language_mode`). This layer used
+ * to discard it and emit every function as sloppy code, on the reasonable-
+ * sounding grounds that a directive emits no bytecode. It does emit no
+ * bytecode. It changes what the bytecode AROUND it is, and for one construct
+ * it changes it a lot:
+ *
+ *   `ClassScope::ClassScope:195` sets `set_language_mode(kStrict)` at :199 --
+ *   a class body is strict code, always. `Scope::ForceContextForLanguageMode`
+ *   (scopes.h:423) returns false only for a FUNCTION_SCOPE or a script scope,
+ *   and otherwise answers `language_mode() > outer_scope_->language_mode()`.
+ *   A class scope is neither (`is_class_scope:375`), so inside SLOPPY code it
+ *   is stricter than its outer scope, `Scope::AllocateVariablesRecursively`
+ *   (scopes.cc:2621) puts that into `must_have_context` at :2646/:2651, the
+ *   `num_heap_slots_ = 0` shortcut at :2662 is skipped, and `NeedsContext()`
+ *   (scopes.h:434) is true. `BytecodeGenerator::VisitClassLiteral:3836` then
+ *   takes its :3838 branch and emits `BuildNewLocalBlockContext` (:3852).
+ *
+ * So a class body in sloppy text sits behind a context that the same class
+ * body in strict text does not, and every slot a member captures from an
+ * enclosing scope is read one PREVIOUS_INDEX hop deeper:
+ * `LdaImmutableCurrentContextSlot [i]` becomes
+ * `LdaImmutableContextSlot <context> [i] [1]`. That is docs/RECOVER.md 9.7's
+ * 5 827-function row, and it is measured both ways in
+ * `tools/probes/probe_class.mjs context`.
+ *
+ * The rule, which needs no choices: a function emits `'use strict'` iff its
+ * own ScopeInfo says `kStrict` and no emitted ancestor has already said it.
+ * Strictness is inherited in the original by construction -- the parser cannot
+ * produce a sloppy scope inside a strict one -- so one directive at the
+ * outermost strict unit reproduces the original's mode for its whole subtree.
+ * That inheritance is not assumed: `unitsSloppyUnderAStrictAncestor` counts
+ * every place our emitted nesting would contradict it, and it is 0 over the
+ * 29-file sample's 5 313 units.
+ *
+ * The one thing that can refuse the directive is V8's own syntax: a directive
+ * prologue is illegal in a function with a non-simple parameter list, and the
+ * only non-simple form this layer emits is a rest parameter (`paramsOf`). Such
+ * a function keeps the mode it inherits and is counted as
+ * `strictDirectivesNotExpressible`, never guessed at. Measured: 0 of the
+ * sample's 193 strictness roots have one.
+ */
+const STRICT = 'kStrict';
+
+/** `'use strict'` as a directive, so it cannot be mistaken for a statement. */
+const useStrict = () => t.directive(t.directiveLiteral('use strict'));
+
+/**
  * @param {object|object[]} recovered  T7's output, one per unit
  * @param {object|object[]} structured T8's output, same order
  * @param {object} opts  { file, units, failures, perFunctionCode, verify }
@@ -287,7 +337,7 @@ export function emit(recovered, structured, opts = {}) {
     programBody.push(...stmts);
   }
 
-  const program = t.program(programBody, [], 'script');
+  const program = t.program(programBody, state.scriptDirectives ?? [], 'script');
   const ast = t.file(program, [], []);
 
   // ------------------------------------------------- text, map, checks
@@ -461,6 +511,12 @@ function fileReport() {
     declarationSitesRevertedAfterEmission: 0, declarationSiteRevertsByWhy: {},
     declarationSitesWithADifferentSpelling: 0, declarationSitesEmittedTwice: 0,
     forcedAsync: 0, forcedGenerator: 0,
+    // The language mode, read off each unit's own ScopeInfo rather than
+    // chosen. See STRICT: a class body in sloppy text is a context and in
+    // strict text is not, which is what docs/RECOVER.md 9.7 turned on.
+    unitsStrictInTheOriginal: 0, strictDirectivesEmitted: 0,
+    strictDirectivesNotExpressible: 0, strictDirectiveRefusalsByWhy: {},
+    unitsSloppyUnderAStrictAncestor: 0, unitsWithoutALanguageMode: 0,
     blocksWithoutStatements: 0, regionKindsNot112: {}, unknownRegionKinds: {},
     monotonicity: { functions: 0, monotone: 0, inversions: 0 },
     bytecode: { backEdges: 0, handlerRanges: 0, handlerRangesByPrediction: {}, switchDispatchOpcodes: 0, blocks: 0 },
@@ -610,6 +666,30 @@ function emitUnitInner(state, rec0, how) {
   state.emitted.add(rec0.sfiId);
   const name = state.emitName.get(rec0.sfiId);
 
+  // ---- the language mode this unit was compiled in, read off its own
+  //      ScopeInfo. See STRICT above for why it is not cosmetic.
+  const mode = unit.scope?.languageMode ?? null;
+  if (mode === null) state.report.unitsWithoutALanguageMode++;
+  const wantStrict = mode === STRICT;
+  if (wantStrict) state.report.unitsStrictInTheOriginal++;
+  if (mode !== null && !wantStrict && how.strict === true) {
+    // Our emitted nesting implies a strictness the original did not state.
+    // Counted rather than silently accepted; 0 on every sample measured.
+    state.report.unitsSloppyUnderAStrictAncestor++;
+  }
+  /** Does the directive belong on THIS function, with its parameter list? */
+  const directiveHere = (hasRestParameter) => {
+    if (!wantStrict || how.strict === true) return false;
+    if (hasRestParameter) {
+      state.report.strictDirectivesNotExpressible++;
+      state.report.strictDirectiveRefusalsByWhy.nonSimpleParameterList =
+        (state.report.strictDirectiveRefusalsByWhy.nonSimpleParameterList ?? 0) + 1;
+      return false;
+    }
+    state.report.strictDirectivesEmitted++;
+    return true;
+  };
+
   // ---- a unit with no usable pair still has to appear (11.5). Its children
   //      do too: a function is not lost because its parent could not be
   //      recovered, so they are emitted inside the stub body.
@@ -627,16 +707,22 @@ function emitUnitInner(state, rec0, how) {
     state.report.holes.total++;
     state.report.holes.byWhy.unitNotRecovered = (state.report.holes.byWhy.unitNotRecovered ?? 0) + 1;
     state.report.holes.byKind.stmt++;
+    // `paramsOfUnit` spells every parameter `p0..pN` and never a rest
+    // element, so the directive is always expressible on a stub.
+    const stubDirectives = directiveHere(false) ? [useStrict()] : [];
+    const stubStrict = how.strict === true || wantStrict;
     const stubChildren = [];
     for (const c of state.childrenOf.get(rec0.sfiId) ?? []) {
       if (state.claimed.has(c.sfiId) || state.emitted.has(c.sfiId)) continue;
-      for (const s of asStatements(emitUnit(state, c, { role: 'declaration', inherited: how.inherited ?? new Set() }))) {
+      for (const s of asStatements(emitUnit(state, c, {
+        role: 'declaration', inherited: how.inherited ?? new Set(), strict: stubStrict,
+      }))) {
         stubChildren.push(unreferenced(state, c, s, how));
       }
     }
-    const body = t.blockStatement([...stubChildren, ...failedBody(unit, failure)]);
+    const body = t.blockStatement([...stubChildren, ...failedBody(unit, failure)], stubDirectives);
     state.perFunction.push(perFunctionEntry(unit, null, null, null, { failed: true, error: failure?.error ?? null }));
-    if (how.role === 'script') return body.body;
+    if (how.role === 'script') { state.scriptDirectives = stubDirectives; return body.body; }
     return t.functionDeclaration(t.identifier(name ?? sanitise(unit.name || 'anonymous')),
       paramsOfUnit(unit), body, !!unit.isGenerator, !!unit.isAsync);
   }
@@ -645,6 +731,12 @@ function emitUnitInner(state, rec0, how) {
   const sites = state.declSites.forUnit(rec0.sfiId);
   const plan = planNames(rec, rec.ir, unit, joinExprs(rec, sf), how.inherited ?? new Set(),
     state.scopes.forUnit(rec0.sfiId), sites);
+
+  // ---- the language mode, now that the parameter list is known. A class
+  //      body is strict whatever encloses it (`ClassScope::ClassScope:199`),
+  //      so a member inherits strictness from the body and not from here.
+  const directives = directiveHere(plan.restName !== null) ? [useStrict()] : [];
+  const strictForChildren = how.strict === true || directives.length > 0;
 
   // ---- names for the children, before the body is built: `{e:'fn'}` emits a
   //      reference to one of them, so the spelling has to exist first. A child
@@ -680,6 +772,9 @@ function emitUnitInner(state, rec0, how) {
     inlineClaims.push(e.sfiId);
     const node = emitUnit(state, child, {
       role: 'expression-inline', inherited: plan.exported, allowSuper: true,
+      // A class body is strict code; an object literal is not a scope at all,
+      // so its method inherits whatever this function is.
+      strict: role === 'class-member' ? true : strictForChildren,
     });
     return node;
   };
@@ -691,7 +786,9 @@ function emitUnitInner(state, rec0, how) {
     if (child && !state.emitted.has(e.sfiId) && !state.claimed.has(e.sfiId)) {
       state.claimed.add(e.sfiId);
       inlineClaims.push(e.sfiId);
-      const fn = emitUnit(state, child, { role: 'expression-inline', inherited: plan.exported, allowSuper: true });
+      const fn = emitUnit(state, child, {
+        role: 'expression-inline', inherited: plan.exported, allowSuper: true, strict: true,
+      });
       if (fn && fn.type === 'FunctionExpression') {
         members.push(t.classMethod('constructor', t.identifier('constructor'), fn.params, fn.body));
       }
@@ -806,7 +903,9 @@ function emitUnitInner(state, rec0, how) {
   const nested = [];
   for (const c of children) {
     if (state.claimed.has(c.sfiId) || state.emitted.has(c.sfiId)) continue;
-    const node = emitUnit(state, c, { role: 'declaration', inherited: plan.exported, childName });
+    const node = emitUnit(state, c, {
+      role: 'declaration', inherited: plan.exported, childName, strict: strictForChildren,
+    });
     for (const s of asStatements(node)) {
       nested.push(referenced.has(c.sfiId) ? s : unreferenced(state, c, s, how));
     }
@@ -835,15 +934,19 @@ function emitUnitInner(state, rec0, how) {
 
   let node;
   if (how.role === 'script') {
+    // The script's directive prologue belongs to the Program, which `emit()`
+    // builds; `statements` is only its body.
+    state.scriptDirectives = directives;
     node = null;
   } else if (unit.kind === 'arrow' && how.role === 'declaration') {
-    const arrow = t.arrowFunctionExpression(paramsOf(plan), t.blockStatement(statements), ctx.isAsync);
+    const arrow = t.arrowFunctionExpression(paramsOf(plan), t.blockStatement(statements, directives), ctx.isAsync);
     node = t.variableDeclaration('var', [t.variableDeclarator(t.identifier(name), arrow)]);
     mark(node, 'arrow function; hoisted to the top of its parent body');
   } else if (how.role === 'expression-inline') {
-    node = t.functionExpression(null, paramsOf(plan), t.blockStatement(statements), ctx.isGenerator, ctx.isAsync);
+    node = t.functionExpression(null, paramsOf(plan), t.blockStatement(statements, directives), ctx.isGenerator, ctx.isAsync);
   } else {
-    node = t.functionDeclaration(t.identifier(name), paramsOf(plan), t.blockStatement(statements), ctx.isGenerator, ctx.isAsync);
+    node = t.functionDeclaration(t.identifier(name), paramsOf(plan),
+      t.blockStatement(statements, directives), ctx.isGenerator, ctx.isAsync);
   }
 
   // ---- 11.3, asserted on this function
@@ -1257,7 +1360,7 @@ function classMember(ctx, m, state) {
   // honest outcome for a name we do not know.
   const previousName = state.emitName.get(m.value.sfiId);
   if (named) state.emitName.set(m.value.sfiId, named.v8Name);
-  const fn = ctx.functionLike(m.value, 'method');
+  const fn = ctx.functionLike(m.value, 'class-member');
   // Every path that does not place the member puts the name back: the unit is
   // then emitted as a sibling declaration after all, under the spelling the
   // text will really use.
