@@ -1153,12 +1153,38 @@ const CLASS_MEMBER_HOLES = new Set([
  *
  * @returns {{node: object}|{why: string, detail?: string}}
  */
+/**
+ * A non-computed member key, and the name V8 will give the member's function
+ * when it recompiles our text.
+ *
+ * `sanitise` must NOT be used here. It is for variable spellings, and a
+ * property key is not one: `class C { "a-b"(){} }` is legal and
+ * `sanitise('a-b')` would rename the member. A key that is a valid identifier
+ * is emitted as one; anything else is emitted as a string literal, which a
+ * class body accepts and which keeps the key exactly as the boilerplate
+ * spelled it.
+ *
+ * The name matters beyond the text. docs/O1.md §4's `sfi` pairing is identity
+ * by construction only because `emitName` records what V8 will call the
+ * function, and for a class member that is the property name, prefixed with
+ * `get `/`set ` for an accessor (`ParseClassPropertyDefinition` ->
+ * `SetFunctionNameFromPropertyName(result, name, prefix)` with
+ * `ast_value_factory()->get_space_string()`).
+ */
+function classMemberKey(m) {
+  const raw = String(m.key ?? 'member');
+  const node = t.isValidIdentifier(raw, false) ? t.identifier(raw) : t.stringLiteral(raw);
+  const v8Name = m.kind === 'get' || m.kind === 'set' ? `${m.kind} ${raw}` : raw;
+  return { node, v8Name };
+}
+
 function classMember(ctx, m, state) {
   if (!m || !CLASS_MEMBER_KINDS.has(m.kind)) {
     return { why: 'classMemberKindNotSpellable', detail: String(m?.kind ?? 'absent') };
   }
-  const key = m.computed || (m.key && typeof m.key === 'object')
-    ? expr(ctx, m.key) : t.identifier(sanitise(String(m.key ?? 'member')));
+  const computedKey = m.computed || (m.key && typeof m.key === 'object');
+  const named = computedKey ? null : classMemberKey(m);
+  const key = computedKey ? expr(ctx, m.key) : named.node;
   if (m.value?.e !== 'fn') {
     // The boilerplate puts only METHOD / GETTER / SETTER in a template
     // (ClassBoilerplate::New), and BuildClassLiteral fills their argument with
@@ -1174,10 +1200,36 @@ function classMember(ctx, m, state) {
   if (!state.byId.has(m.value.sfiId)) {
     return { why: 'classMemberWithoutAUnit', detail: `sfi ${m.value.sfiId}` };
   }
+  // Before `functionLike`, not after: `emitUnitInner` reads `emitName` on entry
+  // to build this unit's `perFunction` row, which is what docs/O1.md §4's `sfi`
+  // pairing keys on.
+  //
+  // `childName` gave the unit the spelling it would have had as a SIBLING
+  // declaration, uniquified against the parent's bindings (`area$2`); as a
+  // class member V8 will call it `area`. Leaving the sibling spelling there
+  // takes the function out of `sfi` pairing and into the weaker `name` mode:
+  // measured on the 1 039-file corpus, 15 863 functions moved `sfi` -> `name`
+  // and the exact count FELL by 686, 33 463 -> 32 777, even though the emitted
+  // shape was right.
+  //
+  // A computed key is deliberately left alone. V8 names such a function at run
+  // time and its compile-time SFI name is empty, so recording `''` would pair
+  // it against every anonymous function in the file. The stale spelling matches
+  // nothing and the pair falls through to the fallback modes, which is the
+  // honest outcome for a name we do not know.
+  const previousName = state.emitName.get(m.value.sfiId);
+  if (named) state.emitName.set(m.value.sfiId, named.v8Name);
   const fn = ctx.functionLike(m.value, 'method');
-  if (!fn) return { why: 'classMemberAlreadyEmitted', detail: `sfi ${m.value.sfiId}` };
+  // Every path that does not place the member puts the name back: the unit is
+  // then emitted as a sibling declaration after all, under the spelling the
+  // text will really use.
+  const giveUp = (why, detail) => {
+    if (named) state.emitName.set(m.value.sfiId, previousName);
+    return { why, detail };
+  };
+  if (!fn) return giveUp('classMemberAlreadyEmitted', `sfi ${m.value.sfiId}`);
   if (fn.type !== 'FunctionExpression') {
-    return { why: 'classMemberValueIsNotAClosure', detail: fn.type };
+    return giveUp('classMemberValueIsNotAClosure', fn.type);
   }
   // `async`/`*` travel with the member, and they are not decoration: dropping
   // them emits `await` inside a non-async method, which is a SyntaxError and
@@ -1189,10 +1241,8 @@ function classMember(ctx, m, state) {
   // the combination means the flag came from somewhere other than the SFI
   // (`ctx.forceAsync`). Refused rather than emitted.
   if ((fn.async || fn.generator) && (m.kind === 'get' || m.kind === 'set')) {
-    return {
-      why: 'classAccessorIsAsyncOrAGenerator',
-      detail: `${m.kind} ${fn.async ? 'async' : ''}${fn.generator ? '*' : ''}`.trim(),
-    };
+    return giveUp('classAccessorIsAsyncOrAGenerator',
+      `${m.kind} ${fn.async ? 'async' : ''}${fn.generator ? '*' : ''}`.trim());
   }
   return {
     node: t.classMethod(m.kind, key, fn.params, fn.body, !!m.computed, !!m.static,

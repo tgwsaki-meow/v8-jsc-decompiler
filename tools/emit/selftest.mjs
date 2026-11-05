@@ -413,14 +413,25 @@ for (const { tag, profile } of profiles) {
       walk(ast.program.body);
     }
     placed = placed.sort();
+    // The pairing name, which docs/O1.md §4's `sfi` mode is identity by
+    // construction only because of: `perFunction[].name` has to be what V8 will
+    // call the function when it recompiles this text, and for a class member
+    // that is the property name, `get `-prefixed for a getter
+    // (ParseClassPropertyDefinition -> SetFunctionNameFromPropertyName with
+    // get_space_string). Leaving the sibling spelling there cost 686 exact
+    // matches over the corpus while the emitted shape was already right.
+    const pairNames = out.perFunction.filter((f) => f.sfiId === 11 || f.sfiId === 12)
+      .map((f) => f.name).sort();
     return {
       ok: JSON.stringify(placed) === JSON.stringify(['area', 'constructor', 'get size'])
+        && JSON.stringify(pairNames) === JSON.stringify(['area', 'get size'])
         && siblings.length === 0
         && out.report.classMembersPlaced === 3
         && holes.length === 0
         && violationsOf(out) === 0 && !parses(code),
-      detail: `class body [${placed.join(', ')}], siblings [${siblings.join(', ')}], `
-        + `report ${out.report.classMembersPlaced}, class holes ${holes.join(',') || 'none'}`,
+      detail: `class body [${placed.join(', ')}], pairing names [${pairNames.join(', ')}], `
+        + `siblings [${siblings.join(', ')}], report ${out.report.classMembersPlaced}, `
+        + `class holes ${holes.join(',') || 'none'}`,
     };
   });
 
