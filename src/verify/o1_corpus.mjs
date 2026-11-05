@@ -112,7 +112,13 @@
 //        either. The decoder refuses by map name instead of guessing a stride,
 //        and the renderer prints `!undecoded:FixedDoubleArrayMap`. Two
 //        different double literals therefore still compare equal, with that
-//        name attached. Fixing it is `tools/profilegen` work -- the stride is a
+//        name attached -- but only where BOTH streams refuse. Where one does
+//        and the other does not, the texts differ and the pair is counted as
+//        differing, which is the verdict the length-only rendering gave too. On
+//        the full corpus that is every case: 2 500 refusals on stream A, 0 on
+//        stream B (docs/O1.md 6.9), so this residual costs no equality there
+//        and self-test G is what keeps it measured.
+//        Fixing it is `tools/profilegen` work -- the stride is a
 //        fact about V8 and belongs in a profile derived from pinned sources,
 //        never a literal in a reader. The elements KIND is now rendered, so
 //        `[1.5]` against `[1,2]` is visible even here; `[1.5]` against `[2.5]`
