@@ -686,7 +686,6 @@ function emitUnitInner(state, rec0, how) {
 
   const resolveClass = (ctx, e) => {
     const child = e.sfiId === null || e.sfiId === undefined ? null : state.byId.get(e.sfiId);
-    const id = e.name ? t.identifier(sanitise(e.name)) : null;
     const superClass = e.superClass ? expr(ctx, e.superClass) : null;
     const members = [];
     if (child && !state.emitted.has(e.sfiId) && !state.claimed.has(e.sfiId)) {
@@ -706,7 +705,7 @@ function emitUnitInner(state, rec0, how) {
       if (mm.node) members.push(mm.node);
       else refused.push({ why: mm.why, detail: mm.detail ?? null, key: typeof m.key === 'string' ? m.key : null });
     }
-    const node = t.classExpression(id, superClass, t.classBody(members), []);
+    const node = t.classExpression(classId(e, members, superClass), superClass, t.classBody(members), []);
     if (!e.membersDecoded) {
       // docs/RECOVER.md 8.1: args[0] was not a decoded ClassBoilerplate, so
       // there is no member list at all and that has to be visible, not implied.
@@ -1153,6 +1152,45 @@ const CLASS_MEMBER_HOLES = new Set([
  *
  * @returns {{node: object}|{why: string, detail?: string}}
  */
+/**
+ * The `id` of a class expression, moved off any spelling its own members use.
+ *
+ * A named class expression binds its name INSIDE the class, so every member
+ * body is in its scope. T7 never resolves anything to that binding -- there is
+ * no such `ref` kind, and every `{e:'name'}` in a member body was resolved
+ * against the scope chain OUTSIDE the class -- so a member that happens to
+ * mention the class's spelling must not be captured by it. While the member
+ * list was empty this could not happen; with the members inside, it does, and
+ * it is a scoping change and not a cosmetic one: the identifier binds to the
+ * class instead of to the outer variable it was resolved from.
+ *
+ * It is also the whole of the first measurable regression this change caused.
+ * V8 allocates a context slot for a class variable only when it is used
+ * (`ClassScope`), so capturing one member's read turns the class scope into a
+ * context and every OTHER read in that member goes from
+ * `LdaImmutableCurrentContextSlot [i]` to `LdaImmutableContextSlot [i] [1]`.
+ * On the 1 039-file corpus that one row was 5 827 functions of a `load-form`
+ * family that grew by 5 255, and the exact count fell by 686 while the shape
+ * was right; on a 36-file sample reproduced locally, `r_4672.jsc` alone went
+ * 39 exact -> 26 with `load-form` 8 -> 32.
+ *
+ * The identifier set is over-approximated on purpose: every `Identifier` and
+ * `PrivateName` anywhere in the member subtrees, property keys included.
+ * Over-approximating only suffixes the class name more often, and the class's
+ * own spelling is invisible to O1.
+ */
+function classId(e, members, superClass) {
+  const base = e.name ? sanitise(e.name) : null;
+  if (!base) return null;
+  const used = new Set();
+  const collect = (n) => { if (n.type === 'Identifier' || n.type === 'PrivateName') used.add(n.name ?? n.id?.name); };
+  for (const m of members) walkAst(m, collect);
+  if (superClass) walkAst(superClass, collect);
+  let name = base;
+  for (let k = 2; used.has(name); k++) name = `${base}$${k}`;
+  return t.identifier(name);
+}
+
 /**
  * A non-computed member key, and the name V8 will give the member's function
  * when it recompiles our text.
