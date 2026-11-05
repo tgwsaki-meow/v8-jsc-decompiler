@@ -169,6 +169,39 @@ back to a table known to be shifted.
   they mean is C++'s, and without it a getter cannot be told from a method —
   see §4.2a.
 
+### 2.5 Only a Torque field may enter the overlay's type dictionary
+
+The overlay sizes a Torque type by *observation*: `buildTypeTable` walks every
+field `layouts.json` carries, and since each field already states its own kind
+and size, a type the profile has seen needs no rule. Two of profilegen's three
+layout mechanisms produce fields that have no Torque type to key on, and
+`layouts.json` records `type: null` for them:
+
+| mechanism | what it states instead of a type |
+|---|---|
+| hand-written `FIELD_LIST` | a size expression — `kInt32Size`, `OBJECT_POINTER_PADDING(…)` |
+| `V8_OBJECT class X { TaggedMember<T> f_; }` | a C++ template argument |
+
+Entering those fields anyway put all of them under the single key `null`, and
+the first pair whose widths differed came out as a conflict *in the type
+`null`* — which printed as an empty name, because that is what `null` joins to.
+It stayed invisible for as long as every untyped field happened to be the same
+width: at `kTaggedSize=4` `AccessorPair`'s two `TaggedMember`s are 4 bytes,
+exactly like `FeedbackMetadata`'s two `uint32` `FIELD_LIST` fields, and at
+`kTaggedSize=8` they are not. Both committed profiles are `kTaggedSize=4`, and
+the only caller of this generator is the `V8 oracle` workflow, which runs it
+against one `kTaggedSize=8` profile generated for the runner's own node — so the
+first machine to see it was CI.
+
+The rule now: a field with no Torque type is left out of the dictionary, which
+loses nothing because a lookup key here is always a Torque type string and
+could never have reached a `null` entry; and a field with no Torque type whose
+class claims `layoutSource: "torque"` **throws**, naming the field, because
+that is a profilegen regression and not a case to skip. A genuine conflict
+names the type, both fields that disagree and what each said.
+`tools/profilegen/selftest.mjs`'s `TYPETABLE` group asserts all three at the
+widths a `kTaggedSize=8` profile would produce.
+
 ---
 
 ## 3. The container: `src/cache/`

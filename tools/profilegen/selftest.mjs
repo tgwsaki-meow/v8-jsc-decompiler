@@ -587,6 +587,9 @@ const SABOTAGE = [
 let expectationsModule = null;
 try { expectationsModule = await import('./expectations.mjs'); } catch { /* reported below */ }
 
+let layoutpatchModule = null;
+try { layoutpatchModule = await import('../layoutpatch/index.mjs'); } catch { /* reported below */ }
+
 for (const tag of tags) {
   const p = profiles[tag];
   if (!p) continue;
@@ -750,6 +753,104 @@ for (const tag of tags) {
       ok: undetected.length === 0,
       detail: undetected.length ? `NOT caught: ${undetected.join(', ')}`
         : `${SABOTAGE.length} single-entry removals, each caught by its own expectation`,
+    };
+  });
+}
+
+// ------------------------------- (f) the consumer's view of a non-Torque field
+//
+// tools/layoutpatch/index.mjs resolves a Torque type to (kind, size) by
+// observing the types layouts.json already carries. A field promoted from a
+// FIELD_LIST or from a `V8_OBJECT class X { TaggedMember<T> f_; }` body has no
+// Torque type at all -- layouts.json records `type: null` -- and entering those
+// fields in the dictionary put every one of them under the single key `null`.
+// The first pair whose widths differed was then reported as a conflict in the
+// type `null`, which printed as an empty name.
+//
+// Only kTaggedSize=8 exposes it: at 4 an AccessorPair TaggedMember is 4 bytes,
+// exactly like a FeedbackMetadata uint32, so the collision is silent. Every
+// committed profile is kTaggedSize=4, and the only caller of this reader is the
+// oracle workflow, which generates one kTaggedSize=8 profile for the runner's
+// own V8. These three checks stand in for that profile.
+
+/** The committed layouts, as the consumer sees them, with the widths it would see at kTaggedSize=8. */
+function layoutsAtTaggedSize8(p) {
+  const classes = structuredClone(p.tables.layouts.classes);
+  for (const cls of Object.values(classes)) {
+    for (const f of [...(cls.fields ?? []), ...(cls.allFields ?? [])]) {
+      if (f.sizeName === 'kTaggedSize' && f.size === 4) f.size = 8;
+    }
+  }
+  return { tables: { layouts: { ...p.tables.layouts, classes } } };
+}
+
+if (PRIMARY && profiles[PRIMARY]) {
+  const p = profiles[PRIMARY];
+
+  check('typetable', 'a C++-promoted field never enters the Torque type dictionary', () => {
+    if (!layoutpatchModule) return { ok: false, detail: 'layoutpatch/index.mjs did not import' };
+    const widened = layoutsAtTaggedSize8(p);
+    const nullTyped = [];
+    for (const [name, cls] of Object.entries(widened.tables.layouts.classes)) {
+      for (const f of cls.allFields ?? cls.fields ?? []) {
+        if (f.type === null || f.type === undefined) nullTyped.push(`${f.declaredIn ?? name}.${f.name}:${f.size}`);
+      }
+    }
+    const { table, conflicts } = layoutpatchModule.buildTypeTable(widened);
+    const widths = new Set(nullTyped.map((s) => s.split(':')[1]));
+    return {
+      ok: conflicts.length === 0 && nullTyped.length > 0 && widths.size > 1 && !table.has(null) && !table.has(undefined),
+      detail: conflicts.length
+        ? `${conflicts.length} conflict(s): ${conflicts.map((c) => JSON.stringify(c.type)).join(', ')}`
+        : `${nullTyped.length} untyped field(s) of ${widths.size} distinct widths left out: ${nullTyped.join(' ')}`,
+    };
+  });
+
+  check('typetable', 'an untyped field in a Torque-derived class throws and names itself', () => {
+    if (!layoutpatchModule) return { ok: false, detail: 'layoutpatch/index.mjs did not import' };
+    const v = structuredClone({ tables: { layouts: { classes: p.tables.layouts.classes } } });
+    const victim = Object.entries(v.tables.layouts.classes)
+      .find(([, c]) => c.layoutSource === 'torque' && (c.fields ?? []).length);
+    if (!victim) return { ok: false, detail: 'no Torque-derived class with fields to sabotage' };
+    const [name, cls] = victim;
+    const field = cls.fields[0].name;
+    cls.fields[0].type = null;
+    delete cls.allFields;
+    let message = null;
+    try { layoutpatchModule.buildTypeTable(v); } catch (e) { message = e.message; }
+    return {
+      ok: !!message && message.includes(`${name}.${field}`) && message.includes('torque'),
+      detail: message ? message.replace(/\s+/g, ' ') : `${name}.${field} with type null was accepted in silence`,
+    };
+  });
+
+  check('typetable', 'a real conflict names the type, both fields and both widths', () => {
+    if (!layoutpatchModule) return { ok: false, detail: 'layoutpatch/index.mjs did not import' };
+    const v = structuredClone({ tables: { layouts: { classes: p.tables.layouts.classes } } });
+    // Two classes whose own field lists share a Torque type; widen the second.
+    const seen = new Map();
+    let a = null; let b = null;
+    for (const [name, cls] of Object.entries(v.tables.layouts.classes)) {
+      for (const f of cls.allFields ?? cls.fields ?? []) {
+        if (typeof f.type !== 'string' || typeof f.size !== 'number') continue;
+        const where = `${f.declaredIn ?? name}.${f.name}`;
+        if (!seen.has(f.type)) { seen.set(f.type, { where, f }); continue; }
+        if (seen.get(f.type).where === where) continue;
+        a = seen.get(f.type); b = { where, f };
+        break;
+      }
+      if (b) break;
+    }
+    if (!b) return { ok: false, detail: 'no Torque type occurs on two different fields' };
+    b.f.size = a.f.size + 4;
+    const { conflicts } = layoutpatchModule.buildTypeTable(v);
+    const c = conflicts.find((x) => x.type === b.f.type);
+    const ok = !!c && c.a.where === a.where && c.b.where === b.where
+      && c.a.size !== c.b.size && String(c.type).length > 0;
+    return {
+      ok,
+      detail: c ? `${JSON.stringify(c.type)}: ${c.a.where} ${c.a.kind}/${c.a.size} vs ${c.b.where} ${c.b.kind}/${c.b.size}`
+        : `widening ${b.where} was not reported as a conflict`,
     };
   });
 }

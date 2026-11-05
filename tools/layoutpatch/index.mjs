@@ -40,6 +40,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { V8Source } from '../profilegen/fetch.mjs';
 import { loadProfile } from '../../src/profile/index.mjs';
 import * as tq from './torque-lite.mjs';
@@ -96,18 +97,51 @@ function argv() {
  * Build the type->(kind,size) dictionary out of the profile itself: every field
  * layouts.json carries already states its own kind and size, so a type the
  * profile has seen is resolved by observation, not by rule.
+ *
+ * Only a Torque-derived field may enter it. A field promoted from one of the
+ * two C++ layout mechanisms carries `type: null`, because neither mechanism
+ * states a Torque type: a hand-written FIELD_LIST gives a size expression and
+ * nothing else, and a `V8_OBJECT class X { TaggedMember<T> f_; }` body gives a
+ * C++ template argument. Such fields used to be entered anyway -- all of them
+ * under the one key `null` -- and the first pair whose widths differed was
+ * reported as a conflict in the type `null`, which printed as an empty name
+ * because that is what `null` joins to. It stayed invisible for as long as
+ * every such field happened to be the same width: at kTaggedSize=4
+ * AccessorPair's two TaggedMembers are 4 bytes, exactly like FeedbackMetadata's
+ * two uint32 FIELD_LIST fields, and at kTaggedSize=8 they are not. The entries
+ * were unreachable in any case -- a lookup key here is a Torque type string,
+ * never null -- so leaving them out drops noise and resolves nothing
+ * differently.
+ *
+ * A null type whose class does not claim a C++ mechanism is a profilegen
+ * regression, not a case to skip, so it throws and names the field.
  */
 function buildTypeTable(profile) {
+  const classes = profile.tables.layouts.classes;
   const table = new Map();
+  const origin = new Map();          // type -> the first field that defined it
   const conflicts = [];
-  for (const cls of Object.values(profile.tables.layouts.classes)) {
+  for (const [clsName, cls] of Object.entries(classes)) {
     for (const f of cls.allFields ?? cls.fields ?? []) {
       if (f.present === false) continue;
+      const declaredIn = f.declaredIn ?? clsName;
+      const where = `${declaredIn}.${f.name}`;
+      if (f.type === null || f.type === undefined) {
+        const mechanism = classes[declaredIn]?.layoutSource ?? null;
+        if (mechanism !== 'FIELD_LIST' && mechanism !== 'V8_OBJECT') {
+          throw new Error(`layoutpatch: ${where} carries no Torque type, but ${declaredIn} reports `
+            + `layoutSource ${JSON.stringify(mechanism)}. A Torque-derived field must state its `
+            + 'type; only a field promoted from a FIELD_LIST or a V8_OBJECT body may lack one.');
+        }
+        continue;                    // not a Torque type: nothing can look it up
+      }
       const key = f.type;
       const val = { kind: f.kind, size: f.size, sizeName: f.sizeName, elementSize: f.elementSize };
       const prev = table.get(key);
-      if (!prev) table.set(key, val);
-      else if (prev.kind !== val.kind || prev.size !== val.size) conflicts.push({ type: key, a: prev, b: val });
+      if (!prev) { table.set(key, val); origin.set(key, where); }
+      else if (prev.kind !== val.kind || prev.size !== val.size) {
+        conflicts.push({ type: key, a: { ...prev, where: origin.get(key) }, b: { ...val, where } });
+      }
     }
   }
   return { table, conflicts };
@@ -682,7 +716,16 @@ async function main() {
       + 'reordered its Torque declarations to match C++ (in which case drop this assertion '
       + 'deliberately) or this reader stopped extracting the C++ values');
   }
-  if (conflicts.length) failures.push(`type table conflicts: ${conflicts.map((c) => c.type).join(', ')}`);
+  // Named in full: a generator that reports a conflict it cannot name cannot be
+  // debugged from its own output. The type, both fields that disagree, and what
+  // each of them said.
+  for (const c of conflicts) {
+    const say = (s) => `${s.kind}/${s.size} bytes`
+      + (s.sizeName ? ` (${s.sizeName})` : '')
+      + (s.elementSize !== undefined ? ` element ${s.elementSize}` : '');
+    failures.push(`type table conflict on the Torque type ${JSON.stringify(c.type)}: `
+      + `${c.a.where} says ${say(c.a)}, ${c.b.where} says ${say(c.b)}`);
+  }
 
   fs.mkdirSync(o.out, { recursive: true });
   const file = path.join(o.out, `${o.tag}.json`);
@@ -719,4 +762,12 @@ async function main() {
   }
 }
 
-main().catch((e) => { console.error(e.stack || String(e)); process.exitCode = 1; });
+// Importable, so that the type table can be asserted without fetching 28
+// sources: tools/profilegen/selftest.mjs exercises buildTypeTable directly,
+// which is the only coverage this reader's dictionary has outside the oracle
+// workflow -- and the oracle workflow runs it for exactly one profile.
+export { buildTypeTable };
+
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  main().catch((e) => { console.error(e.stack || String(e)); process.exitCode = 1; });
+}
