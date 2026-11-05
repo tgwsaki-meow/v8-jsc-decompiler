@@ -11,6 +11,8 @@
 //   TrustedByteArray / ByteArray
 //   ObjectBoilerplateDescription / ArrayBoilerplateDescription /
 //   RegExpBoilerplateDescription / TemplateObjectDescription
+//   ClassBoilerplate                 and the DescriptorArray / AccessorPair it
+//                                    reaches its member list through
 //   UncompiledData and its four concrete subclasses
 //   HeapNumber, BigInt, Symbol
 //
@@ -720,6 +722,358 @@ function regExpFlagString(bits) {
   return REGEXP_FLAG_LETTERS.filter(([n]) => bits[n] === 1).map(([, l]) => l).join('');
 }
 
+// ------------------------------------------------------------ ClassBoilerplate
+//
+// `%DefineClass`'s first argument, and the only place a class's member list is
+// written down. What it actually holds (src/objects/literal-objects.tq, and
+// src/objects/literal-objects.cc::ClassBoilerplate::New:680-825):
+//
+//   arguments_count                  Smi: the final dynamic_argument_index, i.e.
+//                                    how many registers the %DefineClass call
+//                                    takes (:812)
+//   static_/instance_properties_template
+//                                    the members with a non-index literal key.
+//                                    A DescriptorArray unless the class has a
+//                                    computed-name member or more properties
+//                                    than kMaxNumberOfDescriptors, in which
+//                                    case it is a name dictionary
+//                                    (ObjectDescriptor::HasDictionaryProperties
+//                                    :471, CreateTemplates:492)
+//   static_/instance_elements_template
+//                                    the members whose key is an array index,
+//                                    in a NumberDictionary; the canonical
+//                                    empty_slow_element_dictionary when there
+//                                    are none (CreateTemplates:521)
+//   static_/instance_computed_properties
+//                                    one Smi per computed-name member, packing
+//                                    (ValueKind, key index) through
+//                                    EncodeComputedEntry:33; empty_fixed_array
+//                                    when there are none (:528)
+//
+// An entry's VALUE is the whole of the link to the bytecode: `Smi(value_index)`
+// for a data member and an `AccessorPair` of two such Smis for an accessor
+// (AddToDescriptorArrayTemplate:80, AddToDictionaryTemplate:196,
+// SetAccessorPlaceholderIndices:41), where `value_index` is the index of the
+// register in the %DefineClass argument list that holds that member's closure.
+// So this decoder returns argument INDICES, not expressions: only
+// src/recover/patterns/classes.mjs has the argument list.
+//
+// Two things the boilerplate provably does not contain, both read off the same
+// source rather than inferred:
+//
+//  * A FIELD. `ClassBoilerplate::New:769` `continue`s on
+//    ClassLiteral::Property::FIELD before any `desc.Add*`, after bumping the
+//    argument index by one when the field's name is computed. So a class field
+//    is not merely undecoded here, it is absent -- which is why
+//    docs/RECOVER.md 8.1's field gap is not closed by this decoder.
+//  * The four descriptors V8 adds itself: `length`, `name` and `prototype`
+//    (whose values are the function accessor roots) and `class_positions_symbol`
+//    on the static side, and `constructor` -> `Smi(kConstructorArgumentIndex)`
+//    on the instance side (:701-751). They are told from members by the value
+//    rule above -- a member's value is a Smi at or above
+//    kFirstDynamicArgumentIndex, or an AccessorPair of those -- not by name.
+
+/** Is this reference a Smi? Returns its value, or null. */
+function smiOfSlot(ctx, ref) {
+  if (!ref || ref.k !== 'RawSlot') return null;
+  const tg = ctx.profile.constants.tagging;
+  if ((ref.raw[0] & tg.kSmiTagMask) !== tg.kSmiTag) return null;
+  return smiFromBytes(ref.raw, tg.kSmiTagSize + tg.kSmiShiftSize);
+}
+
+/** The two components of an AccessorPair, as argument indices or null. */
+function accessorPairIndices(record, ctx) {
+  const cls = ctx.classifyObject(record);
+  if (!cls || cls.className !== 'AccessorPair') return null;
+  const view = ctx.viewOf(record);
+  const walk = ctx.walk('AccessorPair', view);
+  const read = (name) => {
+    const rec = walk.fields.get(name);
+    if (!rec?.present) return { why: `AccessorPair has no ${name} field` };
+    const slot = deref(view.slot(rec.offset));
+    if (slot === undefined) return { why: `AccessorPair.${name} was not serialized` };
+    const smi = smiOfSlot(ctx, slot);
+    if (smi !== null) return { index: smi };
+    // NewAccessorPair fills both components with `null`; the half of an
+    // accessor the class does not declare stays that way.
+    const u = describeRef(slot, ctx);
+    if (u && (u.t === 'null' || u.t === 'undefined')) return { unset: true };
+    return { why: `AccessorPair.${name} is ${u?.t ?? 'an object'}` };
+  };
+  return { getter: read('getter'), setter: read('setter') };
+}
+
+/**
+ * The descriptors of a (Strong)DescriptorArray, as `{key, details, value}`.
+ *
+ * Only the first `number_of_descriptors` of the `number_of_all_descriptors`
+ * slots hold anything: `DescriptorArray::Allocate(isolate, 0, count + slack)`
+ * reserves the slack and `Append` fills forwards (ClassBoilerplate::New's
+ * ObjectDescriptor::CreateTemplates:505-517), so reading the whole region would
+ * report the reserve as members with an unwritten key.
+ */
+function descriptorEntries(record, className, ctx) {
+  const view = ctx.viewOf(record);
+  const walk = ctx.walk(className, view);
+  const struct = ctx.profile.tables.layouts.structs?.DescriptorEntry;
+  if (!struct) return { entries: null, why: 'layouts.json has no DescriptorEntry struct' };
+  const off = (n) => struct.fields.find((f) => f.name === n)?.offset;
+  const keyOff = off('key'); const detailsOff = off('details'); const valueOff = off('value');
+  if (keyOff === undefined || detailsOff === undefined || valueOff === undefined) {
+    return { entries: null, why: 'DescriptorEntry has no key/details/value field' };
+  }
+  const usedRec = walk.fields.get('number_of_descriptors');
+  const allRec = walk.fields.get('number_of_all_descriptors');
+  const region = walk.fields.get('descriptors');
+  const used = usedRec?.present ? view.readScalar(usedRec, { optional: true }) : null;
+  const all = allRec?.present ? view.readScalar(allRec, { optional: true }) : null;
+  if (used === null) return { entries: null, why: 'number_of_descriptors was not serialized' };
+  if (!region?.present) return { entries: null, why: 'the descriptors region is not present' };
+  if (all !== null && used > all) {
+    return { entries: null, why: `number_of_descriptors ${used} exceeds number_of_all_descriptors ${all}` };
+  }
+  const entries = [];
+  for (let i = 0; i < used; i++) {
+    const base = region.offset + i * region.elementSize;
+    entries.push({
+      key: ctx.decodeValue(deref(view.slot(base + keyOff))),
+      details: view.readSmi(base + detailsOff, { optional: true }),
+      value: deref(view.slot(base + valueOff)),
+    });
+  }
+  return { entries, used, all };
+}
+
+/** A descriptor/dictionary key as a member key. */
+function memberKeyOf(k) {
+  if (!k) return { why: 'the key slot was not serialized' };
+  if (k.t === 'string') return { keyKind: 'name', key: k.v };
+  if (k.t === 'number') return { keyKind: 'index', key: k.v };
+  if (k.t === 'symbol') return { keyKind: 'symbol', key: k.desc ?? null };
+  return { why: `the key is ${k.t === 'unresolved' ? k.why : k.t}` };
+}
+
+/**
+ * One properties template -> member entries, synthesised descriptors and
+ * refusals. `side` is only carried through so the caller can report it.
+ */
+function propertiesTemplate(ref, side, ctx, firstDynamic, out) {
+  if (ref === undefined) {
+    out.refusals.push({ side, why: 'propertiesTemplateNotSerialized' });
+    return;
+  }
+  if (ref && ref.sizeInTagged === undefined) {
+    const u = describeRef(ref, ctx);
+    // `class C {}` with nothing on that side still gets a template, so an
+    // empty root here is a fact, not a failure.
+    if (u && u.t === 'rootObject' && u.isEmpty) return;
+    out.refusals.push({ side, why: 'propertiesTemplateIsNotAnObject', detail: u?.why ?? u?.t ?? null });
+    return;
+  }
+  const cls = ctx.classifyObject(ref);
+  const mapName = ctx.classifier.mapName(ref.map);
+  if (!cls || !/DescriptorArray$/.test(cls.className)) {
+    // ObjectDescriptor::HasDictionaryProperties:471 -- a computed-name member
+    // or more than kMaxNumberOfDescriptors properties switches the template to
+    // a NameDictionary or a SwissNameDictionary. Those are hash tables whose
+    // kPrefixSize/kEntrySize live with the table class in C++ and are in no
+    // profile table (see readNameToIndexHashTable), so the entries are refused
+    // by name rather than read with a guessed stride.
+    out.refusals.push({
+      side,
+      why: 'propertiesTemplateIsADictionary',
+      detail: cls?.className ?? mapName ?? 'an unnamed map',
+    });
+    ctx.note(`classBoilerplate:properties-template-not-a-descriptor-array:${cls?.className ?? mapName ?? 'unnamed'}`,
+      { objectId: ref.id });
+    return;
+  }
+  const d = descriptorEntries(ref, cls.className, ctx);
+  if (!d.entries) {
+    out.refusals.push({ side, why: 'descriptorArrayNotReadable', detail: d.why });
+    return;
+  }
+  out.descriptorsRead += d.entries.length;
+  for (const ent of d.entries) {
+    const k = memberKeyOf(ent.key);
+    const smi = smiOfSlot(ctx, ent.value);
+
+    if (smi !== null) {
+      if (smi < firstDynamic) {
+        // `constructor` -> Smi(kConstructorArgumentIndex). V8's own.
+        out.synthesised.push({ side, key: k.key ?? null, keyKind: k.keyKind ?? null, valueIndex: smi });
+        continue;
+      }
+      if (k.why) { out.refusals.push({ side, why: 'memberKeyNotDecoded', detail: k.why }); continue; }
+      out.entries.push({ side, keyKind: k.keyKind, key: k.key, kind: 'data', valueIndex: smi, keyIndex: null, details: ent.details });
+      continue;
+    }
+
+    if (ent.value && ent.value.sizeInTagged !== undefined) {
+      const pair = accessorPairIndices(ent.value, ctx);
+      if (pair) {
+        if (k.why) { out.refusals.push({ side, why: 'memberKeyNotDecoded', detail: k.why }); continue; }
+        for (const [half, kind] of [['getter', 'getter'], ['setter', 'setter']]) {
+          const c = pair[half];
+          if (c.unset) continue;
+          if (c.why) { out.refusals.push({ side, why: 'accessorPairComponentNotDecoded', detail: c.why, key: k.key }); continue; }
+          if (c.index < firstDynamic) {
+            out.refusals.push({
+              side, why: 'accessorPairComponentIsNotADynamicArgument', key: k.key,
+              detail: `${half} index ${c.index} is below kFirstDynamicArgumentIndex ${firstDynamic}`,
+            });
+            continue;
+          }
+          out.entries.push({ side, keyKind: k.keyKind, key: k.key, kind, valueIndex: c.index, keyIndex: null, details: ent.details });
+        }
+        continue;
+      }
+      // ClassPositions under class_positions_symbol: ObjectDescriptor::AddConstant.
+      out.synthesised.push({ side, key: k.key ?? null, keyKind: k.keyKind ?? null, valueClass: ctx.classifyObject(ent.value)?.className ?? ctx.classifier.mapName(ent.value.map) ?? null });
+      continue;
+    }
+
+    // A root or a read-only reference: the three function accessors, whose
+    // values are AccessorInfo roots and therefore not a `t` the constant union
+    // has a case for -- the root NAME is the useful report.
+    const u = describeRef(ent.value, ctx);
+    out.synthesised.push({
+      side, key: k.key ?? null, keyKind: k.keyKind ?? null,
+      valueRoot: ent.value?.root?.cppName ?? u?.rootName ?? u?.detail?.rootName ?? u?.t ?? null,
+    });
+  }
+}
+
+/** One elements template: the members whose key is an array index. */
+function elementsTemplate(ref, side, ctx, out) {
+  if (ref === undefined) { out.refusals.push({ side, why: 'elementsTemplateNotSerialized' }); return; }
+  if (ref && ref.sizeInTagged === undefined) {
+    const u = describeRef(ref, ctx);
+    if (u && u.t === 'rootObject' && (u.isEmpty || /empty/.test(u.rootName ?? ''))) return;
+    out.refusals.push({ side, why: 'elementsTemplateIsNotAnObject', detail: u?.why ?? u?.t ?? null });
+    return;
+  }
+  // A NumberDictionary, for `class C { 0(){} }`. Same hash-table problem as the
+  // dictionary properties template, and the same refusal.
+  const cls = ctx.classifyObject(ref);
+  out.refusals.push({
+    side, why: 'elementsTemplateIsADictionary',
+    detail: cls?.className ?? ctx.classifier.mapName(ref.map) ?? 'an unnamed map',
+  });
+  ctx.note('classBoilerplate:elements-template-is-a-dictionary', { objectId: ref.id });
+}
+
+/** One computed-properties FixedArray: EncodeComputedEntry Smis. */
+function computedTemplate(ref, side, ctx, flags, kindNames, out) {
+  if (ref === undefined) { out.refusals.push({ side, why: 'computedPropertiesNotSerialized' }); return; }
+  if (ref && ref.sizeInTagged === undefined) {
+    const u = describeRef(ref, ctx);
+    if (u && u.t === 'rootObject' && u.isEmpty) return;
+    out.refusals.push({ side, why: 'computedPropertiesIsNotAnObject', detail: u?.why ?? u?.t ?? null });
+    return;
+  }
+  const cls = ctx.classifyObject(ref);
+  if (!cls || !/FixedArray$/.test(cls.className)) {
+    out.refusals.push({ side, why: 'computedPropertiesIsNotAFixedArray', detail: cls?.className ?? null });
+    return;
+  }
+  if (!flags) {
+    out.refusals.push({ side, why: 'computedEntryFlagsNotInProfile' });
+    return;
+  }
+  const r = fixedArrayElements(ref, cls.className, ctx);
+  if (!r.elements) { out.refusals.push({ side, why: 'computedPropertiesNotReadable', detail: r.why }); return; }
+  // VERSION-FREE: all-ones 32-bit mask for a full-width field.
+  const mask = (w) => (w >= 32 ? 0xffffffff : ((1 << w) - 1) >>> 0);
+  for (const el of r.elements) {
+    const raw = smiOfSlot(ctx, el);
+    if (raw === null) { out.refusals.push({ side, why: 'computedPropertyEntryIsNotASmi' }); continue; }
+    const vk = (raw >>> flags.fields.valueKind.offset) & mask(flags.fields.valueKind.width);
+    const keyIndex = (raw >>> flags.fields.keyIndex.offset) & mask(flags.fields.keyIndex.width);
+    const kind = kindNames.get(vk);
+    if (!kind) { out.refusals.push({ side, why: 'computedPropertyValueKindUnknown', detail: `ValueKind ${vk}` }); continue; }
+    // AddComputed:594: `int value_index = key_index + 1`, and
+    // BuildClassLiteral:3668-3731 grows the argument list by the key and then
+    // the value, in that order.
+    out.entries.push({ side, keyKind: 'computed', key: null, kind, valueIndex: keyIndex + 1, keyIndex, details: null });
+  }
+}
+
+/**
+ * Decode a ClassBoilerplate into the member list of one `class` literal.
+ *
+ * `entries` is in declaration order: `ClassBoilerplate::New` hands out argument
+ * indices by walking `expr->public_members()` once and incrementing
+ * `dynamic_argument_index` (:756-793), so the index IS the declaration order
+ * and sorting by it recovers an order the templates themselves do not keep (a
+ * DescriptorArray is sorted by key hash, `Finalize:610`).
+ */
+export function decodeClassBoilerplate(record, ctx) {
+  const view = ctx.viewOf(record);
+  const walk = ctx.walk('ClassBoilerplate', view);
+  const F = (n) => walk.fields.get(n);
+  const facts = ctx.overlay.data.cppLayouts?.ClassBoilerplate ?? null;
+
+  const out = {
+    t: 'classBoilerplate',
+    argumentsCount: null,
+    firstDynamicArgumentIndex: facts?.argumentIndices?.kFirstDynamicArgumentIndex ?? null,
+    entries: [],
+    synthesised: [],
+    refusals: [],
+    descriptorsRead: 0,
+    warnings: [...walk.warnings],
+  };
+  if (!facts) {
+    // Without ValueKind and kFirstDynamicArgumentIndex nothing here can be
+    // named, so nothing is reported rather than half-reported.
+    out.refusals.push({ why: 'classBoilerplateFactsNotInProfile' });
+    ctx.note('classBoilerplate:no-cppLayouts-ClassBoilerplate');
+    return out;
+  }
+
+  const ac = F('arguments_count');
+  if (ac?.present) out.argumentsCount = view.readSmi(ac.offset, { optional: true });
+  if (out.argumentsCount === null) out.refusals.push({ why: 'argumentsCountNotSerialized' });
+
+  // ValueKind ordinal -> the member kind this layer reports.
+  const vk = facts.valueKind ?? {};
+  const kindNames = new Map();
+  if (vk.kData !== undefined) kindNames.set(vk.kData, 'data');
+  if (vk.kGetter !== undefined) kindNames.set(vk.kGetter, 'getter');
+  if (vk.kSetter !== undefined) kindNames.set(vk.kSetter, 'setter');
+  if (vk.kAutoAccessor !== undefined) kindNames.set(vk.kAutoAccessor, 'autoAccessor');
+
+  const firstDynamic = out.firstDynamicArgumentIndex;
+  const slotOf = (name) => {
+    const rec = F(name);
+    return rec?.present ? deref(view.slot(rec.offset)) : undefined;
+  };
+
+  for (const side of ['static', 'instance']) {
+    propertiesTemplate(slotOf(`${side}_properties_template`), side, ctx, firstDynamic, out);
+    elementsTemplate(slotOf(`${side}_elements_template`), side, ctx, out);
+    computedTemplate(slotOf(`${side}_computed_properties`), side, ctx, facts.computedEntryFlags, kindNames, out);
+  }
+
+  out.entries.sort((a, b) => (a.keyIndex ?? a.valueIndex) - (b.keyIndex ?? b.valueIndex));
+
+  // Every dynamic argument should be accounted for by exactly one entry, and
+  // the gap is itself a result: a class FIELD with a computed name consumes one
+  // argument (its key) and appears in no template at all
+  // (ClassBoilerplate::New:769-777), so an unaccounted argument is the measure
+  // of how much of this class the boilerplate does NOT describe.
+  const claimed = new Set();
+  for (const e of out.entries) {
+    claimed.add(e.valueIndex);
+    if (e.keyIndex !== null) claimed.add(e.keyIndex);
+  }
+  out.argumentsClaimed = claimed.size;
+  out.argumentsUnclaimed = out.argumentsCount === null
+    ? null : Math.max(0, out.argumentsCount - firstDynamic - claimed.size);
+  return out;
+}
+
 export function decodeTemplateObjectDescription(record, ctx) {
   const view = ctx.viewOf(record);
   const walk = ctx.walk('TemplateObjectDescription', view);
@@ -748,5 +1102,5 @@ export default {
   decodeArrayLike, byteArrayPayload, fixedArrayElements,
   decodeHeapNumber, decodeBigInt, decodeSymbol,
   decodeObjectBoilerplate, decodeArrayBoilerplate, decodeRegExpBoilerplate,
-  decodeTemplateObjectDescription,
+  decodeTemplateObjectDescription, decodeClassBoilerplate,
 };

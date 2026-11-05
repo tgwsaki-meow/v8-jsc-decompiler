@@ -27,11 +27,18 @@
 //
 // so `superClass` is args[2] unless it is the hole, and the class's identity is
 // the constructor's SharedFunctionInfo, which is where its name and its body
-// live. The member list is deliberately NOT reconstructed from the dynamic
-// arguments: the boilerplate holds the static half and src/heap does not decode
-// `ClassBoilerplate`, so claiming a full member list would be an invention.
-// `members` is left empty, the claim is `confidence:'shape'`, and the gap is in
-// docs/RECOVER.md.
+// live.
+//
+// The member list is `args[0]`, the `ClassBoilerplate`, which `src/heap` now
+// decodes (docs/FRONTEND.md). It does not name the members' VALUES -- it names
+// the argument INDEX of each one, because `ClassBoilerplate::New` stores
+// `Smi(value_index)` and the argument list is the caller's, not the constant's.
+// This layer is where the two meet: index `i` is `args[i]`, which is the
+// `CreateClosure` of that method, so `members[]` is the boilerplate's entries
+// with `pc.E(args[valueIndex])` substituted for the index. A member the
+// boilerplate describes but this layer cannot turn into a `{kind, key, value}`
+// triple goes into `membersNotPlaced` with a named reason and is counted by
+// `src/emit`; it is never downgraded into a plain method.
 //
 // `super()` is `FindNonDefaultConstructorOrConstruct` (or
 // `GetSuperConstructor` + `Construct`) and the three `Throw*Super*` guards; the
@@ -162,6 +169,103 @@ function superConstructCall(pc, dispatch, candidateValues) {
   }
 }
 
+/** The constant an SSA value was loaded from, when it is a ClassBoilerplate. */
+function boilerplateOf(pc, id) {
+  if (id === null || id === undefined) return null;
+  const v = pc.values[pc.canon(id)];
+  if (!v || v.kind !== 'Op') return null;
+  const ins = pc.ir.instructions[v.instruction];
+  const c = ins?.operands.find((o) => o.type === 'kConstantPoolIndex')?.constant;
+  return c?.t === 'classBoilerplate' ? c : null;
+}
+
+/** `ClassBoilerplate` kind -> the `kind` field `src/emit`'s classMember reads. */
+const MEMBER_KIND = { data: 'method', getter: 'get', setter: 'set' };
+
+/**
+ * The boilerplate's entries with the argument list substituted in.
+ *
+ * Called from inside the `{e:'class'}` thunk, so `pc.E` resolves a member's
+ * closure at the same time as the rest of the class rather than during the
+ * pattern pass.
+ */
+function membersOf(pc, cb, args) {
+  const members = [];
+  const notPlaced = [];
+  for (const ent of cb.entries) {
+    const kind = MEMBER_KIND[ent.kind];
+    if (kind === undefined) {
+      // `accessor x` (ClassLiteral::Property::AUTO_ACCESSOR). It has no
+      // `{kind}` src/emit can spell, and guessing `get`/`set` would emit a
+      // different program, so it is refused by name.
+      notPlaced.push({ why: 'classMemberKindNotSpellable', detail: ent.kind, key: ent.key ?? null });
+      continue;
+    }
+    const argId = args[ent.valueIndex];
+    if (argId === undefined || argId === null) {
+      notPlaced.push({
+        why: 'classMemberValueArgumentMissing', key: ent.key ?? null,
+        detail: `the boilerplate names args[${ent.valueIndex}] and the call has ${args.length} argument(s)`,
+      });
+      continue;
+    }
+    // The member's VALUE is read as the raw transcription of its register's
+    // defining instruction, not through `pc.E`.
+    //
+    // `pc.E` routes through the inlining plan, and the plan materialises this
+    // value: the absorb pass works backwards from a use instruction, and the
+    // only instruction that reads the member closures is the `%DefineClass`
+    // this pattern consumed. The remaining candidate user is the value the
+    // `{e:'class'}` sits on -- the CONSTRUCTOR's `CreateClosure` -- and
+    // `BuildClassLiteral:3659-3662` emits that one BEFORE the members, so the
+    // member's definition does not dominate it and `inline.mjs` marks it
+    // `defDoesNotDominateUse`. Asking for the materialised form then yields
+    // `{e:'name'}` for a name whose `let` this pattern consumed: measured on
+    // `r_15524.jsc`, 12 of 14 members came out as
+    // `HOLE classMemberValueIsNotAClosure (name)`.
+    //
+    // A `CreateClosure` is all a member value can be: `BuildClassLiteral:3731`
+    // is `VisitForRegisterValue(property->value(), value)` and a METHOD /
+    // GETTER / SETTER property's value is a FunctionLiteral. So the
+    // transcription is the closure, and anything else is refused.
+    const fn = pc.exprOf(pc.canon(argId));
+    if (fn?.e !== 'fn') {
+      notPlaced.push({
+        why: 'classMemberValueIsNotAClosure', key: ent.key ?? null,
+        detail: `args[${ent.valueIndex}] transcribes to ${fn?.e ?? 'nothing'}`,
+      });
+      continue;
+    }
+    let key = null;
+    let computed = false;
+    if (ent.keyKind === 'name') { key = ent.key; }
+    else if (ent.keyKind === 'index') { key = { e: 'lit', v: ent.key }; computed = true; }
+    else if (ent.keyKind === 'computed') {
+      const keyId = ent.keyIndex === null ? undefined : args[ent.keyIndex];
+      if (keyId === undefined || keyId === null) {
+        notPlaced.push({
+          why: 'classMemberKeyArgumentMissing', key: null,
+          detail: `the boilerplate names args[${ent.keyIndex}] as the computed key`,
+        });
+        continue;
+      }
+      key = pc.E(keyId); computed = true;
+    } else {
+      // A symbol-keyed descriptor with a dynamic-argument value. A Symbol has
+      // no source spelling, so there is nothing to write.
+      notPlaced.push({ why: 'classMemberKeyKindNotSpellable', detail: ent.keyKind, key: ent.key ?? null });
+      continue;
+    }
+    members.push({ kind, key, computed, static: ent.side === 'static', value: fn });
+  }
+  // Each refusal the decode itself made, carried through rather than summarised
+  // away: the emitted class is incomplete and the reason is src/heap's.
+  for (const r of cb.refusals) {
+    notPlaced.push({ why: `classBoilerplate:${r.why}`, detail: r.detail ?? r.side ?? null, key: r.key ?? null });
+  }
+  return { members, notPlaced };
+}
+
 function defineClass(pc, v) {
   const args = pc.flatRegInputs(v);
   const ctorId = args[1] ?? null;
@@ -209,14 +313,24 @@ function defineClass(pc, v) {
   // constructor's `super()` could not be written (`super` is only legal inside
   // a class method).
   const classValue = ctorId !== null && ctorExpr?.e === 'fn' ? pc.canon(ctorId) : v.id;
-  pc.setExpr(classValue, () => ({
-    e: 'class',
-    sfiId: ctorExpr?.e === 'fn' ? ctorExpr.sfiId : null,
-    name: ctorExpr?.e === 'fn' ? ctorExpr.name : null,
-    superClass: noExtends ? null : pc.E(superId),
-    members: [],
-    dynamicArguments: Math.max(0, args.length - 3),
-  }));
+  const cb = boilerplateOf(pc, args[0] ?? null);
+  pc.setExpr(classValue, () => {
+    const m = cb === null ? null : membersOf(pc, cb, args);
+    return {
+      e: 'class',
+      sfiId: ctorExpr?.e === 'fn' ? ctorExpr.sfiId : null,
+      name: ctorExpr?.e === 'fn' ? ctorExpr.name : null,
+      superClass: noExtends ? null : pc.E(superId),
+      // `membersDecoded` is what tells "this class has no members" from "the
+      // member list was not readable": `class C { constructor(){} }` is the
+      // first, and src/emit must not mark a hole for it.
+      membersDecoded: m !== null,
+      members: m ? m.members : [],
+      membersNotPlaced: m ? m.notPlaced : [],
+      boilerplateArgumentsUnclaimed: cb?.argumentsUnclaimed ?? null,
+      dynamicArguments: Math.max(0, args.length - 3),
+    };
+  });
   if (classValue !== v.id) {
     pc.setExpr(v.id, () => ({
       e: 'member', obj: pc.E(classValue), prop: 'prototype', computed: false, optional: false,
@@ -227,12 +341,23 @@ function defineClass(pc, v) {
     pc.setExpr(p, () => ({ e: 'member', obj: pc.E(classValue), prop: 'prototype', computed: false, optional: false }));
   }
   pc.consumeMovesFeeding(v);
+  // The method closures are `args[3..]`; their `CreateClosure` instructions
+  // exist only to fill that argument list, exactly like an object literal's
+  // property values, so they are consumed here and the member carries the
+  // `{e:'fn'}`. Without this each one is still a live pure value and the
+  // statement loop emits it a second time, next to the class.
+  for (const id of args.slice(3)) {
+    const src = pc.values[pc.canon(id)];
+    if (src && src.kind === 'Op' && src.op === 'CreateClosure') pc.consume(src.instruction);
+  }
   pc.claim({
     kind: 'class', blocks: [v.block], values: [v.id, ...(v.projections ?? [])],
-    instructions: [v.instruction], confidence: 'shape',
-    cites: ['BuildClassLiteral:3534', 'VisitClassLiteral:3832'],
-    detail: `${Math.max(0, args.length - 3)} dynamic argument(s); the member list comes from the `
-      + 'ClassBoilerplate constant, which src/heap does not decode',
+    instructions: [v.instruction], confidence: cb === null ? 'shape' : 'exact',
+    cites: ['BuildClassLiteral:3534', 'VisitClassLiteral:3832', 'ClassBoilerplate::New:680'],
+    detail: cb === null
+      ? `${Math.max(0, args.length - 3)} dynamic argument(s); args[0] is not a decoded ClassBoilerplate`
+      : `${cb.entries.length} member(s) from the ClassBoilerplate, `
+        + `${cb.refusals.length} refusal(s), ${cb.argumentsUnclaimed ?? '?'} dynamic argument(s) it does not describe`,
   });
   pc.consume(v.instruction);
 }

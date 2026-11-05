@@ -1092,20 +1092,25 @@ export function recover(ir, opts = {}) {
   //
   // Every unplaced literal gets a named reason, and the reason decides
   // whether it is counted or refused -- they are not the same defect.
-  // Measured on 29 corpus files, 747 of 5 284 literals reach no statement
-  // (`tools/probes/probe_closure.mjs fate`):
+  // Measured on 29 corpus files, 99 of 5 284 literals reach no statement
+  // (`tools/probes/probe_class.mjs emit`); it was 747 before `src/heap`
+  // decoded the `ClassBoilerplate`:
   //
-  //   648  claimedByAPatternThroughItsUser:class
+  //     0  claimedByAPatternThroughItsUser:class   (was 648)
   //    54  readByAValueWithNoStatement:DefineNamedOwnProperty
   //    45  readByAValueWithNoStatement:Call*
   //     0  everything else
   //
-  // Both populated reasons are a gap this layer already declares somewhere
+  // The `class` row is empty because `patterns/classes.mjs` now puts each
+  // member's `{e:'fn'}` into `{e:'class'}.members`, and a class expression
+  // reaches a statement -- so the literal is mentioned. `claimedByAPattern` is
+  // still in the declared set, for the template shapes docs/RECOVER.md 8.1
+  // refuses (a dictionary properties template, `accessor x`).
+  //
+  // The remaining reasons are a gap this layer already declares somewhere
   // else, with its own hole, so counting them here is the honest answer and
-  // refusing would delete correct output: the `class` row is §8.1's undecoded
-  // `ClassBoilerplate` (the pattern owns the instruction and places no member
-  // for it, `{e:'class'}` carries only the constructor), and the
-  // `readByAValueWithNoStatement` rows are a literal whose only reader
+  // refusing would delete correct output: a
+  // `readByAValueWithNoStatement` row is a literal whose only reader
   // transcribes to a hole -- `ownPropertyDefinitionNotFoldedIntoItsLiteral`
   // for the `Define*OwnProperty` row -- so the output already says "I don't
   // know" at that spot.

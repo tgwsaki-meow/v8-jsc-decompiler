@@ -1,6 +1,6 @@
 # Probes — the one-off measurements that published claims rest on
 
-Five scripts that each answered one question about the measurement rather than
+Six scripts that each answered one question about the measurement rather than
 about the decompiler. They are here, and not in `scratch/`, because
 `docs/O1.md`, `docs/RECOVER.md`, `docs/METRICS.md`, `src/verify/HARNESS.md`,
 `src/verify/mutate.mjs` and `src/verify/o1_bytecode.mjs` all cite them as the
@@ -21,6 +21,7 @@ anything that mints has to mint with the corpus's own V8 (docs/O1.md 1).
 
 | probe | needs | backs |
 |---|---|---|
+| `probe_class.mjs` | corpus | docs/FRONTEND.md 4.2a; docs/RECOVER.md 8.1, 9.3 and 9.6 |
 | `probe_pool.mjs` | a cached `d8` | docs/O1.md 3.5 and 6; HARNESS.md O1 limitation 2; METRICS.md 4/12; `o1_bytecode.mjs` `blindSpot.evidence`; `mutate.mjs` header |
 | `probe_gap.mjs` | corpus + minter | docs/O1.md 7.2 |
 | `probe_gap2.mjs` | minter | docs/O1.md 6.3 and 7.2, now self-test F |
@@ -108,3 +109,46 @@ node tools/probes/probe_rootcause.mjs extracted_jsc/r_commonKitComponentXkitXDia
 
 A JSON array on stdout, one row per file argument; no argument means no work.
 Working files in `scratch/o1corpus/rootcause/`.
+
+## `probe_class.mjs` — what is in a `ClassBoilerplate`, and what reaches the text
+
+`docs/RECOVER.md` §9.6 measured the cost of not decoding `%DefineClass`'s first
+argument: **648 of 5 284 function literals — 12.3% —** were class members
+emitted as *sibling* declarations next to a class whose body was empty, counted
+as `classMembersNotDecoded`. This probe is the evidence for the decode that
+closed it, and for the parts of the shape that are still refused.
+
+Three modes:
+
+* **`shape`** — per boilerplate, what the seven fields hold: which class each
+  of the six templates resolves to, how many descriptors it carries, and which
+  of those are members as against the five `ObjectDescriptor::AddConstant`
+  adds itself. This is the question `decodeClassBoilerplate` was written
+  against, and the answer is what decided which shapes to decode and which to
+  refuse by name. On 29 files: 82 boilerplates, every properties template a
+  `StrongDescriptorArray`, every elements template the canonical
+  `empty_slow_element_dictionary` and every computed-properties array the
+  canonical `empty_fixed_array`; 1 054 descriptors read, **648 members** (531
+  instance methods, 107 getters, 4 setters, 6 static methods), 410 = 82 × 5
+  added by V8, **0 refusals**, **0 unclaimed arguments**.
+* **`members`** — the join `src/recover` makes: every member with the argument
+  index it names, against the `%DefineClass` argument list T7 sees. 82 of 82
+  `{e:'class'}` nodes carry a member list, 648 members, 0 whose value is not a
+  closure, 0 refused.
+* **`emit`** — the whole pipeline. `classMembersPlaced` 730 (the 648 plus 82
+  constructors), **0** `class*` holes, function literals in a statement
+  5 185 of 5 284 = **98.13%** (was 84.9%), and the
+  `claimedByAPatternThroughItsUser:class` row of §9.3 at **0**.
+
+```
+node tools/probes/probe_class.mjs shape   --corpus extracted_jsc --stride 37
+node tools/probes/probe_class.mjs members --corpus extracted_jsc --stride 37
+node tools/probes/probe_class.mjs emit    --corpus extracted_jsc --stride 37
+```
+
+A table goes to stderr and one JSON object to stdout. All three need the corpus
+(`extracted_jsc/`, not public); nothing from it is executed. The findings these
+modes became are check `every ClassBoilerplate decodes to a member list that
+fits its argument list` in `tests/t4/selftest.mjs` and
+`a class member is emitted inside its class body, not beside it` in
+`tools/emit/selftest.mjs`.

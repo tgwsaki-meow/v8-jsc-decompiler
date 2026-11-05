@@ -17,6 +17,22 @@
 //   rule seeded at the parent class's size. Sizes come from
 //   src/torque/types.cc SizeOf(). See torque.mjs for the citations.
 //
+// Mechanism 3 -- V8_OBJECT + TaggedMember<T>
+//   src/objects/object-macros.h:
+//     #define V8_OBJECT __attribute__((packed)) / #pragma pack(1) ... alignas
+//   A class written as
+//     V8_OBJECT class AccessorPair : public StructLayout {
+//       ... TaggedMember<Object> getter_; TaggedMember<Object> setter_;
+//     } V8_OBJECT_END;
+//   has no FIELD_LIST and, when its Torque declaration is a body-less
+//   `extern class AccessorPair extends Struct;` (ClassFlag::kUndefinedLayout),
+//   no Torque layout either -- so neither mechanism above sees it. The layout
+//   is still the same running sum: the class is packed, so each member sits at
+//   the next byte after the previous one, seeded at the parent's size, and a
+//   TaggedMember<T> is exactly kTaggedSize wide (src/objects/tagged-field.h).
+//   This mechanism is consulted ONLY for a class Torque leaves undescribed, so
+//   that nothing already derived from Torque changes meaning.
+//
 // For classes whose layout is data-dependent (ScopeInfo above all) a flat
 // offset table is simply wrong, so we emit a *layout program*: the ordered
 // field list, each field's size, and each field's presence condition expressed
@@ -35,6 +51,15 @@ export const REQUIRED_CLASSES = [
   'ByteArray', 'TrustedByteArray',
   'ObjectBoilerplateDescription', 'ArrayBoilerplateDescription',
   'RegExpBoilerplateDescription', 'TemplateObjectDescription',
+  // `class C { m(){} }`: %DefineClass's first argument. The member list lives
+  // in the two properties templates, which for every class the corpus contains
+  // is a (Strong)DescriptorArray of DescriptorEntry{key, details, value}, and
+  // an accessor's value is an AccessorPair holding the two argument indices.
+  // StrongDescriptorArray adds no field -- `class StrongDescriptorArray extends
+  // DescriptorArray {}` -- but it has its own map, so it needs its own entry
+  // for src/heap/classify.mjs to resolve that map to a layout.
+  'ClassBoilerplate',
+  'DescriptorArray', 'StrongDescriptorArray', 'EnumCache', 'AccessorPair',
   'UncompiledData',
   'UncompiledDataWithoutPreparseData', 'UncompiledDataWithPreparseData',
   'UncompiledDataWithoutPreparseDataWithJob', 'UncompiledDataWithPreparseDataAndJob',
@@ -266,6 +291,95 @@ export function deriveFieldLists(headerText, headerPath, cpp, sizes, anchorValue
   return out;
 }
 
+// ------------------------------------------- mechanism 3: V8_OBJECT + TaggedMember
+
+/** The `}` closing the `{` at `open`. */
+function matchBrace(s, open) {
+  let depth = 0;
+  for (let i = open; i < s.length; i++) {
+    const c = s[i];
+    if (c === '{') depth++;
+    else if (c === '}') { depth--; if (depth === 0) return i; }
+  }
+  return -1;
+}
+
+/**
+ * The member declarations V8_OBJECT bodies use, and what each one is worth.
+ * Named rather than pattern-matched: a member kind this does not know makes the
+ * whole class unresolved, because one unknown width moves every later offset.
+ */
+const V8_OBJECT_MEMBER_SIZES = {
+  // src/objects/tagged-field.h: TaggedMember<T> is a Tagged_t, kTaggedSize wide.
+  TaggedMember: 'kTaggedSize',
+  ProtectedPointerMember: 'kTaggedSize',
+  // src/objects/trusted-pointer.h / tagged-field.h
+  TrustedPointerMember: 'kTrustedPointerSize',
+  ExternalPointerMember: 'kExternalPointerSlotSize',
+  CppHeapPointerMember: 'kCppHeapPointerSlotSize',
+};
+
+/**
+ * Field lists of the `V8_OBJECT class X : public Y { ... TaggedMember<T> f_; }`
+ * classes in one header, in the same shape `deriveFieldLists` returns so that
+ * the driver can promote either one.
+ *
+ * Field names are the Torque spelling of the C++ member (`getter_` ->
+ * `getter`), which is what makes the result interchangeable with a Torque
+ * layout and cross-checkable against one where both exist.
+ */
+export function deriveV8ObjectMembers(headerText, headerPath, defines, sizes, anchorValues) {
+  // Its own Cpp instance, deliberately. A `Cpp` remembers the macros it has
+  // seen, so the second pass over a header whose include guard the first pass
+  // defined sees `#ifndef V8_OBJECTS_STRUCT_H_` as false and reads an empty
+  // file -- which is exactly what happened, and the symptom was an AccessorPair
+  // with no fields rather than an error.
+  const text = new Cpp(defines).run(headerText, { label: headerPath });
+  const out = [];
+  const head = /V8_OBJECT\s+class\s+([A-Za-z_]\w*)\s*(?:final\s*)?:\s*public\s+([A-Za-z_][\w:<>, ]*?)\s*\{/g;
+  for (let m = head.exec(text); m !== null; m = head.exec(text)) {
+    const [, name, parentExpr] = m;
+    const open = text.indexOf('{', m.index + m[0].length - 1);
+    const close = matchBrace(text, open);
+    if (close < 0) continue;
+    const body = text.slice(open + 1, close);
+    // Nested V8_OBJECT classes would be parsed again by the outer loop; their
+    // members must not be attributed to the enclosing class.
+    const ownBody = body.replace(/V8_OBJECT\s+class[\s\S]*?V8_OBJECT_END;/g, '');
+    const parent = String(parentExpr).replace(/\s+/g, '').replace(/Layout$/, '');
+    const anchorName = `${parent}::kSize`;
+    const anchorValue = anchorValues[anchorName] ?? anchorValues[`${parent}::kHeaderSize`] ?? null;
+
+    const fields = [];
+    const unresolved = [];
+    let rel = 0;
+    const member = /^[ \t]*([A-Za-z_]\w*)<([^;]*?)>\s+([A-Za-z_]\w*)_\s*;/gm;
+    for (let f = member.exec(ownBody); f !== null; f = member.exec(ownBody)) {
+      const [, kind, type, field] = f;
+      const sizeName = V8_OBJECT_MEMBER_SIZES[kind];
+      if (sizeName === undefined) continue;   // not a layout member (Handle<>, etc.)
+      const size = sizes[sizeName];
+      if (typeof size !== 'number') {
+        unresolved.push(`${field}: ${kind}<${type}> (unknown ${sizeName})`);
+        continue;
+      }
+      fields.push({
+        name: field, cppName: `${field}_`, sizeExpr: sizeName, size,
+        relativeOffset: rel, offset: anchorValue === null ? null : anchorValue + rel,
+        memberKind: kind, memberType: type.replace(/\s+/g, ' ').trim(),
+      });
+      rel += size;
+    }
+    if (!fields.length) continue;
+    out.push({
+      list: `V8_OBJECT ${name}`, anchor: anchorName, anchorValue,
+      ownerClass: name, header: headerPath, fields, endRelative: rel, unresolved,
+      mechanism: 'V8_OBJECT',
+    });
+  }
+  return out;
+}
+
 // ---------------------------------------------------- mechanism 2: Torque layout
 
 /**
@@ -420,6 +534,7 @@ export async function deriveLayouts(src, {
 
   const cpp = new Cpp(defines);
   const fieldListsByClass = new Map();
+  const v8ObjectByClass = new Map();
   const headerUnresolved = [];
   for (const p of LAYOUT_HEADERS) {
     const f = await src.get(p, { optional: true });
@@ -431,13 +546,24 @@ export async function deriveLayouts(src, {
       const owner = l.ownerClass;
       if (owner && !fieldListsByClass.has(owner)) fieldListsByClass.set(owner, l);
     }
+    let members;
+    try { members = deriveV8ObjectMembers(f.text, p, defines, { ...sizes, kTaggedSize: taggedSize }, anchorValues); }
+    catch (e) { headerUnresolved.push(`${p}: ${e.message}`); continue; }
+    for (const l of members) {
+      if (l.unresolved.length) headerUnresolved.push(...l.unresolved.map((u) => `${p} ${l.list}: ${u}`));
+      if (l.ownerClass && !v8ObjectByClass.has(l.ownerClass)) v8ObjectByClass.set(l.ownerClass, l);
+    }
   }
 
   const out = {};
   const missing = [];
   for (const name of classes) {
     const tq = torqueLayouts.get(name) ?? null;
-    const fl = fieldListsByClass.get(name) ?? null;
+    // Mechanism 3 is a fallback only: a class Torque describes keeps its Torque
+    // layout, so adding the V8_OBJECT reader cannot change a derivation that
+    // already worked.
+    const fl = fieldListsByClass.get(name)
+      ?? ((!tq || !tq.hasBody) ? (v8ObjectByClass.get(name) ?? null) : null);
     if (!tq && !fl) { missing.push(name); continue; }
 
     // When Torque declares no layout, the hand-written FIELD_LIST *is* the
@@ -488,7 +614,7 @@ export async function deriveLayouts(src, {
         name, source: fl.header, parent: null, parentSize: fl.anchorValue ?? null,
         isExtern: true, abstract: false, isShape: false, hasBody: true, droppedFields: [],
       }),
-      layoutSource: useFieldList ? 'FIELD_LIST' : 'torque',
+      layoutSource: useFieldList ? (fl.mechanism ?? 'FIELD_LIST') : 'torque',
       inheritanceChain: chain,
       fields,
       ...(allFields.length ? { allFields } : {}),

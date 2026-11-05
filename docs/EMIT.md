@@ -140,8 +140,9 @@ to confirm it. A unit with no usable range (an assembled test unit is `0..0`)
 stays a root rather than being guessed into someone's body. The report carries
 `unitTree.{byRange, byParentSfiId, disagreed}`.
 
-Two units are emitted **inline** rather than as a sibling declaration, because
-`super` is only legal there: the constructor a `{e:'class'}` names, and an
+Three kinds of unit are emitted **inline** rather than as a sibling
+declaration, because `super` is only legal there: the constructor a
+`{e:'class'}` names, each member of `{e:'class'}.members` (§9 gap 2), and an
 object literal's accessor or method. `claimed` keeps them from also being
 emitted as a sibling. Anything still unemitted at the end — a broken parent
 link — goes to the top level with an `ORPHAN` marker, so §11.5's "every
@@ -531,13 +532,22 @@ reject anything.
 ### 8.1 `tools/emit/selftest.mjs` — engine-free, both profiles
 
 ```
-node tools/emit/selftest.mjs      ->  76 passed, 0 failed
-npm test                          ->  the `emit` slot runs the same 76
+node tools/emit/selftest.mjs      ->  80 passed, 0 failed
+npm test                          ->  the `emit` slot runs the same 80
 ```
 
-Groups: 5 layering, 6 closed-set, 10 per profile × 2 profiles = 20 assembled
+Groups: 5 layering, 6 closed-set, 12 per profile × 2 profiles = 24 assembled
 shapes, 25 fixtures (one named check per source construct, plus the closure
-check below), 20 invariant and rendering checks. Over the 24 minted fixtures in
+check below), 20 invariant and rendering checks. Two of the assembled shapes are
+four-unit files whose parent holds a `%DefineClass` with a
+`{t:'classBoilerplate'}`. The first names a method and a getter and reads the
+emitted text back **through a parser**, asserting that the class body holds
+`constructor`, `area` and `get size`, that no `area`/`size` sibling declaration
+exists anywhere in the file, that `classMembersPlaced` is 3 and that no
+`class*` hole was counted. The second names an `async` method and a generator
+method and asserts both keywords survive, because dropping them is a
+`SyntaxError` that costs the whole file (§9 gap 2). Over the 24 minted fixtures
+in
 `tests/t8/fixtures/`:
 
 | | |
@@ -715,7 +725,9 @@ What the join decided, over the same 465 files:
 
 Holes by reason: `unitNotRecovered` 423, `unstructured:stepIntoEmittedBlock`
 87, `frameHeaderRegisterReadAsValue` 35, `arrayBoilerplateElementsNotDecoded`
-24, `superOutsideAMethod` 13, `classMembersNotDecoded` 12,
+24, `superOutsideAMethod` 13, `classMembersNotDecoded` 12 (that row is §9 gap 2
+and the `ClassBoilerplate` decode takes it to 0 — 0 of 82 classes on the
+29-file sample of RECOVER.md §9.6),
 `unstructured:labelledJoinNeverReached` 4, `namedPropertyKeyNotAString` 6,
 `namedStoreKeyNotAString` 6, `unstructured:functionChainFellOut` 1,
 `runtimeIdNotNamedByProfile` 1.
@@ -774,20 +786,46 @@ of the same name for the whole body. The spelling is invisible to O1.
 
 Everything here is counted by the tooling and appears in `report`.
 
-1. **`super` outside a class method.** T7's `{e:'class'}` carries
-   `members: []` (RECOVER.md §8.1: the `ClassBoilerplate` constant is not
-   decoded), so a class's *methods* are not reachable from the class
-   expression — they are separate units emitted as sibling function
-   declarations, and `super` is a `SyntaxError` there. The reference becomes a
-   declared `__super` placeholder with a `HOLE superOutsideAMethod` marker. A
-   constructor reached through `{e:'class', sfiId}` *is* emitted as a
-   `ClassMethod`, so `super()` in a constructor is fine; everything else is
-   not. Fixing this needs the member list, which is a `src/heap` gap.
-2. **A class body is empty.** Same cause. `{e:'class'}` emits
-   `class X extends Y { constructor(...) {...} }` with a
-   `HOLE classMembersNotDecoded <n> dynamic argument(s)` marker, and the
-   methods appear as sibling functions instead of members. Correct-but-wrong-
-   shaped, counted.
+1. **`super` outside a class method — mostly closed.** T7's `{e:'class'}` used
+   to carry `members: []`, so a class's methods were separate units emitted as
+   sibling function declarations and `super` is a `SyntaxError` there. The
+   member list is now decoded (RECOVER.md §8.1, FRONTEND.md §4.2a), so
+   `resolveClass` emits each method, getter, setter and static member as a
+   `ClassMethod` of the class body and `super` inside one is legal. What is
+   left is a `super` in a unit the member list does not reach — a class field's
+   initialiser, a static block, or a member whose template shape §8.1 refuses.
+   The reference becomes a declared `__super` placeholder with a
+   `HOLE superOutsideAMethod` marker.
+2. **A class body is empty only when it really is empty.** `resolveClass` marks
+   `HOLE classMembersNotDecoded <n> dynamic argument(s)` on the
+   `{e:'class'}`'s *member list*, not on its member count: the flag is T7's
+   `membersDecoded`, so `class C { constructor(){} }` is no longer reported as
+   a hole and a class whose boilerplate could not be read still is. Each member
+   T7 or `src/heap` refused is its own counted hole with its own reason —
+   `classMemberKindNotSpellable` (`accessor x`),
+   `classMemberKeyKindNotSpellable` (a Symbol key),
+   `classMemberValueIsNotAClosure`, `classMemberWithoutAUnit`,
+   `classMemberAlreadyEmitted`, `classMemberValueArgumentMissing`,
+   `classMemberKeyArgumentMissing`, `classAccessorIsAsyncOrAGenerator`, and
+   `classMemberNotPlaced` for a `src/heap` refusal this layer has no counter of
+   its own for. A member whose kind cannot be determined is **not** emitted as a
+   plain method: `CLASS_MEMBER_KINDS` is a closed set of three with no default
+   branch, which is the one line that used to turn a getter into `x(){}`.
+
+   `async` and `*` travel with the member, which is not a detail: a
+   `t.classMethod` built without them emits `await` inside a non-async method,
+   which is a `SyntaxError` and takes the whole *file* with it. Measured while
+   building this — 4 of a 20-file sample stopped compiling, each one an `async`
+   class method — which is why the accessor case is a refusal rather than a
+   flag: `async get x(){}` and `get *x(){}` are both `SyntaxError`s, and
+   `function-kind.h` gives an accessor its own kind, so the combination means
+   the flag did not come from the SFI.
+
+   Two counters go with it. `classMembersPlaced` is how many members landed
+   inside a class body; `classArgumentsNoTemplateDescribes` is how many dynamic
+   arguments of a `%DefineClass` no template accounts for, which is the measure
+   of the class fields the boilerplate cannot reach — `ClassBoilerplate::New`
+   writes no template entry for a `FIELD` at all.
 3. **`names read but never written`** (check 3c). The residual is dominated by
    values whose defining instruction an idiom consumed while nothing
    re-materialised it — the same class of gap as §4.1's for-in key, in the

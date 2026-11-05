@@ -339,6 +339,157 @@ for (const { tag, profile } of profiles) {
     };
   });
 
+  // The whole point of decoding the ClassBoilerplate: a method goes INSIDE its
+  // class body. Before it did not -- `{e:'class'}.members` was always empty, so
+  // every method was emitted as a sibling `var m = function m(){}` next to the
+  // class and the output declared a class with nothing in it.
+  //
+  // Four units, because a class member is one unit's statements inside another
+  // unit's expression: the parent holds the `%DefineClass` and the three
+  // children are the constructor, the method and the getter.
+  check(P, 'a class member is emitted inside its class body, not beside it', () => {
+    const rid = profile.runtimeId ? profile.runtimeId('DefineClass') : null;
+    if (rid === null || rid === undefined) return { skip: true, detail: 'profile has no DefineClass runtime id' };
+
+    const child = (sfiId, name, body) => {
+      const c = asm(profile);
+      body(c);
+      return c.build({ sfiId, parentSfiId: 1, name });
+    };
+    const kids = [
+      child(7, 'Shape', (c) => c.emit('LdaUndefined').emit('Return')),
+      child(11, 'area', (c) => c.emit('LdaSmi', [{ imm: 4 }]).emit('Return')),
+      child(12, 'size', (c) => c.emit('LdaSmi', [{ imm: 9 }]).emit('Return')),
+    ];
+
+    const a = asm(profile);
+    const bp = a.constant({
+      t: 'classBoilerplate',
+      argumentsCount: 5, firstDynamicArgumentIndex: 3, descriptorsRead: 3,
+      argumentsUnclaimed: 0, synthesised: [], refusals: [],
+      entries: [
+        { side: 'instance', keyKind: 'name', key: 'area', kind: 'data', valueIndex: 3, keyIndex: null },
+        { side: 'instance', keyKind: 'name', key: 'size', kind: 'getter', valueIndex: 4, keyIndex: null },
+      ],
+    });
+    a.emit('LdaConstant', [{ const: bp }]).emit('Star', [{ reg: 0 }])
+      .emit('CreateClosure', [{ const: a.constant({ t: 'sfi', sfiId: 7 }) }, { slot: 0 }, { u: 0 }]).emit('Star', [{ reg: 1 }])
+      .emit('LdaTheHole').emit('Star', [{ reg: 2 }])
+      .emit('CreateClosure', [{ const: a.constant({ t: 'sfi', sfiId: 11 }) }, { slot: 1 }, { u: 0 }]).emit('Star', [{ reg: 3 }])
+      .emit('CreateClosure', [{ const: a.constant({ t: 'sfi', sfiId: 12 }) }, { slot: 2 }, { u: 0 }]).emit('Star', [{ reg: 4 }])
+      .emit('CallRuntime', [{ u: rid }, { regList: [0, 5] }, { count: 5 }])
+      .emit('Return');
+    const parent = a.build({ sfiId: 1, name: 'makeShape', registerCount: 6 });
+
+    const all = [parent, ...kids];
+    const recs = [];
+    const sfs = [];
+    for (const b of all) {
+      const ir = buildIR(b.unit, { profile });
+      recs.push(recover(ir));
+      sfs.push(structure(ir, { profile, verify: true }));
+    }
+    const out = emit(recs, sfs, { file: 'selftest.jsc', units: all.map((b) => b.unit), verify: true });
+    const code = String(out.code);
+    const holes = Object.keys(out.report.holes.byWhy ?? {}).filter((w) => /^class/.test(w));
+    // Read back out of the AST, not out of the text: "inside the class body" is
+    // a structural claim and a regexp over the source cannot make it.
+    let placed = [];
+    let siblings = [];
+    if (!parses(code)) {
+      const ast = parse(code, { sourceType: 'script' });
+      const walk = (n) => {
+        if (!n || typeof n !== 'object') return;
+        if (Array.isArray(n)) { n.forEach(walk); return; }
+        if (typeof n.type !== 'string') return;
+        if (n.type === 'ClassExpression' || n.type === 'ClassDeclaration') {
+          for (const m of n.body.body) {
+            const k = m.kind === 'method' || m.kind === 'constructor' ? '' : `${m.kind} `;
+            placed.push(`${m.static ? 'static ' : ''}${k}${m.key?.name ?? '?'}`);
+          }
+        }
+        if (n.type === 'FunctionDeclaration' && /^(area|size)/.test(n.id?.name ?? '')) siblings.push(n.id.name);
+        if (n.type === 'VariableDeclarator' && /^(area|size)/.test(n.id?.name ?? '')) siblings.push(n.id.name);
+        for (const k in n) { if (k !== 'loc' && k !== 'leadingComments' && k !== 'trailingComments') walk(n[k]); }
+      };
+      walk(ast.program.body);
+    }
+    placed = placed.sort();
+    // The pairing name, which docs/O1.md §4's `sfi` mode is identity by
+    // construction only because of: `perFunction[].name` has to be what V8 will
+    // call the function when it recompiles this text, and for a class member
+    // that is the property name, `get `-prefixed for a getter
+    // (ParseClassPropertyDefinition -> SetFunctionNameFromPropertyName with
+    // get_space_string). Leaving the sibling spelling there cost 686 exact
+    // matches over the corpus while the emitted shape was already right.
+    const pairNames = out.perFunction.filter((f) => f.sfiId === 11 || f.sfiId === 12)
+      .map((f) => f.name).sort();
+    return {
+      ok: JSON.stringify(placed) === JSON.stringify(['area', 'constructor', 'get size'])
+        && JSON.stringify(pairNames) === JSON.stringify(['area', 'get size'])
+        && siblings.length === 0
+        && out.report.classMembersPlaced === 3
+        && holes.length === 0
+        && violationsOf(out) === 0 && !parses(code),
+      detail: `class body [${placed.join(', ')}], pairing names [${pairNames.join(', ')}], `
+        + `siblings [${siblings.join(', ')}], report ${out.report.classMembersPlaced}, `
+        + `class holes ${holes.join(',') || 'none'}`,
+    };
+  });
+
+  // `async` and `*` on a class member are not decoration. A `t.classMethod`
+  // built without them puts `await` inside a non-async method, which is a
+  // SyntaxError -- and a SyntaxError anywhere takes the whole FILE with it.
+  // Measured while the member placement above was being built: 4 of a 20-file
+  // corpus sample stopped compiling, each one an `async` class method.
+  check(P, 'async and generator travel with a class member', () => {
+    const rid = profile.runtimeId ? profile.runtimeId('DefineClass') : null;
+    if (rid === null || rid === undefined) return { skip: true, detail: 'profile has no DefineClass runtime id' };
+    const kid = (sfiId, name, extra) => {
+      const c = asm(profile);
+      c.emit('LdaUndefined').emit('Return');
+      return c.build({ sfiId, parentSfiId: 1, name, ...extra });
+    };
+    const kids = [
+      kid(7, 'Job', {}),
+      kid(11, 'run', { isAsync: true }),
+      kid(12, 'items', { isGenerator: true }),
+    ];
+    const a = asm(profile);
+    const bp = a.constant({
+      t: 'classBoilerplate',
+      argumentsCount: 5, firstDynamicArgumentIndex: 3, descriptorsRead: 3,
+      argumentsUnclaimed: 0, synthesised: [], refusals: [],
+      entries: [
+        { side: 'instance', keyKind: 'name', key: 'run', kind: 'data', valueIndex: 3, keyIndex: null },
+        { side: 'instance', keyKind: 'name', key: 'items', kind: 'data', valueIndex: 4, keyIndex: null },
+      ],
+    });
+    a.emit('LdaConstant', [{ const: bp }]).emit('Star', [{ reg: 0 }])
+      .emit('CreateClosure', [{ const: a.constant({ t: 'sfi', sfiId: 7 }) }, { slot: 0 }, { u: 0 }]).emit('Star', [{ reg: 1 }])
+      .emit('LdaTheHole').emit('Star', [{ reg: 2 }])
+      .emit('CreateClosure', [{ const: a.constant({ t: 'sfi', sfiId: 11 }) }, { slot: 1 }, { u: 0 }]).emit('Star', [{ reg: 3 }])
+      .emit('CreateClosure', [{ const: a.constant({ t: 'sfi', sfiId: 12 }) }, { slot: 2 }, { u: 0 }]).emit('Star', [{ reg: 4 }])
+      .emit('CallRuntime', [{ u: rid }, { regList: [0, 5] }, { count: 5 }])
+      .emit('Return');
+    const all = [a.build({ sfiId: 1, name: 'makeJob', registerCount: 6 }), ...kids];
+    const recs = [];
+    const sfs = [];
+    for (const b of all) {
+      const ir = buildIR(b.unit, { profile });
+      recs.push(recover(ir));
+      sfs.push(structure(ir, { profile, verify: true }));
+    }
+    const out = emit(recs, sfs, { file: 'selftest.jsc', units: all.map((b) => b.unit), verify: true });
+    const code = String(out.code);
+    return {
+      ok: /\basync\s+run\s*\(\)/.test(code) && /\*\s*items\s*\(\)/.test(code)
+        && out.report.classMembersPlaced === 3
+        && violationsOf(out) === 0 && !parses(code),
+      detail: code.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\s+/g, ' ').slice(0, 170),
+    };
+  });
+
   check(P, 'two runs over the same input produce identical text (O2 precondition)', () => {
     const build = () => {
       const a = asm(profile);

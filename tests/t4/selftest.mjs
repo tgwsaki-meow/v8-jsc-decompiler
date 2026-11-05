@@ -467,6 +467,55 @@ check('layout', 'the static prefix of a walk matches the offsets layouts.json st
   return { ok: bad.length === 0, detail: bad.length ? bad.slice(0, 6).join('; ') : `${compared} static field offsets agree` };
 });
 
+// `decodeClassBoilerplate` reaches eleven fields by name across three classes
+// and five values out of `cppLayouts.ClassBoilerplate`. A walk that returns no
+// such field does not throw -- `fields.get(name)` is `undefined` and the
+// decoder reports a refusal -- so without this check a profile that stopped
+// carrying any of them would turn every class into a counted hole and look like
+// a corpus with no classes in it.
+check('layout', 'every field decodeClassBoilerplate reads by name is in the walk', () => {
+  const bad = [];
+  const rows = [];
+  for (const tag of listProfiles('profiles')) {
+    const profile = loadProfile(path.join('profiles', tag));
+    const resolver = new LayoutResolver(profile, loadOverlay(profile.version, { profile }));
+    for (const [className, want] of [
+      ['ClassBoilerplate', ['arguments_count',
+        'static_properties_template', 'static_elements_template', 'static_computed_properties',
+        'instance_properties_template', 'instance_elements_template', 'instance_computed_properties']],
+      // The member list is read through the StrongDescriptorArray map the
+      // corpus actually uses, not through the base class.
+      ['StrongDescriptorArray', ['number_of_descriptors', 'number_of_all_descriptors', 'descriptors']],
+      ['AccessorPair', ['getter', 'setter']],
+    ]) {
+      let prog;
+      try { prog = resolver.program(className); } catch (e) { bad.push(`${tag}: no ${className} (${e.message})`); continue; }
+      for (const f of want) if (!prog.byName.has(f)) bad.push(`${tag}: ${className} has no ${f}`);
+    }
+    const de = profile.tables.layouts.structs?.DescriptorEntry;
+    if (!de) bad.push(`${tag}: no DescriptorEntry struct`);
+    else for (const f of ['key', 'details', 'value']) {
+      if (!de.fields.some((x) => x.name === f)) bad.push(`${tag}: DescriptorEntry has no ${f}`);
+    }
+    const facts = profile.tables.layouts.cppLayouts?.ClassBoilerplate;
+    if (!facts) bad.push(`${tag}: no cppLayouts.ClassBoilerplate`);
+    else {
+      // kData is 0, so `??` rather than a truthiness test.
+      for (const k of ['kData', 'kGetter', 'kSetter']) {
+        if ((facts.valueKind?.[k] ?? null) === null) bad.push(`${tag}: no ValueKind::${k}`);
+      }
+      if ((facts.argumentIndices?.kFirstDynamicArgumentIndex ?? null) === null) {
+        bad.push(`${tag}: no kFirstDynamicArgumentIndex`);
+      }
+      if (!facts.computedEntryFlags?.fields?.keyIndex?.width) bad.push(`${tag}: no ComputedEntryFlags.keyIndex`);
+      rows.push(`${tag}: DescriptorEntry ${de.packedSize}B, ValueKind kGetter=${facts.valueKind.kGetter}, `
+        + `kFirstDynamicArgumentIndex=${facts.argumentIndices.kFirstDynamicArgumentIndex}, `
+        + `keyIndex ${facts.computedEntryFlags.fields.keyIndex.width} bits at ${facts.computedEntryFlags.fields.keyIndex.offset}`);
+    }
+  }
+  return { ok: bad.length === 0, detail: bad.length ? bad.slice(0, 6).join('; ') : rows.join('; ') };
+});
+
 check('layout', 'the enum values the overlay corrects really do disagree with layouts.json', () => {
   const profile = loadProfile(path.join('profiles', o.profile));
   const overlay = loadOverlay(profile.version);
@@ -521,6 +570,56 @@ if (corpusFile && fs.existsSync(corpusFile)) {
       ok: built.units.length > 0 && withPos === built.units.length,
       detail: `${built.units.length} units, ${withName} with a name, ${withPos} with a source range, `
         + `${naming.namedSlots}/${naming.contextSlots} context slots named`,
+    };
+  });
+
+  // The decoder on real objects. Every assertion is a property of
+  // ClassBoilerplate::New rather than of this corpus file: a member's argument
+  // index is a real register of the %DefineClass call, the four descriptors V8
+  // adds itself are told from members by their value and not by their name, and
+  // every descriptor read is accounted for as one or the other or as a refusal.
+  check('corpus', 'every ClassBoilerplate decodes to a member list that fits its argument list', () => {
+    const built = buildUnits(env, decoded.graph);
+    const bad = [];
+    let boilerplates = 0;
+    let members = 0;
+    let refusals = 0;
+    let synthesised = 0;
+    const kinds = new Set();
+    for (const u of built.units) {
+      for (const c of u.constants ?? []) {
+        if (c?.t !== 'classBoilerplate') continue;
+        boilerplates++;
+        members += c.entries.length;
+        refusals += c.refusals.length;
+        synthesised += c.synthesised.length;
+        if (c.argumentsCount === null) { bad.push(`sfi ${u.sfiId}: no arguments_count`); continue; }
+        if (c.firstDynamicArgumentIndex === null) { bad.push(`sfi ${u.sfiId}: no kFirstDynamicArgumentIndex`); continue; }
+        for (const e of c.entries) {
+          kinds.add(`${e.side}/${e.kind}/${e.keyKind}`);
+          if (e.valueIndex < c.firstDynamicArgumentIndex || e.valueIndex >= c.argumentsCount) {
+            bad.push(`sfi ${u.sfiId}: ${e.key} -> args[${e.valueIndex}] outside [${c.firstDynamicArgumentIndex}, ${c.argumentsCount})`);
+          }
+          if (e.keyKind === 'computed' && e.keyIndex !== e.valueIndex - 1) {
+            bad.push(`sfi ${u.sfiId}: computed key args[${e.keyIndex}] is not args[${e.valueIndex}] - 1`);
+          }
+        }
+        // ObjectDescriptor::AddConstant is called four times for the static
+        // side and once for the instance side, and nowhere else.
+        if (c.synthesised.length > 5) bad.push(`sfi ${u.sfiId}: ${c.synthesised.length} entries attributed to V8 itself`);
+        if (c.descriptorsRead !== c.synthesised.length + c.entries.filter((e) => e.keyKind !== 'computed').length
+          && !c.entries.some((e) => e.kind === 'getter' || e.kind === 'setter')) {
+          // An accessor pair is one descriptor and up to two entries, so the
+          // identity only holds when there is no accessor.
+          bad.push(`sfi ${u.sfiId}: ${c.descriptorsRead} descriptors vs ${c.entries.length} entries + ${c.synthesised.length} V8's`);
+        }
+      }
+    }
+    return {
+      ok: bad.length === 0 && boilerplates > 0,
+      detail: bad.length ? bad.slice(0, 4).join('; ')
+        : `${boilerplates} boilerplate(s), ${members} member(s), ${synthesised} added by V8, `
+          + `${refusals} refusal(s); kinds ${[...kinds].sort().join(' ') || 'none'}`,
     };
   });
 

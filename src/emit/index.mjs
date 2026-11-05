@@ -437,6 +437,11 @@ function fileReport() {
     unreferencedClosures: 0, unreferencedClosuresRebound: 0,
     unreferencedClosuresAlreadyBound: 0, unreferencedClosuresAtTheTopLevel: 0,
     unreferencedClosuresNotInTheInput: 0,
+    // A class member placed INSIDE its class body, and the dynamic arguments
+    // of a %DefineClass that no template describes -- which, since
+    // ClassBoilerplate::New puts no FIELD in a template, is the measure of the
+    // class fields this decode cannot reach (docs/RECOVER.md 8.1).
+    classMembersPlaced: 0, classArgumentsNoTemplateDescribes: 0,
     holes: { total: 0, byWhy: {}, byKind: { expr: 0, stmt: 0, region: 0 } },
     loops: 0, loopForms: {}, loopIdioms: {}, tries: 0, triesByPrediction: {},
     finallyShapes: 0, finallyShapeKinds: {}, switches: 0, switchForms: {},
@@ -681,7 +686,6 @@ function emitUnitInner(state, rec0, how) {
 
   const resolveClass = (ctx, e) => {
     const child = e.sfiId === null || e.sfiId === undefined ? null : state.byId.get(e.sfiId);
-    const id = e.name ? t.identifier(sanitise(e.name)) : null;
     const superClass = e.superClass ? expr(ctx, e.superClass) : null;
     const members = [];
     if (child && !state.emitted.has(e.sfiId) && !state.claimed.has(e.sfiId)) {
@@ -692,17 +696,33 @@ function emitUnitInner(state, rec0, how) {
         members.push(t.classMethod('constructor', t.identifier('constructor'), fn.params, fn.body));
       }
     }
+    // Every member T7 placed, plus every one it could not: a refusal is a
+    // counted hole with the reason T7 or src/heap gave it, never a member
+    // guessed into a shape that happens to parse.
+    const refused = [...(e.membersNotPlaced ?? [])];
     for (const m of e.members ?? []) {
-      const mm = classMember(ctx, m);
-      if (mm) members.push(mm);
+      const mm = classMember(ctx, m, state);
+      if (mm.node) members.push(mm.node);
+      else refused.push({ why: mm.why, detail: mm.detail ?? null, key: typeof m.key === 'string' ? m.key : null });
     }
-    const node = t.classExpression(id, superClass, t.classBody(members), []);
-    if (!(e.members ?? []).length) {
-      // docs/RECOVER.md 8.1: the ClassBoilerplate constant is not decoded, so
-      // the member list is empty and that has to be visible, not implied.
+    const node = t.classExpression(classId(e, members, superClass), superClass, t.classBody(members), []);
+    if (!e.membersDecoded) {
+      // docs/RECOVER.md 8.1: args[0] was not a decoded ClassBoilerplate, so
+      // there is no member list at all and that has to be visible, not implied.
       ctx.countHole('classMembersNotDecoded', 'expr');
       mark(node, `HOLE classMembersNotDecoded ${e.dynamicArguments ?? 0} dynamic argument(s)`);
     }
+    for (const r of refused) {
+      ctx.countHole(CLASS_MEMBER_HOLES.has(r.why) ? r.why : 'classMemberNotPlaced', 'expr');
+      mark(node, `HOLE ${r.why}${r.key ? ` ${r.key}` : ''}${r.detail ? ` (${r.detail})` : ''}`);
+    }
+    if (e.boilerplateArgumentsUnclaimed) {
+      // ClassBoilerplate::New describes no FIELD at all, and a computed-name
+      // field still costs one argument, so this is the measure of what the
+      // decode cannot reach rather than of anything going wrong here.
+      state.report.classArgumentsNoTemplateDescribes += e.boilerplateArgumentsUnclaimed;
+    }
+    state.report.classMembersPlaced += members.length;
     return node;
   };
 
@@ -1108,18 +1128,164 @@ function paramsOfUnit(unit) {
   return out;
 }
 
-function classMember(ctx, m) {
-  if (!m || !m.kind) return null;
-  const key = m.computed || (m.key && typeof m.key === 'object')
-    ? expr(ctx, m.key) : t.identifier(sanitise(String(m.key ?? 'member')));
-  if (m.value?.e === 'fn') {
-    const fn = ctx.functionLike(m.value, 'method');
-    if (fn && fn.type === 'FunctionExpression') {
-      const kind = m.kind === 'get' || m.kind === 'set' ? m.kind : 'method';
-      return t.classMethod(kind, key, fn.params, fn.body, !!m.computed, !!m.static);
-    }
+/**
+ * The three member kinds this layer can spell, and nothing else.
+ *
+ * `method`, `get` and `set` are exactly what a `ClassBoilerplate` entry's
+ * ValueKind can be once `kAutoAccessor` is excluded (src/heap's
+ * `decodeClassBoilerplate`), and the mapping is total: there is no default
+ * branch. A kind not in this table used to fall through to `method`, which
+ * would emit `x(){}` for a getter -- a different program with no marker.
+ */
+const CLASS_MEMBER_KINDS = new Set(['method', 'get', 'set']);
+
+/** The named refusals `resolveClass` counts under their own why. */
+const CLASS_MEMBER_HOLES = new Set([
+  'classMemberKindNotSpellable', 'classMemberKeyKindNotSpellable',
+  'classMemberValueArgumentMissing', 'classMemberKeyArgumentMissing',
+  'classMemberValueIsNotAClosure', 'classMemberAlreadyEmitted', 'classMemberWithoutAUnit',
+  'classAccessorIsAsyncOrAGenerator',
+]);
+
+/**
+ * One `{e:'class'}.members` entry as a class body element.
+ *
+ * @returns {{node: object}|{why: string, detail?: string}}
+ */
+/**
+ * The `id` of a class expression, moved off any spelling its own members use.
+ *
+ * A named class expression binds its name INSIDE the class, so every member
+ * body is in its scope. T7 never resolves anything to that binding -- there is
+ * no such `ref` kind, and every `{e:'name'}` in a member body was resolved
+ * against the scope chain OUTSIDE the class -- so a member that happens to
+ * mention the class's spelling must not be captured by it. While the member
+ * list was empty this could not happen; with the members inside, it does, and
+ * it is a scoping change and not a cosmetic one: the identifier binds to the
+ * class instead of to the outer variable it was resolved from.
+ *
+ * It is also the whole of the first measurable regression this change caused.
+ * V8 allocates a context slot for a class variable only when it is used
+ * (`ClassScope`), so capturing one member's read turns the class scope into a
+ * context and every OTHER read in that member goes from
+ * `LdaImmutableCurrentContextSlot [i]` to `LdaImmutableContextSlot [i] [1]`.
+ * On the 1 039-file corpus that one row was 5 827 functions of a `load-form`
+ * family that grew by 5 255, and the exact count fell by 686 while the shape
+ * was right; on a 36-file sample reproduced locally, `r_4672.jsc` alone went
+ * 39 exact -> 26 with `load-form` 8 -> 32.
+ *
+ * The identifier set is over-approximated on purpose: every `Identifier` and
+ * `PrivateName` anywhere in the member subtrees, property keys included.
+ * Over-approximating only suffixes the class name more often, and the class's
+ * own spelling is invisible to O1.
+ */
+function classId(e, members, superClass) {
+  const base = e.name ? sanitise(e.name) : null;
+  if (!base) return null;
+  const used = new Set();
+  const collect = (n) => { if (n.type === 'Identifier' || n.type === 'PrivateName') used.add(n.name ?? n.id?.name); };
+  for (const m of members) walkAst(m, collect);
+  if (superClass) walkAst(superClass, collect);
+  let name = base;
+  for (let k = 2; used.has(name); k++) name = `${base}$${k}`;
+  return t.identifier(name);
+}
+
+/**
+ * A non-computed member key, and the name V8 will give the member's function
+ * when it recompiles our text.
+ *
+ * `sanitise` must NOT be used here. It is for variable spellings, and a
+ * property key is not one: `class C { "a-b"(){} }` is legal and
+ * `sanitise('a-b')` would rename the member. A key that is a valid identifier
+ * is emitted as one; anything else is emitted as a string literal, which a
+ * class body accepts and which keeps the key exactly as the boilerplate
+ * spelled it.
+ *
+ * The name matters beyond the text. docs/O1.md §4's `sfi` pairing is identity
+ * by construction only because `emitName` records what V8 will call the
+ * function, and for a class member that is the property name, prefixed with
+ * `get `/`set ` for an accessor (`ParseClassPropertyDefinition` ->
+ * `SetFunctionNameFromPropertyName(result, name, prefix)` with
+ * `ast_value_factory()->get_space_string()`).
+ */
+function classMemberKey(m) {
+  const raw = String(m.key ?? 'member');
+  const node = t.isValidIdentifier(raw, false) ? t.identifier(raw) : t.stringLiteral(raw);
+  const v8Name = m.kind === 'get' || m.kind === 'set' ? `${m.kind} ${raw}` : raw;
+  return { node, v8Name };
+}
+
+function classMember(ctx, m, state) {
+  if (!m || !CLASS_MEMBER_KINDS.has(m.kind)) {
+    return { why: 'classMemberKindNotSpellable', detail: String(m?.kind ?? 'absent') };
   }
-  return t.classProperty(key, m.value ? expr(ctx, m.value) : null, null, null, !!m.computed, !!m.static);
+  const computedKey = m.computed || (m.key && typeof m.key === 'object');
+  const named = computedKey ? null : classMemberKey(m);
+  const key = computedKey ? expr(ctx, m.key) : named.node;
+  if (m.value?.e !== 'fn') {
+    // The boilerplate puts only METHOD / GETTER / SETTER in a template
+    // (ClassBoilerplate::New), and BuildClassLiteral fills their argument with
+    // `VisitForRegisterValue(property->value(), value)` on a FunctionLiteral,
+    // so the argument is a `CreateClosure`. Anything else means the closure was
+    // lost on the way here, and a `classProperty` holding it would be a class
+    // field -- a different program.
+    return { why: 'classMemberValueIsNotAClosure', detail: m.value?.e ?? 'absent' };
+  }
+  // `resolveFn` answers null for both "no such unit in this file" and "already
+  // emitted somewhere else", and they are different defects: the first is the
+  // input's, the second is this layer's.
+  if (!state.byId.has(m.value.sfiId)) {
+    return { why: 'classMemberWithoutAUnit', detail: `sfi ${m.value.sfiId}` };
+  }
+  // Before `functionLike`, not after: `emitUnitInner` reads `emitName` on entry
+  // to build this unit's `perFunction` row, which is what docs/O1.md §4's `sfi`
+  // pairing keys on.
+  //
+  // `childName` gave the unit the spelling it would have had as a SIBLING
+  // declaration, uniquified against the parent's bindings (`area$2`); as a
+  // class member V8 will call it `area`. Leaving the sibling spelling there
+  // takes the function out of `sfi` pairing and into the weaker `name` mode:
+  // measured on the 1 039-file corpus, 15 863 functions moved `sfi` -> `name`
+  // and the exact count FELL by 686, 33 463 -> 32 777, even though the emitted
+  // shape was right.
+  //
+  // A computed key is deliberately left alone. V8 names such a function at run
+  // time and its compile-time SFI name is empty, so recording `''` would pair
+  // it against every anonymous function in the file. The stale spelling matches
+  // nothing and the pair falls through to the fallback modes, which is the
+  // honest outcome for a name we do not know.
+  const previousName = state.emitName.get(m.value.sfiId);
+  if (named) state.emitName.set(m.value.sfiId, named.v8Name);
+  const fn = ctx.functionLike(m.value, 'method');
+  // Every path that does not place the member puts the name back: the unit is
+  // then emitted as a sibling declaration after all, under the spelling the
+  // text will really use.
+  const giveUp = (why, detail) => {
+    if (named) state.emitName.set(m.value.sfiId, previousName);
+    return { why, detail };
+  };
+  if (!fn) return giveUp('classMemberAlreadyEmitted', `sfi ${m.value.sfiId}`);
+  if (fn.type !== 'FunctionExpression') {
+    return giveUp('classMemberValueIsNotAClosure', fn.type);
+  }
+  // `async`/`*` travel with the member, and they are not decoration: dropping
+  // them emits `await` inside a non-async method, which is a SyntaxError and
+  // takes the WHOLE FILE with it. Measured on a 20-file sample: 4 files stopped
+  // compiling, each one an `async` class method.
+  //
+  // An accessor cannot carry either -- `async get x(){}` and `get *x(){}` are
+  // both SyntaxErrors, and function-kind.h gives an accessor its own kind, so
+  // the combination means the flag came from somewhere other than the SFI
+  // (`ctx.forceAsync`). Refused rather than emitted.
+  if ((fn.async || fn.generator) && (m.kind === 'get' || m.kind === 'set')) {
+    return giveUp('classAccessorIsAsyncOrAGenerator',
+      `${m.kind} ${fn.async ? 'async' : ''}${fn.generator ? '*' : ''}`.trim());
+  }
+  return {
+    node: t.classMethod(m.kind, key, fn.params, fn.body, !!m.computed, !!m.static,
+      !!fn.generator, !!fn.async),
+  };
 }
 
 /** T7's idiom claims, as 11.4's `perFunction[].patterns`. */

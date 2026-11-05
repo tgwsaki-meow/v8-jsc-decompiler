@@ -719,6 +719,69 @@ for (const { profile } of profiles) {
     };
   });
 
+  // The member list. `BuildClassLiteral:3668-3731` grows the argument list by
+  // one register per method value, and by a key/value PAIR per computed-name
+  // member, in declaration order; `ClassBoilerplate::New` records the index of
+  // each one. So this check asserts the join: index i is args[i].
+  //
+  // The constant is written by hand because `src/heap` is a different layer --
+  // what is under test here is the substitution, not the decode (tests/t4
+  // checks that against real objects).
+  check('F', `${V}: classes -- the ClassBoilerplate's member list becomes {e:'class'}.members`, () => {
+    const a = asm(profile);
+    const rid = profile.runtimeId ? profile.runtimeId('DefineClass') : null;
+    if (rid === null || rid === undefined) return { skip: true, detail: 'profile has no DefineClass runtime id' };
+    const bp = a.constant({
+      t: 'classBoilerplate',
+      argumentsCount: 9,
+      firstDynamicArgumentIndex: 3,
+      descriptorsRead: 6,
+      argumentsUnclaimed: 0,
+      synthesised: [],
+      entries: [
+        { side: 'instance', keyKind: 'name', key: 'm', kind: 'data', valueIndex: 3, keyIndex: null },
+        { side: 'instance', keyKind: 'name', key: 'g', kind: 'getter', valueIndex: 4, keyIndex: null },
+        { side: 'instance', keyKind: 'name', key: 'g', kind: 'setter', valueIndex: 5, keyIndex: null },
+        { side: 'static', keyKind: 'name', key: 's', kind: 'data', valueIndex: 6, keyIndex: null },
+        { side: 'instance', keyKind: 'computed', key: null, kind: 'data', valueIndex: 8, keyIndex: 7 },
+        // kAutoAccessor: decoded, and still not spellable. It must come back as
+        // a named refusal, not as a method.
+        { side: 'instance', keyKind: 'name', key: 'auto', kind: 'autoAccessor', valueIndex: 3, keyIndex: null },
+      ],
+      refusals: [{ side: 'instance', why: 'propertiesTemplateIsADictionary', detail: 'SwissNameDictionary' }],
+    });
+    const key = a.constant({ t: 'string', v: 'computedKey' });
+    const closure = (id) => a.constant({ t: 'sfi', sfiId: id });
+    a.emit('LdaConstant', [{ const: bp }]).emit('Star', [{ reg: 0 }])
+      .emit('CreateClosure', [{ const: closure(7) }, { slot: 0 }, { u: 0 }]).emit('Star', [{ reg: 1 }])
+      .emit('LdaTheHole').emit('Star', [{ reg: 2 }])
+      .emit('CreateClosure', [{ const: closure(11) }, { slot: 1 }, { u: 0 }]).emit('Star', [{ reg: 3 }])
+      .emit('CreateClosure', [{ const: closure(12) }, { slot: 2 }, { u: 0 }]).emit('Star', [{ reg: 4 }])
+      .emit('CreateClosure', [{ const: closure(13) }, { slot: 3 }, { u: 0 }]).emit('Star', [{ reg: 5 }])
+      .emit('CreateClosure', [{ const: closure(14) }, { slot: 4 }, { u: 0 }]).emit('Star', [{ reg: 6 }])
+      .emit('LdaConstant', [{ const: key }]).emit('Star', [{ reg: 7 }])
+      .emit('CreateClosure', [{ const: closure(15) }, { slot: 5 }, { u: 0 }]).emit('Star', [{ reg: 8 }])
+      .emit('CallRuntime', [{ u: rid }, { regList: [0, 9] }, { count: 9 }])
+      .emit('Return');
+    const { rec } = run(a, profile, { registerCount: 10 });
+    const cls = allNodes(rec).find((n) => n.e === 'class');
+    const shape = (cls?.members ?? []).map((m) => `${m.static ? 'static ' : ''}${m.kind} `
+      + `${m.computed ? `[${m.key?.e === 'lit' ? JSON.stringify(m.key.v) : m.key?.e}]` : m.key}`
+      + ` = sfi ${m.value?.sfiId}`);
+    const want = [
+      'method m = sfi 11', 'get g = sfi 12', 'set g = sfi 13',
+      'static method s = sfi 14', 'method ["computedKey"] = sfi 15',
+    ];
+    const refused = (cls?.membersNotPlaced ?? []).map((r) => r.why).sort();
+    return {
+      ok: cls?.membersDecoded === true
+        && JSON.stringify(shape) === JSON.stringify(want)
+        && JSON.stringify(refused) === JSON.stringify([
+          'classBoilerplate:propertiesTemplateIsADictionary', 'classMemberKindNotSpellable']),
+      detail: `${shape.join(' | ')}  refused: ${refused.join(', ')}`,
+    };
+  });
+
   // BuildAwait:6337 verbatim, with the BuildGeneratorPrologue:2074 dispatch it
   // is always emitted under. The prologue is not decoration: BuildSuspendPoint
   // binds the resume point into `generator_jump_table_`, so without the

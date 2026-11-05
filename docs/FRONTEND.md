@@ -41,7 +41,10 @@ src/heap/                  the objects
   handlertable.mjs         HandlerTable rows
   sourceposition.mjs       SourcePositionTable, absolute values
   objects.mjs              ScopeInfo, SharedFunctionInfo, UncompiledData,
-                           boilerplates, HeapNumber, BigInt, Symbol, arrays
+                           boilerplates (including ClassBoilerplate and the
+                           DescriptorArray / AccessorPair it reaches a class's
+                           member list through), HeapNumber, BigInt, Symbol,
+                           arrays
   index.mjs                HeapContext, buildUnits() -> FunctionUnit[],
                            contextSlotNamingStats()
 
@@ -148,7 +151,7 @@ macro-generated member (`TYPED_ARRAYS`), which covers every kind a literal can
 have; a value past that resolves to `null` and is counted, rather than falling
 back to a table known to be shifted.
 
-### 2.4 Four C++ facts `constants.json` does not carry
+### 2.4 Five C++ facts `constants.json` does not carry
 
 * `0xC0DE0000`, the code-cache magic base (`src/snapshot/snapshot-data.h`).
   `magic ^ 0xC0DE0000` recovers `ExternalReferenceTable::kSize`, which is the
@@ -160,6 +163,11 @@ back to a table known to be shifted.
 * `SourcePosition`'s bitfield (`src/codegen/source-position.h`) — see §5.3.
 * `BigIntBase`'s layout and `HashTableBase`'s index constants, both
   `@cppObjectLayoutDefinition` classes with no Torque declaration.
+* `ClassBoilerplate`'s vocabulary: the `ValueKind` enum, the
+  `DefineClassArgumentsIndices` enum and the `ComputedEntryFlags` bit widths
+  (`src/objects/literal-objects.h`). Torque declares the seven *fields*; what
+  they mean is C++'s, and without it a getter cannot be told from a method —
+  see §4.2a.
 
 ---
 
@@ -296,6 +304,85 @@ Anything neither step resolves is **not** guessed. The report separates two
 failures: a map that is named but has no `layouts.json` class (benign for
 classes the front end never decodes) from a map word that could not be named at
 all (which would hide real objects). The corpus produces zero of the latter.
+
+### 4.2a `ClassBoilerplate`: the member list of a `class`
+
+`%DefineClass`'s first argument. It is the only place a class's member list is
+written down, and until it was decoded every method, getter and setter of every
+class in the corpus was emitted as a sibling function declaration next to a
+class whose body was empty (RECOVER.md §9.6).
+
+`decodeClassBoilerplate` returns `{t:'classBoilerplate'}` with `entries`, the
+same way `decodeObjectBoilerplate` returns `entries` and
+`decodeArrayBoilerplate` returns `elements`. What it does **not** return is the
+members' values: `ClassBoilerplate::New` stores `Smi(value_index)` — the index
+of the register in the `%DefineClass` argument list that holds that member's
+closure — and the argument list belongs to the caller, not to the constant. So
+this layer reports argument indices and `src/recover` performs the join.
+
+The seven fields (`src/objects/literal-objects.tq`,
+`literal-objects.cc::ClassBoilerplate::New:680`):
+
+| field | what it holds |
+|---|---|
+| `arguments_count` | the final `dynamic_argument_index`: how many registers the `%DefineClass` call takes (`:812`) |
+| `static_` / `instance_properties_template` | every member with a non-index literal key. A `DescriptorArray` unless the class has a computed-name member or more than `kMaxNumberOfDescriptors` properties, when `ObjectDescriptor::HasDictionaryProperties:471` switches it to a name dictionary |
+| `static_` / `instance_elements_template` | the members whose key is an array index, in a `NumberDictionary`; the canonical `empty_slow_element_dictionary` when there are none (`CreateTemplates:521`) |
+| `static_` / `instance_computed_properties` | one Smi per computed-name member, packing `(ValueKind, key index)` through `EncodeComputedEntry:33`; `empty_fixed_array` when there are none |
+
+A template entry's value is the whole of the link to the bytecode:
+`Smi(value_index)` for a data member, and an `AccessorPair` whose `getter` and
+`setter` are two such Smis for an accessor
+(`AddToDescriptorArrayTemplate:80`, `AddToDictionaryTemplate:196`,
+`SetAccessorPlaceholderIndices:41`). That is also how V8's own descriptors are
+told apart from members, **by value and not by name**: `ObjectDescriptor::
+AddConstant` adds `length`, `name` and `prototype` (whose values are the
+function-accessor roots), `class_positions_symbol` (a `ClassPositions`) and
+`constructor` → `Smi(kConstructorArgumentIndex)` = 1, which is below
+`kFirstDynamicArgumentIndex` = 3. So the rule is: a member's value is a Smi at
+or above `kFirstDynamicArgumentIndex`, or an `AccessorPair` of those. Everything
+else is reported under `synthesised` with the root or class it points at.
+
+`entries` is sorted by argument index, which **is** the declaration order:
+`ClassBoilerplate::New:756-793` walks `expr->public_members()` once and only
+ever increments `dynamic_argument_index`. The templates themselves do not keep
+that order — a `DescriptorArray` is sorted by key hash (`Finalize:610`).
+
+Three things are refused rather than guessed, each with a named reason carried
+all the way to a counted hole in the emitted text:
+
+* `propertiesTemplateIsADictionary` — a `NameDictionary` or
+  `SwissNameDictionary`. Its `kPrefixSize` / `kEntrySize` live with the table
+  class in C++ and are in no profile table (the same wall §8.3 describes), so
+  the entries are named rather than read with a guessed stride.
+* `elementsTemplateIsADictionary` — a `NumberDictionary`, i.e. `class C { 0(){} }`.
+* `computedPropertyValueKindUnknown` — a `ValueKind` ordinal the profile's
+  `cppLayouts.ClassBoilerplate.valueKind` does not name.
+
+**A class FIELD is not in here at all.** `ClassBoilerplate::New:769` `continue`s
+on `ClassLiteral::Property::FIELD` before any `desc.Add*`, after bumping the
+argument index by one when the field's name is computed. So the decode cannot
+make fields reachable even in principle, and
+`argumentsUnclaimed` — dynamic arguments no template describes — is the
+measure of it. Measured over the 29-file sample
+(`node tools/probes/probe_class.mjs shape`): 82 boilerplates, 1 054 descriptors
+read, **648 members** (531 instance methods, 107 instance getters, 4 instance
+setters, 6 static methods), 410 = 82 × 5 descriptors attributed to V8 itself,
+**0 refusals** and **0 unclaimed arguments**.
+
+Three layouts are reached by name to do this, and all three are now in
+`layouts.json` because `tools/profilegen` was extended rather than because any
+offset was written down here: `ClassBoilerplate` and `DescriptorArray` from
+their Torque bodies, `StrongDescriptorArray` (the map the corpus actually uses;
+`class StrongDescriptorArray extends DescriptorArray {}` adds no field but has
+its own map), and `AccessorPair` from a third layout mechanism —
+`V8_OBJECT class AccessorPair : public StructLayout { … TaggedMember<Object>
+getter_; TaggedMember<Object> setter_; }`, which neither Torque (`extern class
+AccessorPair extends Struct;` declares no layout) nor a `FIELD_LIST` describes.
+The C++-only vocabulary — `ValueKind`, `DefineClassArgumentsIndices`,
+`ComputedEntryFlags` and the two minimum-properties counts — is derived into
+`layouts.json -> cppLayouts.ClassBoilerplate`, next to `BigIntBase`,
+`HashTableBase` and `SourcePosition`.
 
 ### 4.3 ScopeInfo and the names
 
@@ -450,6 +537,7 @@ The constant union members are those of §8.1 plus `rootObject`, `array` and
 | `objectBoilerplate` | `entries: [{key, value}]`, `rawEntries`, `flags`, `backingStoreSize`, `length` |
 | `arrayBoilerplate` | `elements`, `flags`, `elementsKind` |
 | `regexpBoilerplate` | `source`, `flags`, `flagBits`, `flagString` |
+| `classBoilerplate` | `entries: [{side, keyKind, key, kind, valueIndex, keyIndex, details}]`, `synthesised`, `refusals`, `argumentsCount`, `firstDynamicArgumentIndex`, `descriptorsRead`, `argumentsUnclaimed` — §4.2a |
 | `templateObject` | `raw`, `cooked` |
 | `smiArray` | `values` — a FixedArray whose every element is a Smi |
 | `array` | `className`, `values` |
@@ -517,7 +605,8 @@ the constant pool: an inner function appears in its parent's pool as
 
 ## 7. What the self-test enforces
 
-`node tests/t4/selftest.mjs` — 19 checks, no V8 required.
+`node tests/t4/selftest.mjs` — 22 checks, no V8 required (17 of them without a
+corpus, which is what CI runs).
 
 * **No version-specific literal.** After block comments are removed, no
   hexadecimal literal and no 3-or-more-digit decimal may appear in
@@ -541,13 +630,27 @@ the constant pool: an inner function appears in its parent's pool as
   range is refused with its offset.
 * The overlay recovers exactly the three ScopeInfo fields, with a clean
   cross-check, for every installed profile.
-* Every static field offset the walker computes (197 of them) equals the offset
+* Every static field offset the walker computes (225 of them) equals the offset
   `layouts.json` states.
+* **Every field `decodeClassBoilerplate` reads by name is in the walk** — the
+  seven `ClassBoilerplate` fields, `StrongDescriptorArray`'s three, the two of
+  `AccessorPair`, the three of the `DescriptorEntry` struct, and the five values
+  of `cppLayouts.ClassBoilerplate` — for every installed profile. This one
+  exists because the failure is silent: `fields.get(name)` answers `undefined`
+  rather than throwing, so a profile that stopped carrying any of them would
+  turn every class into a counted hole and read exactly like a corpus with no
+  classes in it.
 * The enum corrections the overlay makes are still real disagreements.
 * A corpus file decodes with a clean header check, ends in `kNop` padding, has
   no unresolved forward reference, and yields units with names, source ranges
   and scopes; and decoding it with the *wrong* profile is refused with a message
   naming both `profilegen` and `layoutpatch`.
+* **Every `ClassBoilerplate` in that file decodes to a member list that fits its
+  argument list**: every member's index is a real register of its own
+  `%DefineClass` call, a computed member's key index is its value index minus
+  one, and every descriptor read is accounted for as a member, as one of the
+  five `ObjectDescriptor::AddConstant` adds, or as a named refusal. Each
+  assertion is a property of `ClassBoilerplate::New`, not of that file.
 
 ### The oracle
 
@@ -629,12 +732,11 @@ validation would catch it if it were not.
 
 ### 8.4 Classes with no `layouts.json` entry are reported, not decoded
 
-`layouts.json` has 43 classes. These appear in the corpus and are reported by
+`layouts.json` has 48 classes. These appear in the corpus and are reported by
 map name with a count rather than decoded:
 
-`StrongDescriptorArray`, `ClassBoilerplate`, `ClassPositions`, `AccessorPair`,
-`WeakFixedArray`, `NameToIndexHashTable`, `NameDictionary`, `NumberDictionary`,
-`FixedDoubleArray`.
+`ClassPositions`, `WeakFixedArray`, `NameToIndexHashTable`, `NameDictionary`,
+`NumberDictionary`, `FixedDoubleArray`.
 
 Only one of them loses information the `FunctionUnit` contract asks for:
 **`FixedDoubleArray`** is the `constant_elements` of an array literal whose
@@ -643,9 +745,17 @@ elements are all doubles, so `{t:'arrayBoilerplate'}` has `elements: null` and a
 `float64_or_undefined_or_hole`, a 9-byte Torque struct, while the on-heap
 element is an 8-byte double — so the element size cannot be taken from the
 profile either, and guessing a stride is exactly the kind of silent error this
-layer refuses to make. `ClassBoilerplate` similarly means a `class` declaration
-contributes an opaque pool entry; the class's methods are still reachable as
-their own SFIs.
+layer refuses to make.
+
+`ClassPositions` is the value of the `class_positions_symbol` descriptor V8 adds
+to a class's static template; it is the class's source range, which
+`FunctionUnit` already carries from the ScopeInfo, so §4.2a reports it under
+`synthesised` by map name and reads nothing out of it.
+
+`ClassBoilerplate`, `StrongDescriptorArray` and `AccessorPair` were on this list
+and are not any more: §4.2a decodes all three. `NameDictionary` and
+`NumberDictionary` remain, and §4.2a names them as its two refusals when a class
+is shaped so that V8 uses them for its templates.
 
 ### 8.5 `RegExpBoilerplateDescription` is implemented but never exercised
 
