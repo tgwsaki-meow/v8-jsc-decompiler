@@ -923,8 +923,8 @@ Both runs are the sharded O1 scan over all 1039 files
 (`gh workflow run scan.yml -f layer=o1 -f shards=12`), nothing executed either
 time: `main` at `300c1be` — both §9.6's change and `literal-order` merged — as
 run `42018138145`, against this branch as run `42021949756`. They are one
-baseline and one head of the same scan; the single-branch runs quoted in
-earlier drafts of this section were three different runs and do not subtract.
+baseline and one head of the same scan; the two columns an earlier draft of
+this section carried came from separate single-branch runs and do not subtract.
 
 | | `main` @ `300c1be` | this branch |
 |---|---:|---:|
