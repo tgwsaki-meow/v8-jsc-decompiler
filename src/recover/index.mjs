@@ -96,6 +96,10 @@ const UNPLACED_LITERAL_DECLARED_GAPS = Object.freeze(new Set([
   // carry it -- `ownPropertyDefinitionNotFoldedIntoItsLiteral` and the other
   // 6 reasons
   'readByAValueWithNoStatement',
+  // the literal is in a block `dominators.rpo` does not contain, so the
+  // statement pass never visits it. The pass is defined over reachable
+  // blocks; this is its contract rather than a violation of it
+  'inABlockTheStatementPassDoesNotVisit',
 ]));
 
 /**
@@ -1038,6 +1042,7 @@ export function recover(ir, opts = {}) {
   phase('exprs');
 
   const mentionedSfis = new Set();
+  const visitedBlocks = new Set(ir.dominators.rpo);
   countHoles();
   phase('holes');
   function countHoles() {
@@ -1133,6 +1138,12 @@ export function recover(ir, opts = {}) {
     const claimOf = (insIdx) => patterns.find((p) => p.instructions.includes(insIdx))?.kind ?? 'unknown';
     if (consumedIns.has(f.at)) return `claimedByAPattern:${claimOf(f.at)}`;
     if (f.vid === undefined || f.vid < 0) return 'instructionDefinesNoValue';
+    // The statement pass walks `dominators.rpo`, so an instruction in a block
+    // nothing reaches is never visited and cannot produce a statement. That
+    // is the pass's contract, not a contradiction of it, so it is counted
+    // under its own reason -- and it still costs the function, which is why
+    // it is not folded into any of the others.
+    if (!visitedBlocks.has(values[f.vid]?.block)) return 'inABlockTheStatementPassDoesNotVisit';
     const c = canon(f.vid);
     const live = usesOf(c).filter((u) => !dce.dead.has(u));
     if (!live.length) return materialisedNames.has(c) ? 'materialisedButItsStatementIsMissing' : 'noLiveUse';

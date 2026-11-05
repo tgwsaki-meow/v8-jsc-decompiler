@@ -710,7 +710,12 @@ and the split is a closed set, `UNPLACED_LITERAL_DECLARED_GAPS`:
   whose only reader transcribes to a hole —
   `ownPropertyDefinitionNotFoldedIntoItsLiteral` for the `Define*OwnProperty`
   row (§6). Refusing them would delete every class in the corpus to report a
-  gap that is already reported.
+  gap that is already reported. The fourth,
+  `inABlockTheStatementPassDoesNotVisit`, is the statement pass's own
+  contract: it walks `dominators.rpo`, so an instruction in a block nothing
+  reaches is never visited. It costs the function all the same, which is why
+  it is counted separately rather than folded into the others; nothing in the
+  sample reaches it either.
 * **refused** — anything else, by `throw new RecoverError`, unconditionally
   rather than under `opts.strict`. `noLiveUse`,
   `materialisedButItsStatementIsMissing` and `instructionDefinesNoValue` are
