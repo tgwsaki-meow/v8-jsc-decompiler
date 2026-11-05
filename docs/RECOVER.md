@@ -427,23 +427,56 @@ representative.
   loop `VisitYieldStar:6161` builds around `BuildIteratorNext` is a loop, so it
   is T8's, and T7 contributes no `{e:'yield', delegate:true}` for it.
   Confidence `shape`; the count is reported.
-* **`%DefineClass`'s member list is not decoded.** `BuildClassLiteral` passes a
-  `ClassBoilerplate` constant that `src/heap` does not decode, so
-  `{e:'class'}` carries `superClass` and the constructor SFI but
-  `members: []` plus a `dynamicArguments` count. Confidence `shape`.
+* **`%DefineClass`'s member list is decoded; two template shapes are not.**
+  Was: `src/heap` did not decode the `ClassBoilerplate` at all, so
+  `{e:'class'}` carried `superClass` and the constructor SFI and nothing else.
+  It does now (docs/FRONTEND.md §4.2a), and `{e:'class'}` carries
+  `members: [{kind, key, computed, static, value}]` in declaration order plus
+  `membersDecoded` and a `membersNotPlaced` list. Measured over the 29-file
+  sample (`node tools/probes/probe_class.mjs members`): 82 `{e:'class'}`
+  nodes, **82 with a decoded member list**, **648 members** carried —
+  531 methods, 107 getters, 4 setters, 6 static methods — **0 refused**, and
+  the claim is `confidence:'exact'`.
+
+  What is still refused, each by name and each counted as a hole by
+  `src/emit`:
+  * a properties or elements template that is a `NameDictionary`,
+    `SwissNameDictionary` or `NumberDictionary` rather than a
+    `DescriptorArray` — `ObjectDescriptor::HasDictionaryProperties:471` picks
+    that shape for a class with a computed-name member or more than
+    `kMaxNumberOfDescriptors` properties, and for a member whose key is an
+    array index. 0 of 82 in the sample, so the corpus-wide count is the number
+    to watch rather than a known quantity;
+  * `kAutoAccessor` (`accessor x`), which has no `{kind}` `src/emit` can spell.
+    A named accessor pair is additionally *indistinguishable* from
+    `accessor x` in the boilerplate: `SetAccessorPlaceholderIndices:41` sets
+    `getter = i, setter = i + 1` in one call for an auto-accessor, which is
+    exactly what adjacent `get x` / `set x` declarations produce. Only a
+    computed-name auto-accessor carries its own `ValueKind` and is therefore
+    identifiable. 0 in the sample.
 * **A derived constructor's `super()` is recovered but its dispatch diamond is
   not collapsed.** `BuildSuperCallOptimization:7123` branches on a runtime
   flag, so T8 structures the two paths as an `if` and T7 contributes
   `super(args)` inside it plus a hole for the flag. The source is one
   statement; the output is `if (<hole>) { instance = super(args) }` and a phi
   for `this`. Collapsing it needs T8/T9, because the dispatch is control flow.
-* **A class field is still not placed in its class body.** T7 now knows which
-  unit is the class-members initialiser (the SFI's `FunctionKind` is
-  `kClassMembersInitializerFunction`) and `VisitClassLiteral:3795` ties it to
+* **A class field is still not placed in its class body, and the
+  `ClassBoilerplate` decode cannot help.** T7 knows which unit is the
+  class-members initialiser (the SFI's `FunctionKind` is
+  `kClassMembersInitializerFunction`) and `VisitClassLiteral:3800` ties it to
   its class with `StoreClassFieldsInitializer`, so the link is recoverable —
   but emitting one unit's statements as another unit's class members is
   `src/emit/index.mjs::resolveClass`'s decision, not this layer's. Until then
   each field is a counted `classFieldOutsideItsClassBody` hole.
+
+  What is now settled is that the boilerplate is not the way in.
+  `ClassBoilerplate::New:769` `continue`s on `ClassLiteral::Property::FIELD`
+  before any `desc.Add*`, so a field appears in no template — it is absent, not
+  undecoded. The only trace it leaves is one dynamic argument when its name is
+  computed, which `{e:'class'}.boilerplateArgumentsUnclaimed` reports and
+  `src/emit` sums as `classArgumentsNoTemplateDescribes`. Over the 29-file
+  sample that number is **0**, so every dynamic argument of every
+  `%DefineClass` in it is accounted for by a member.
 * **`{e:'class'}` used to sit on a value nothing reads.** Recorded because it
   was invisible for a long time: `Runtime::kDefineClass` installs the
   prototype and the members **onto the constructor JSFunction** and returns
@@ -520,9 +553,11 @@ Reported, not fixed.
   — so the fix is to emit a `FunctionExpression` in the argument position when
   the closure has one reference, which is `src/emit/index.mjs`'s call.
 * **Emitting a class member needs one unit's statements inside another unit.**
-  `resolveClass` builds `members` only from `{e:'class'}.members`, so a class
+  `resolveClass` builds `members` from `{e:'class'}.members`, which is now
+  populated, so a method, getter, setter or static member is placed. A class
   field (which lives in its own `kClassMembersInitializerFunction` SFI) and a
-  static block cannot be placed even when T7 can identify them. See §8.1.
+  static block still cannot be, because neither is in the `ClassBoilerplate`
+  at all. See §8.1.
 
 * **`src/profile` has `runtimeId(name)` but no `intrinsicId(name)`.** The
   intrinsic table is exposed id → name only (`intrinsicName`, `intrinsic`),
@@ -649,6 +684,11 @@ leaves `{e:'class'}.members` empty. That `t7Missing` count of 1 is this layer's
 share of the whole defect, and it is the same instruction the `fate` table
 found.
 
+The 384 methods and 101 getters of that row are §9.6: once the boilerplate is
+decoded their `{e:'fn'}` is inside `{e:'class'}.members`, which **is** a
+statement, so they are neither unreferenced nor siblings. The 59 arrows are
+not — an arrow is never a class member — and they stay.
+
 ### 9.2 A function literal nothing reads (step 5b)
 
 Every instruction carrying an `{t:'sfi'}` constant pool entry is collected
@@ -691,18 +731,24 @@ stayed invisible. Two counters now cover every exit:
 * **`stats.emit.functionLiteralsNotInAnyStatement`**, with
   `byUnplacedFunctionLiteral`. A literal whose `{e:'fn'}` appears in no
   statement cannot reach T9 at all, so T9 emits that function as a sibling
-  declaration nothing references and V8 then does not serialise it. 747 of
-  5 284, **14.14%**:
+  declaration nothing references and V8 then does not serialise it. **99 of
+  5 284, 1.87%** (`node tools/probes/probe_class.mjs emit`); it was 747 =
+  14.14% before the `ClassBoilerplate` decode of §8.1:
 
-| reason | count |
-|---|---:|
-| `claimedByAPatternThroughItsUser:class` | 648 |
-| `readByAValueWithNoStatement:DefineNamedOwnProperty` | 54 |
-| `readByAValueWithNoStatement:CallProperty1` | 25 |
-| `readByAValueWithNoStatement:CallUndefinedReceiver2` | 7 |
-| `readByAValueWithNoStatement:CallUndefinedReceiver1` | 7 |
-| `readByAValueWithNoStatement:CallUndefinedReceiver` | 6 |
-| everything else | 0 |
+| reason | count | was |
+|---|---:|---:|
+| `claimedByAPatternThroughItsUser:class` | **0** | 648 |
+| `readByAValueWithNoStatement:DefineNamedOwnProperty` | 54 | 54 |
+| `readByAValueWithNoStatement:CallProperty1` | 25 | 25 |
+| `readByAValueWithNoStatement:CallUndefinedReceiver2` | 7 | 7 |
+| `readByAValueWithNoStatement:CallUndefinedReceiver1` | 7 | 7 |
+| `readByAValueWithNoStatement:CallUndefinedReceiver` | 6 | 6 |
+| everything else | 0 | 0 |
+
+The whole of the 648 is the `class` row and it is now zero, which is the one
+number this section is for: the member closures are in a statement because
+`{e:'class'}.members` mentions them. Nothing else in the table moved, which is
+the check that the change is the one described and not a side effect.
 
 The reason decides whether the literal is counted or the function is refused,
 and the split is a closed set, `UNPLACED_LITERAL_DECLARED_GAPS`:
@@ -710,9 +756,12 @@ and the split is a closed set, `UNPLACED_LITERAL_DECLARED_GAPS`:
 * **counted** — `claimedByAPattern`, `claimedByAPatternThroughItsUser` and
   `readByAValueWithNoStatement`. Each is a gap this layer already declares
   somewhere else and marks with its own hole, so the output does say "I don't
-  know" where the function went: the `class` row is §8.1's undecoded
-  `ClassBoilerplate`, and the `readByAValueWithNoStatement` rows are a literal
-  whose only reader transcribes to a hole —
+  know" where the function went. The `class` row used to be §8.1's undecoded
+  `ClassBoilerplate` and is now empty — the member closures reach a statement
+  through `{e:'class'}.members`, and `claimedByAPattern:class` stays in the
+  declared set only for the shapes §8.1 still refuses. The
+  `readByAValueWithNoStatement` rows are a literal whose only reader
+  transcribes to a hole —
   `ownPropertyDefinitionNotFoldedIntoItsLiteral` for the `Define*OwnProperty`
   row (§6). Refusing them would delete every class in the corpus to report a
   gap that is already reported. The fourth,
@@ -825,12 +874,45 @@ so one unreferenced declaration costs its whole subtree, and rewriting the
 binding at every level at once recovers more functions than it rewrites
 bindings.
 
-### 9.6 What this does not fix
+### 9.6 What this did not fix, and what closed it
 
-The 648-strong `claimedByAPatternThroughItsUser:class` row is the largest
-remaining block and it is not a closure-scoping problem at all: it is §8.1's
-`ClassBoilerplate`. A class method is emitted as a sibling declaration rather
-than as a member of its class body, and the binding form of §9.4 is what keeps
+The 648-strong `claimedByAPatternThroughItsUser:class` row was the largest
+remaining block and it was not a closure-scoping problem at all: it was §8.1's
+`ClassBoilerplate`. A class method was emitted as a sibling declaration rather
+than as a member of its class body, and the binding form of §9.4 is what kept
 it in the output at all — but a method that has to be read off
-`class C { m(){} }` is a decoding gap in `src/heap`, and until it is closed
-those functions are carried as siblings with a wrong shape rather than lost.
+`class C { m(){} }` was a decoding gap in `src/heap`.
+
+**That gap is closed.** `src/heap` decodes the boilerplate
+(docs/FRONTEND.md §4.2a), `patterns/classes.mjs` joins each entry's argument
+index to `args[i]`, and `src/emit/index.mjs::resolveClass` places the result in
+the class body. On the same 29-file sample
+(`node tools/probes/probe_class.mjs`):
+
+| | before | after |
+|---|---:|---:|
+| `{e:'class'}` nodes with a member list | 0 of 82 | **82 of 82** |
+| members carried into `{e:'class'}.members` | 0 | **648** |
+| class body members `src/emit` placed (`classMembersPlaced`) | 82 | **730** |
+| `classMembersNotDecoded` holes | 82 | **0** |
+| function literals in no statement (§9.3's table) | 747 = 14.14% | **99 = 1.87%** |
+| dynamic arguments no template describes | — | **0** |
+
+The first four "before" figures are structural rather than re-measured:
+`defineClass` set `members: []` unconditionally, so every one of the 82 classes
+took the `classMembersNotDecoded` branch and `resolveClass` placed its
+constructor and nothing else. The function-literal row is a real before/after on
+the same 29 files, because §9.3's table was measured on exactly this sample.
+
+`classMembersPlaced` counts 730 rather than 648 because `resolveClass` already
+inlined the constructor; what is new is the other 648. The emit report's
+`unreferencedClosures` fell too — a method is no longer a sibling declaration
+nothing references — but §9.4's 543 was measured on a different sample (25
+files, every 43rd), so the two are not a before/after pair; the corpus run is.
+
+Three things this still does not fix, all of them §8.1's and all of them
+measured at 0 in the sample, so the corpus-wide count is the number to read
+rather than a known quantity: a dictionary-shaped properties or elements
+template, `accessor x`, and a class FIELD — which is not an undecoded part of
+the boilerplate but an absent one, because `ClassBoilerplate::New:769`
+`continue`s on `ClassLiteral::Property::FIELD` before it writes any template.
