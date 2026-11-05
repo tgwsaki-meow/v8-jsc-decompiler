@@ -3721,6 +3721,855 @@
         "cooked_strings": 4
       }
     },
+    "ClassBoilerplate": {
+      "name": "ClassBoilerplate",
+      "source": "src/objects/literal-objects.tq",
+      "parent": "Struct",
+      "parentSize": 4,
+      "parentSizeKnown": true,
+      "isExtern": true,
+      "abstract": false,
+      "isShape": false,
+      "hasBody": true,
+      "fields": [
+        {
+          "name": "arguments_count",
+          "type": "Smi",
+          "kind": "tagged",
+          "size": 4,
+          "sizeName": "kTaggedSize",
+          "const": false,
+          "weak": false,
+          "offset": 4,
+          "relativeOffset": 0,
+          "present": true
+        },
+        {
+          "name": "static_properties_template",
+          "type": "Object",
+          "kind": "tagged",
+          "size": 4,
+          "sizeName": "kTaggedSize",
+          "const": false,
+          "weak": false,
+          "offset": 8,
+          "relativeOffset": 4,
+          "present": true
+        },
+        {
+          "name": "static_elements_template",
+          "type": "Object",
+          "kind": "tagged",
+          "size": 4,
+          "sizeName": "kTaggedSize",
+          "const": false,
+          "weak": false,
+          "offset": 12,
+          "relativeOffset": 8,
+          "present": true
+        },
+        {
+          "name": "static_computed_properties",
+          "type": "FixedArray",
+          "kind": "tagged",
+          "size": 4,
+          "sizeName": "kTaggedSize",
+          "const": false,
+          "weak": false,
+          "offset": 16,
+          "relativeOffset": 12,
+          "present": true
+        },
+        {
+          "name": "instance_properties_template",
+          "type": "Object",
+          "kind": "tagged",
+          "size": 4,
+          "sizeName": "kTaggedSize",
+          "const": false,
+          "weak": false,
+          "offset": 20,
+          "relativeOffset": 16,
+          "present": true
+        },
+        {
+          "name": "instance_elements_template",
+          "type": "Object",
+          "kind": "tagged",
+          "size": 4,
+          "sizeName": "kTaggedSize",
+          "const": false,
+          "weak": false,
+          "offset": 24,
+          "relativeOffset": 20,
+          "present": true
+        },
+        {
+          "name": "instance_computed_properties",
+          "type": "FixedArray",
+          "kind": "tagged",
+          "size": 4,
+          "sizeName": "kTaggedSize",
+          "const": false,
+          "weak": false,
+          "offset": 28,
+          "relativeOffset": 24,
+          "present": true
+        }
+      ],
+      "droppedFields": [],
+      "headerSize": 32,
+      "size": 32,
+      "sizeKnown": true,
+      "variableLength": false,
+      "layoutSource": "torque",
+      "inheritanceChain": [
+        "HeapObject",
+        "Struct",
+        "ClassBoilerplate"
+      ],
+      "allFields": [
+        {
+          "name": "map",
+          "type": "Map",
+          "kind": "tagged",
+          "size": 4,
+          "sizeName": "kTaggedSize",
+          "const": true,
+          "weak": false,
+          "offset": 0,
+          "relativeOffset": 0,
+          "present": true,
+          "declaredIn": "HeapObject"
+        },
+        {
+          "name": "arguments_count",
+          "type": "Smi",
+          "kind": "tagged",
+          "size": 4,
+          "sizeName": "kTaggedSize",
+          "const": false,
+          "weak": false,
+          "offset": 4,
+          "relativeOffset": 0,
+          "present": true,
+          "declaredIn": "ClassBoilerplate"
+        },
+        {
+          "name": "static_properties_template",
+          "type": "Object",
+          "kind": "tagged",
+          "size": 4,
+          "sizeName": "kTaggedSize",
+          "const": false,
+          "weak": false,
+          "offset": 8,
+          "relativeOffset": 4,
+          "present": true,
+          "declaredIn": "ClassBoilerplate"
+        },
+        {
+          "name": "static_elements_template",
+          "type": "Object",
+          "kind": "tagged",
+          "size": 4,
+          "sizeName": "kTaggedSize",
+          "const": false,
+          "weak": false,
+          "offset": 12,
+          "relativeOffset": 8,
+          "present": true,
+          "declaredIn": "ClassBoilerplate"
+        },
+        {
+          "name": "static_computed_properties",
+          "type": "FixedArray",
+          "kind": "tagged",
+          "size": 4,
+          "sizeName": "kTaggedSize",
+          "const": false,
+          "weak": false,
+          "offset": 16,
+          "relativeOffset": 12,
+          "present": true,
+          "declaredIn": "ClassBoilerplate"
+        },
+        {
+          "name": "instance_properties_template",
+          "type": "Object",
+          "kind": "tagged",
+          "size": 4,
+          "sizeName": "kTaggedSize",
+          "const": false,
+          "weak": false,
+          "offset": 20,
+          "relativeOffset": 16,
+          "present": true,
+          "declaredIn": "ClassBoilerplate"
+        },
+        {
+          "name": "instance_elements_template",
+          "type": "Object",
+          "kind": "tagged",
+          "size": 4,
+          "sizeName": "kTaggedSize",
+          "const": false,
+          "weak": false,
+          "offset": 24,
+          "relativeOffset": 20,
+          "present": true,
+          "declaredIn": "ClassBoilerplate"
+        },
+        {
+          "name": "instance_computed_properties",
+          "type": "FixedArray",
+          "kind": "tagged",
+          "size": 4,
+          "sizeName": "kTaggedSize",
+          "const": false,
+          "weak": false,
+          "offset": 28,
+          "relativeOffset": 24,
+          "present": true,
+          "declaredIn": "ClassBoilerplate"
+        }
+      ],
+      "fieldList": null,
+      "crossCheck": null,
+      "offsets": {
+        "arguments_count": 4,
+        "static_properties_template": 8,
+        "static_elements_template": 12,
+        "static_computed_properties": 16,
+        "instance_properties_template": 20,
+        "instance_elements_template": 24,
+        "instance_computed_properties": 28
+      },
+      "relativeOffsets": {
+        "arguments_count": 0,
+        "static_properties_template": 4,
+        "static_elements_template": 8,
+        "static_computed_properties": 12,
+        "instance_properties_template": 16,
+        "instance_elements_template": 20,
+        "instance_computed_properties": 24
+      }
+    },
+    "DescriptorArray": {
+      "name": "DescriptorArray",
+      "source": "src/objects/descriptor-array.tq",
+      "parent": "HeapObject",
+      "parentSize": 4,
+      "parentSizeKnown": true,
+      "isExtern": true,
+      "abstract": false,
+      "isShape": false,
+      "hasBody": true,
+      "fields": [
+        {
+          "name": "number_of_all_descriptors",
+          "type": "uint16",
+          "kind": "int",
+          "size": 2,
+          "sizeName": "kUInt16Size",
+          "const": true,
+          "weak": false,
+          "offset": 4,
+          "relativeOffset": 0,
+          "present": true
+        },
+        {
+          "name": "number_of_descriptors",
+          "type": "uint16",
+          "kind": "int",
+          "size": 2,
+          "sizeName": "kUInt16Size",
+          "const": false,
+          "weak": false,
+          "offset": 6,
+          "relativeOffset": 2,
+          "present": true
+        },
+        {
+          "name": "raw_gc_state",
+          "type": "uint32",
+          "kind": "int",
+          "size": 4,
+          "sizeName": "kInt32Size",
+          "const": false,
+          "weak": false,
+          "offset": 8,
+          "relativeOffset": 4,
+          "present": true
+        },
+        {
+          "name": "flags",
+          "type": "DescriptorArrayFlags",
+          "kind": "bitfield",
+          "size": 4,
+          "sizeName": "sizeof(uint32)",
+          "const": false,
+          "weak": false,
+          "offset": 12,
+          "relativeOffset": 8,
+          "present": true
+        },
+        {
+          "name": "optional_padding",
+          "type": "void",
+          "kind": "void",
+          "size": 0,
+          "sizeName": "0",
+          "const": false,
+          "weak": false,
+          "offset": 16,
+          "relativeOffset": 12,
+          "present": true
+        },
+        {
+          "name": "enum_cache",
+          "type": "EnumCache",
+          "kind": "tagged",
+          "size": 4,
+          "sizeName": "kTaggedSize",
+          "const": false,
+          "weak": false,
+          "offset": 16,
+          "relativeOffset": 12,
+          "present": true
+        },
+        {
+          "name": "descriptors",
+          "type": "DescriptorEntry",
+          "kind": "struct",
+          "size": 12,
+          "sizeName": "12",
+          "const": false,
+          "weak": false,
+          "offset": 20,
+          "relativeOffset": 16,
+          "present": true,
+          "indexed": true,
+          "elementSize": 12,
+          "count": {
+            "expr": "number_of_all_descriptors",
+            "ast": {
+              "kind": "name",
+              "name": "number_of_all_descriptors"
+            }
+          }
+        }
+      ],
+      "droppedFields": [
+        {
+          "name": "optional_padding",
+          "type": "uint32",
+          "conditions": [
+            {
+              "sense": "if",
+              "flag": "TAGGED_SIZE_8_BYTES",
+              "value": false
+            }
+          ]
+        }
+      ],
+      "headerSize": 20,
+      "size": null,
+      "sizeKnown": false,
+      "variableLength": true,
+      "layoutSource": "torque",
+      "inheritanceChain": [
+        "HeapObject",
+        "DescriptorArray"
+      ],
+      "allFields": [
+        {
+          "name": "map",
+          "type": "Map",
+          "kind": "tagged",
+          "size": 4,
+          "sizeName": "kTaggedSize",
+          "const": true,
+          "weak": false,
+          "offset": 0,
+          "relativeOffset": 0,
+          "present": true,
+          "declaredIn": "HeapObject"
+        },
+        {
+          "name": "number_of_all_descriptors",
+          "type": "uint16",
+          "kind": "int",
+          "size": 2,
+          "sizeName": "kUInt16Size",
+          "const": true,
+          "weak": false,
+          "offset": 4,
+          "relativeOffset": 0,
+          "present": true,
+          "declaredIn": "DescriptorArray"
+        },
+        {
+          "name": "number_of_descriptors",
+          "type": "uint16",
+          "kind": "int",
+          "size": 2,
+          "sizeName": "kUInt16Size",
+          "const": false,
+          "weak": false,
+          "offset": 6,
+          "relativeOffset": 2,
+          "present": true,
+          "declaredIn": "DescriptorArray"
+        },
+        {
+          "name": "raw_gc_state",
+          "type": "uint32",
+          "kind": "int",
+          "size": 4,
+          "sizeName": "kInt32Size",
+          "const": false,
+          "weak": false,
+          "offset": 8,
+          "relativeOffset": 4,
+          "present": true,
+          "declaredIn": "DescriptorArray"
+        },
+        {
+          "name": "flags",
+          "type": "DescriptorArrayFlags",
+          "kind": "bitfield",
+          "size": 4,
+          "sizeName": "sizeof(uint32)",
+          "const": false,
+          "weak": false,
+          "offset": 12,
+          "relativeOffset": 8,
+          "present": true,
+          "declaredIn": "DescriptorArray"
+        },
+        {
+          "name": "optional_padding",
+          "type": "void",
+          "kind": "void",
+          "size": 0,
+          "sizeName": "0",
+          "const": false,
+          "weak": false,
+          "offset": 16,
+          "relativeOffset": 12,
+          "present": true,
+          "declaredIn": "DescriptorArray"
+        },
+        {
+          "name": "enum_cache",
+          "type": "EnumCache",
+          "kind": "tagged",
+          "size": 4,
+          "sizeName": "kTaggedSize",
+          "const": false,
+          "weak": false,
+          "offset": 16,
+          "relativeOffset": 12,
+          "present": true,
+          "declaredIn": "DescriptorArray"
+        },
+        {
+          "name": "descriptors",
+          "type": "DescriptorEntry",
+          "kind": "struct",
+          "size": 12,
+          "sizeName": "12",
+          "const": false,
+          "weak": false,
+          "offset": 20,
+          "relativeOffset": 16,
+          "present": true,
+          "indexed": true,
+          "elementSize": 12,
+          "count": {
+            "expr": "number_of_all_descriptors",
+            "ast": {
+              "kind": "name",
+              "name": "number_of_all_descriptors"
+            }
+          },
+          "declaredIn": "DescriptorArray"
+        }
+      ],
+      "fieldList": null,
+      "crossCheck": null
+    },
+    "StrongDescriptorArray": {
+      "name": "StrongDescriptorArray",
+      "source": "src/objects/descriptor-array.tq",
+      "parent": "DescriptorArray",
+      "parentSize": null,
+      "parentSizeKnown": false,
+      "isExtern": false,
+      "abstract": false,
+      "isShape": false,
+      "hasBody": true,
+      "fields": [],
+      "droppedFields": [],
+      "headerSize": null,
+      "size": null,
+      "sizeKnown": false,
+      "variableLength": true,
+      "layoutSource": "torque",
+      "inheritanceChain": [
+        "HeapObject",
+        "DescriptorArray",
+        "StrongDescriptorArray"
+      ],
+      "allFields": [
+        {
+          "name": "map",
+          "type": "Map",
+          "kind": "tagged",
+          "size": 4,
+          "sizeName": "kTaggedSize",
+          "const": true,
+          "weak": false,
+          "offset": 0,
+          "relativeOffset": 0,
+          "present": true,
+          "declaredIn": "HeapObject"
+        },
+        {
+          "name": "number_of_all_descriptors",
+          "type": "uint16",
+          "kind": "int",
+          "size": 2,
+          "sizeName": "kUInt16Size",
+          "const": true,
+          "weak": false,
+          "offset": 4,
+          "relativeOffset": 0,
+          "present": true,
+          "declaredIn": "DescriptorArray"
+        },
+        {
+          "name": "number_of_descriptors",
+          "type": "uint16",
+          "kind": "int",
+          "size": 2,
+          "sizeName": "kUInt16Size",
+          "const": false,
+          "weak": false,
+          "offset": 6,
+          "relativeOffset": 2,
+          "present": true,
+          "declaredIn": "DescriptorArray"
+        },
+        {
+          "name": "raw_gc_state",
+          "type": "uint32",
+          "kind": "int",
+          "size": 4,
+          "sizeName": "kInt32Size",
+          "const": false,
+          "weak": false,
+          "offset": 8,
+          "relativeOffset": 4,
+          "present": true,
+          "declaredIn": "DescriptorArray"
+        },
+        {
+          "name": "flags",
+          "type": "DescriptorArrayFlags",
+          "kind": "bitfield",
+          "size": 4,
+          "sizeName": "sizeof(uint32)",
+          "const": false,
+          "weak": false,
+          "offset": 12,
+          "relativeOffset": 8,
+          "present": true,
+          "declaredIn": "DescriptorArray"
+        },
+        {
+          "name": "optional_padding",
+          "type": "void",
+          "kind": "void",
+          "size": 0,
+          "sizeName": "0",
+          "const": false,
+          "weak": false,
+          "offset": 16,
+          "relativeOffset": 12,
+          "present": true,
+          "declaredIn": "DescriptorArray"
+        },
+        {
+          "name": "enum_cache",
+          "type": "EnumCache",
+          "kind": "tagged",
+          "size": 4,
+          "sizeName": "kTaggedSize",
+          "const": false,
+          "weak": false,
+          "offset": 16,
+          "relativeOffset": 12,
+          "present": true,
+          "declaredIn": "DescriptorArray"
+        },
+        {
+          "name": "descriptors",
+          "type": "DescriptorEntry",
+          "kind": "struct",
+          "size": 12,
+          "sizeName": "12",
+          "const": false,
+          "weak": false,
+          "offset": 20,
+          "relativeOffset": 16,
+          "present": true,
+          "indexed": true,
+          "elementSize": 12,
+          "count": {
+            "expr": "number_of_all_descriptors",
+            "ast": {
+              "kind": "name",
+              "name": "number_of_all_descriptors"
+            }
+          },
+          "declaredIn": "DescriptorArray"
+        }
+      ],
+      "fieldList": null,
+      "crossCheck": null
+    },
+    "EnumCache": {
+      "name": "EnumCache",
+      "source": "src/objects/descriptor-array.tq",
+      "parent": "Struct",
+      "parentSize": 4,
+      "parentSizeKnown": true,
+      "isExtern": true,
+      "abstract": false,
+      "isShape": false,
+      "hasBody": true,
+      "fields": [
+        {
+          "name": "keys",
+          "type": "FixedArray",
+          "kind": "tagged",
+          "size": 4,
+          "sizeName": "kTaggedSize",
+          "const": false,
+          "weak": false,
+          "offset": 4,
+          "relativeOffset": 0,
+          "present": true
+        },
+        {
+          "name": "indices",
+          "type": "FixedArray",
+          "kind": "tagged",
+          "size": 4,
+          "sizeName": "kTaggedSize",
+          "const": false,
+          "weak": false,
+          "offset": 8,
+          "relativeOffset": 4,
+          "present": true
+        }
+      ],
+      "droppedFields": [],
+      "headerSize": 12,
+      "size": 12,
+      "sizeKnown": true,
+      "variableLength": false,
+      "layoutSource": "torque",
+      "inheritanceChain": [
+        "HeapObject",
+        "Struct",
+        "EnumCache"
+      ],
+      "allFields": [
+        {
+          "name": "map",
+          "type": "Map",
+          "kind": "tagged",
+          "size": 4,
+          "sizeName": "kTaggedSize",
+          "const": true,
+          "weak": false,
+          "offset": 0,
+          "relativeOffset": 0,
+          "present": true,
+          "declaredIn": "HeapObject"
+        },
+        {
+          "name": "keys",
+          "type": "FixedArray",
+          "kind": "tagged",
+          "size": 4,
+          "sizeName": "kTaggedSize",
+          "const": false,
+          "weak": false,
+          "offset": 4,
+          "relativeOffset": 0,
+          "present": true,
+          "declaredIn": "EnumCache"
+        },
+        {
+          "name": "indices",
+          "type": "FixedArray",
+          "kind": "tagged",
+          "size": 4,
+          "sizeName": "kTaggedSize",
+          "const": false,
+          "weak": false,
+          "offset": 8,
+          "relativeOffset": 4,
+          "present": true,
+          "declaredIn": "EnumCache"
+        }
+      ],
+      "fieldList": null,
+      "crossCheck": null,
+      "offsets": {
+        "keys": 4,
+        "indices": 8
+      },
+      "relativeOffsets": {
+        "keys": 0,
+        "indices": 4
+      }
+    },
+    "AccessorPair": {
+      "name": "AccessorPair",
+      "source": "src/objects/struct.tq",
+      "parent": "Struct",
+      "parentSize": 4,
+      "parentSizeKnown": true,
+      "isExtern": true,
+      "abstract": false,
+      "isShape": false,
+      "hasBody": false,
+      "fields": [
+        {
+          "name": "getter",
+          "cppName": "getter",
+          "type": null,
+          "kind": "fieldList",
+          "size": 4,
+          "sizeName": "kTaggedSize",
+          "offset": 4,
+          "relativeOffset": 0,
+          "present": true
+        },
+        {
+          "name": "setter",
+          "cppName": "setter",
+          "type": null,
+          "kind": "fieldList",
+          "size": 4,
+          "sizeName": "kTaggedSize",
+          "offset": 8,
+          "relativeOffset": 4,
+          "present": true
+        }
+      ],
+      "droppedFields": [],
+      "headerSize": 12,
+      "size": 12,
+      "sizeKnown": true,
+      "variableLength": false,
+      "layoutSource": "V8_OBJECT",
+      "inheritanceChain": [
+        "HeapObject",
+        "Struct",
+        "AccessorPair"
+      ],
+      "allFields": [
+        {
+          "name": "map",
+          "type": "Map",
+          "kind": "tagged",
+          "size": 4,
+          "sizeName": "kTaggedSize",
+          "const": true,
+          "weak": false,
+          "offset": 0,
+          "relativeOffset": 0,
+          "present": true,
+          "declaredIn": "HeapObject"
+        },
+        {
+          "name": "getter",
+          "cppName": "getter",
+          "type": null,
+          "kind": "fieldList",
+          "size": 4,
+          "sizeName": "kTaggedSize",
+          "offset": 4,
+          "relativeOffset": 0,
+          "present": true,
+          "declaredIn": "AccessorPair"
+        },
+        {
+          "name": "setter",
+          "cppName": "setter",
+          "type": null,
+          "kind": "fieldList",
+          "size": 4,
+          "sizeName": "kTaggedSize",
+          "offset": 8,
+          "relativeOffset": 4,
+          "present": true,
+          "declaredIn": "AccessorPair"
+        }
+      ],
+      "fieldList": {
+        "list": "V8_OBJECT AccessorPair",
+        "anchor": "Struct::kSize",
+        "anchorValue": 4,
+        "ownerClass": "AccessorPair",
+        "header": "src/objects/struct.h",
+        "fields": [
+          {
+            "name": "getter",
+            "cppName": "getter_",
+            "sizeExpr": "kTaggedSize",
+            "size": 4,
+            "relativeOffset": 0,
+            "offset": 4,
+            "memberKind": "TaggedMember",
+            "memberType": "Object"
+          },
+          {
+            "name": "setter",
+            "cppName": "setter_",
+            "sizeExpr": "kTaggedSize",
+            "size": 4,
+            "relativeOffset": 4,
+            "offset": 8,
+            "memberKind": "TaggedMember",
+            "memberType": "Object"
+          }
+        ],
+        "endRelative": 8,
+        "unresolved": [],
+        "mechanism": "V8_OBJECT"
+      },
+      "crossCheck": {
+        "ok": true,
+        "compared": 0,
+        "mismatches": [],
+        "skipped": "torque declares no layout (extern class without a body)"
+      },
+      "offsets": {
+        "getter": 4,
+        "setter": 8
+      },
+      "relativeOffsets": {
+        "getter": 0,
+        "setter": 4
+      }
+    },
     "UncompiledData": {
       "name": "UncompiledData",
       "source": "src/objects/shared-function-info.tq",
@@ -17121,6 +17970,38 @@
       "inliningIdBias": 1,
       "kNoSourcePosition": -1,
       "note": "scriptOffset = ScriptOffsetField::decode(raw) - scriptOffsetBias, valid only when isExternal is 0; the bias exists so that kNoSourcePosition (-1) stores as 0"
+    },
+    "ClassBoilerplate": {
+      "source": "src/objects/literal-objects.h",
+      "valueKind": {
+        "kData": 0,
+        "kGetter": 1,
+        "kSetter": 2,
+        "kAutoAccessor": 3
+      },
+      "argumentIndices": {
+        "kConstructorArgumentIndex": 1,
+        "kPrototypeArgumentIndex": 2,
+        "kFirstDynamicArgumentIndex": 3
+      },
+      "computedEntryFlags": {
+        "fields": {
+          "valueKind": {
+            "offset": 0,
+            "width": 2,
+            "type": "ValueKind"
+          },
+          "keyIndex": {
+            "offset": 2,
+            "width": 29,
+            "type": "unsigned"
+          }
+        },
+        "usedBits": 31
+      },
+      "minimumClassPropertiesCount": 6,
+      "minimumPrototypePropertiesCount": 1,
+      "note": "the member list is in static_/instance_properties_template (a DescriptorArray, or a name dictionary once a class has a computed-name member or more than kMaxNumberOfDescriptors properties) and in static_/instance_computed_properties; an entry's value is Smi(argument index) for a data member and an AccessorPair of two such Smis for an accessor (ClassBoilerplate::New, AddToDictionaryTemplate / AddToDescriptorArrayTemplate). A FIELD is in neither: ClassBoilerplate::New `continue`s on ClassLiteral::Property::FIELD."
     }
   },
   "enumNote": "`enums.<X>.members` holds the authoritative values. `valueSource` says where they came from: 'cpp' means the C++ definition was read and wins, which is required for an `extern enum` because Torque then declares only that the names exist. `torqueDeclarationOrder` keeps the Torque positions and `disagreements` lists every member where the two differ (`enumDisagreements` is the same list across all enums). valueSource 'torque-declaration-order' with valuesAreDeclarationOrderOnly means no C++ extraction exists for that enum, so its ordinals are positions and not values. `functionKindGroups` are the base::IsInRange predicates of src/objects/function-kind.h resolved to inclusive ordinal ranges. `torqueConstants` maps a Torque `const X: constexpr T generates 'Y'` to the C++ name and the value in constants.json, which is how a count expression written in terms of X can be evaluated. `cppLayouts` carries the layouts declared in C++ rather than in Torque (BigInt's FLEXIBLE_ARRAY_MEMBER, the hash-table prefix, SourcePosition::raw()).",

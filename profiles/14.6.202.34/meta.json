@@ -3,7 +3,7 @@
     "name": "tools/profilegen",
     "version": "1.1.0"
   },
-  "generatedAt": "2026-10-30T03:49:47.035Z",
+  "generatedAt": "2026-11-05T09:16:39.305Z",
   "v8Version": "14.6.202.34",
   "variant": "intl+wasm",
   "taggedSize": 4,
@@ -116,14 +116,14 @@
     "readOnlyRoots": 1049,
     "staticRoots": 1049,
     "torqueMapRoots": 32,
-    "layoutClasses": 43,
+    "layoutClasses": 48,
     "bitfieldStructs": 53,
     "runtimeFunctions": 599,
     "intrinsics": 16,
     "enums": 54,
     "cppValuedEnums": 12,
     "functionKindGroups": 19,
-    "cppLayouts": 3,
+    "cppLayouts": 4,
     "torqueConstants": 214
   },
   "acceptance": {
@@ -151,8 +151,8 @@
       }
     },
     "expectations": {
-      "checked": 36,
-      "satisfied": 36,
+      "checked": 38,
+      "satisfied": 38,
       "missing": []
     }
   },

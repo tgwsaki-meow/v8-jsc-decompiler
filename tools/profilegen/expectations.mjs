@@ -440,6 +440,51 @@ export const EXPECTATIONS = [
       + 'but the fixed prefix is still part of the format',
   },
   {
+    id: 'layouts.cppLayouts.ClassBoilerplate',
+    kind: 'predicate',
+    consumer: 'src/heap/objects.mjs decodeClassBoilerplate',
+    why: 'the seven ClassBoilerplate fields are Torque\'s, but what they mean is C++\'s: without '
+      + 'ValueKind a getter cannot be told from a method, without kFirstDynamicArgumentIndex the '
+      + '`constructor` entry V8 adds itself cannot be told from a member the source wrote, and '
+      + 'without ComputedEntryFlags a computed-name member is an opaque Smi',
+    test: (view) => {
+      const c = at(view, 'layouts.cppLayouts.ClassBoilerplate') ?? {};
+      const missing = [];
+      for (const k of ['kData', 'kGetter', 'kSetter']) if (!num(c.valueKind?.[k]) && c.valueKind?.[k] !== 0) missing.push(`valueKind.${k}`);
+      if (c.argumentIndices?.kFirstDynamicArgumentIndex === undefined) missing.push('argumentIndices.kFirstDynamicArgumentIndex');
+      if (!num(c.computedEntryFlags?.fields?.keyIndex?.width)) missing.push('computedEntryFlags.keyIndex.width');
+      return missing.length ? `missing ${missing.join(', ')}` : null;
+    },
+  },
+  {
+    id: 'layouts.classes.ClassBoilerplate',
+    kind: 'predicate',
+    consumer: 'src/heap/objects.mjs decodeClassBoilerplate',
+    why: '%DefineClass\'s member list is reached through these three layouts: the boilerplate '
+      + 'itself, the (Strong)DescriptorArray its properties template is, and the AccessorPair an '
+      + 'accessor entry\'s value is. AccessorPair is the V8_OBJECT mechanism\'s only consumer here '
+      + '-- Torque declares it body-less -- so this is also the check that mechanism works',
+    test: (view) => {
+      const bad = [];
+      const fieldsOf = (n) => (at(view, `layouts.classes.${n}.fields`) ?? []).map((f) => f.name);
+      for (const [cls, want] of [
+        ['ClassBoilerplate', ['arguments_count', 'static_properties_template', 'static_computed_properties',
+          'instance_properties_template', 'instance_computed_properties']],
+        ['DescriptorArray', ['number_of_all_descriptors', 'number_of_descriptors', 'descriptors']],
+        ['AccessorPair', ['getter', 'setter']],
+      ]) {
+        const have = new Set(fieldsOf(cls));
+        const missing = want.filter((f) => !have.has(f));
+        if (missing.length) bad.push(`${cls}: no ${missing.join(', ')}`);
+      }
+      const de = at(view, 'layouts.structs.DescriptorEntry.fields') ?? [];
+      if (!de.some((f) => f.name === 'value')) bad.push('structs.DescriptorEntry: no value');
+      const sda = at(view, 'layouts.classes.StrongDescriptorArray');
+      if (!sda) bad.push('StrongDescriptorArray: absent (its own map needs its own entry)');
+      return bad.length ? bad.join('; ') : null;
+    },
+  },
+  {
     id: 'constants.readOnlyPage',
     kind: 'predicate',
     consumer: 'src/profile/index.mjs resolveRoRef',
