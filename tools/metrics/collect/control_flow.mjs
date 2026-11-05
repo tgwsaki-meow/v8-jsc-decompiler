@@ -2,7 +2,9 @@
 // Metrics 1, 2, 3 and 10: control flow present in the bytecode vs control flow
 // present in the emitted JavaScript, on the SAME files.
 //
-// Bytecode side, per function (src/deserializer.js + src/lifter.js):
+// Bytecode side, per function (legacy/src/deserializer.js + legacy/src/lifter.js
+// -- the prototype's FRONT end, which legacy/README.md explains is retained as
+// an independent reader; its back end is not used here):
 //   JumpLoop                                      loop back-edges
 //   handler-table ranges                          try regions  <- the real denominator
 //   Throw / ReThrow / SetPendingMessage           exception opcodes (what the
@@ -44,9 +46,9 @@ if (argv.includes('--child')) {
   const outputsFrom = val('--outputs', 'stored');
   const row = { jsc: path.basename(jscPath), inputBytes: fs.statSync(jscPath).size };
   try {
-    const { JSCDeserializer } = await import('../../../src/deserializer.js');
-    const { V8Profile } = await import('../../../src/profile.js');
-    const { Lifter } = await import('../../../src/lifter.js');
+    const { JSCDeserializer } = await import('../../../legacy/src/deserializer.js');
+    const { V8Profile } = await import('../../../legacy/src/profile.js');
+    const { Lifter } = await import('../../../legacy/src/lifter.js');
     const profile = new V8Profile();
     const des = new JSCDeserializer(profile);
     const lifter = new Lifter(profile);

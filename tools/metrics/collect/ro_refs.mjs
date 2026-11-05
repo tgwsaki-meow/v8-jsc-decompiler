@@ -3,7 +3,7 @@
 //
 // A kReadOnlyHeapRef in a constant pool is a pointer into V8's read-only heap,
 // addressed as (chunkIndex, chunkOffset). The decompiler has to turn it back
-// into a value -- usually a string -- and today `src/dataflow.js` throws
+// into a value -- usually a string -- and `legacy/src/dataflow.js` throws
 // UnknownReadOnlyHeapRefError when it cannot (correctly: ARCHITECTURE.md 3.6
 // forbids guessing). So "unresolved RO refs" is measured as hit rate against a
 // table, for both tables that exist:
@@ -32,8 +32,8 @@ if (argv.includes('--child')) {
   const outPath = val('--child');
   const row = { jsc: path.basename(jscPath), inputBytes: fs.statSync(jscPath).size };
   try {
-    const { JSCDeserializer } = await import('../../../src/deserializer.js');
-    const { V8Profile } = await import('../../../src/profile.js');
+    const { JSCDeserializer } = await import('../../../legacy/src/deserializer.js');
+    const { V8Profile } = await import('../../../legacy/src/profile.js');
     const profile = new V8Profile();
     const des = new JSCDeserializer(profile);
     const res = des.deserializeFile(jscPath);

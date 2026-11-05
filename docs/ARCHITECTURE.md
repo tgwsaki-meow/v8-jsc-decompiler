@@ -84,13 +84,13 @@
 
 真实的致命缺陷，按严重程度：
 
-1. `relooper.js` 的 `_findMergeBlock` 取「两分支可达块里 id 最小的那个」当汇合点
+1. `legacy/src/relooper.js` 的 `_findMergeBlock` 取「两分支可达块里 id 最小的那个」当汇合点
    ——那不是 immediate post-dominator。循环检测只认自环（`trueTarget.id === block.id`），
    所以**所有真实循环都没被识别**。
-2. `decompiler.js:70-76` 用「第一个前驱赢」把寄存器状态传给后继
+2. `legacy/src/decompiler.js:70-76` 用「第一个前驱赢」把寄存器状态传给后继
    （`if (!blockStates.has(succ.id))`），**没有 phi，没有定点迭代，按布局顺序遍历**。
    合并点之后的寄存器状态全是错的。
-3. `dataflow.js` 的表达式内联**没有 effect ordering 约束**，而且用
+3. `legacy/src/dataflow.js` 的表达式内联**没有 effect ordering 约束**，而且用
    「下一条指令不是 Star/JumpIf/Return 就把调用也当语句推一遍」这种启发式
    → 既重复求值又丢语句。对象被按引用点复制 → identity 全毁
    （webpack 的 module cache 变成每次 new 一个新对象，`.exports` 永远 undefined）。
@@ -99,13 +99,13 @@
 
 | 产物 | 来源 | 可复现 | 正确性 |
 |---|---|---|---|
-| `rules/v8-14.4.258.16.json`（opcode 表） | `tools/extract_rules.js` ← `rules/raw/bytecodes.h` | ✅ | ✅ 独立重导 0 mismatch |
-| `rules/v8-roots-*.json`（1150 roots） | `tools/build_canonical_roots.py` ← **已不存在的 QQNT.dll**，硬编码偏移 `0xc602b60` + 魔数 `-4` | ❌ | ⚠️ 内容基本对（1041/1045 位置吻合） |
+| `rules/v8-14.4.258.16.json`（opcode 表） | `legacy/tools/extract_rules.js` ← `rules/raw/bytecodes.h` | ✅ | ✅ 独立重导 0 mismatch |
+| `rules/v8-roots-*.json`（1150 roots） | `legacy/tools/build_canonical_roots.py` ← **已不存在的 QQNT.dll**，硬编码偏移 `0xc602b60` + 魔数 `-4` | ❌ | ⚠️ 内容基本对（1041/1045 位置吻合） |
 | `rules/v8-ro-heap.json`（3182 条） | `scratch/generate_complete_ro_heap.js` ← **已不存在的 v8_context_snapshot.bin**，扫魔数 `0x155` | ❌ | ⚠️ 只含字符串，缺 map/symbol/oddball |
 | `rules/raw/roots.h` | 本地拷贝 | — | ❌ **是 V8 12.8.374.38 的** |
 | `rules/raw/static-roots.h` | 本地拷贝 | — | ❌ **是 V8 12.8.374.38 的**，且 ≥14.2 该文件已拆成 4 个变体 |
 
-`operand_properties` 和 `header_offsets` 在 `extract_rules.js` 里是**手敲的字面量**，
+`operand_properties` 和 `header_offsets` 在 `legacy/tools/extract_rules.js` 里是**手敲的字面量**，
 不是从源码导的。这正好撞上一个跨版本陷阱（见 §1.3）。
 
 ### 1.3 跨版本陷阱（为什么必须 per-version 生成）
@@ -211,7 +211,7 @@ corpus/features/                    # 手写的语法特征语料（验证用）
 
 ### 3.2 反序列化
 
-现有 `src/deserializer.js` 的字节码循环是对的，保留思路，重写为 profile 驱动：
+现有 `legacy/src/deserializer.js` 的字节码循环是对的，保留思路，重写为 profile 驱动：
 tag 常量全部来自 `serializer-tags.json`（35 个 tag，14.4/14.6 完全一致），
 `kNewObject` 占 `0x00..0x03`（= `kNumberOfSnapshotSpaces`，有 `static_assert` 锚点），
 区间 tag 按 `BytecodeValueEncoder::Decode` 解。
@@ -368,7 +368,7 @@ chunk 6 是 V8 自己的非 root 尾部（page 6 segment 4 起始于 offset 1314
 
 ### 4.1 Stage A — 反汇编
 
-在现有 `lifter.js` 基础上补齐：
+在现有 `legacy/src/lifter.js` 基础上补齐：
 
 * 操作数长度 = `scalable ? base_size * scale : base_size`，scale 由 `Wide`(0x00)/`ExtraWide`(0x01) 前缀决定。
 * `kRegList` + `kRegCount` 成对出现：寄存器是**递减**的（`start, start-1, ...`）。
@@ -671,7 +671,7 @@ docs/PROFILEGEN.md
 | { k:'newTarget' } | { k:'bytecodeOffset' } | { k:'feedbackVector' }
 ```
 
-现在 `src/profile.js` 返回 `'feedback_vector'` 这种字符串，结果直接漏成了
+现在 `legacy/src/profile.js` 返回 `'feedback_vector'` 这种字符串，结果直接漏成了
 输出里的 JS 变量名。结构化之后这类泄漏在类型上就不可能发生。
 
 ### 8.4 `ir/` → `recover/` / `structure/`
@@ -754,7 +754,7 @@ case 少或非 Smi 的 `switch` 会编译成比较链（语料里 `switch_string
 
 ### 9.5 旧实现有一个比审计报告更严重的问题
 
-T3 在搭验证框架时发现：`src/deserializer.js` 用 `slotIndex >= 6` 判断哪段 raw data 是字节码，
+T3 在搭验证框架时发现：`legacy/src/deserializer.js` 用 `slotIndex >= 6` 判断哪段 raw data 是字节码，
 导致它**读不了任何含内层函数的新铸 `.jsc`**。23 字节的复现：
 
 ```js

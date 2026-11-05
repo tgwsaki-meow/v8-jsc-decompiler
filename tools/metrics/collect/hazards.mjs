@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Metrics 7 and 8: the two semantic hazards BASELINE_AUDIT.md 5.5 measured.
 //
-//   7  duplicated side-effecting call. dataflow.js pushes a call as a
+//   7  duplicated side-effecting call. legacy/src/dataflow.js pushes a call as a
 //      statement AND leaves it in the accumulator, so the call is emitted
 //      twice: `performance.now(); x = performance.now();` is two different
 //      numbers. Metric: adjacent statement pairs where the printed text of

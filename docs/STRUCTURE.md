@@ -136,7 +136,7 @@ T6 cannot supply ready-made, because `ir.idom` / `ir.loops` describe the graph
   Compilation Techniques* (PhD, QUT 1994) ch. 6, `structConds`: the node the
   header immediately dominates that has two or more in-edges, earliest in the
   ordering. The immediate post-dominator is the cross-check and the fall-back.
-  This is what replaces `src/relooper.js:_findMergeBlock`'s "lowest-numbered
+  This is what replaces `legacy/src/relooper.js:_findMergeBlock`'s "lowest-numbered
   block reachable from both branches", which is neither.
 * **Interval / structural analysis** in the general sense (Sharir 1980; Allen
   & Cocke 1976) is what "open the construct where it begins, recurse into its

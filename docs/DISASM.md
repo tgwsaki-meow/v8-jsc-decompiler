@@ -1,7 +1,7 @@
 # `src/disasm/` — Ignition bytecode → `Instruction[]`
 
 Stage A of [ARCHITECTURE.md §4.1](ARCHITECTURE.md). Input: a `FunctionUnit`
-(§8.1). Output: `Instruction[]` (§8.2). Replaces `src/lifter.js`.
+(§8.1). Output: `Instruction[]` (§8.2). Replaces `legacy/src/lifter.js`.
 
 ```
 src/disasm/
@@ -9,7 +9,7 @@ src/disasm/
   frame.mjs            the interpreter frame: operand value <-> structured register
   opcode_facts.mjs     jump / switch / short-star / reg-list facts, derived from the profile
   format.mjs           a listing in V8's own column layout, plus a richer one
-  adapter_legacy.mjs   FALLBACK: src/deserializer.js output -> a FunctionUnit
+  adapter_legacy.mjs   FALLBACK: legacy/src/deserializer.js output -> a FunctionUnit
 src/cli/disasm.mjs     the CLI
 tools/disasm/          the oracle, the self-test, the corpus scan, the source corpus
 corpus/features/disasm/*.js   the 41 oracle sources (written by the oracle run)
@@ -159,7 +159,7 @@ int BytecodeArrayIterator::GetAbsoluteOffset(int relative_offset) const {
 `current_offset()` is the instruction start (`cursor_ - start_ - prefix_size_`),
 so `current_offset() + prefix_size_` is the **opcode byte**, not the start.
 They differ by one for every `Wide`/`ExtraWide` jump, which is why
-`instruction.offset + delta` is wrong and `src/lifter.js`'s
+`instruction.offset + delta` is wrong and `legacy/src/lifter.js`'s
 `opcodeOffset = pc - 1` was accidentally right. The emitter agrees:
 `BytecodeArrayWriter::PatchJump` subtracts one from the delta when the jump
 carries a prefix, and `EmitJumpLoop` adds one to the backward delta for the
@@ -281,7 +281,7 @@ derivation produces:
 `{k:'param', i}` (`i = 0` is the receiver), `{k:'context'}`, `{k:'closure'}`,
 `{k:'acc'}`, `{k:'bytecodeArray'}`, `{k:'bytecodeOffset'}`,
 `{k:'feedbackVector'}`, `{k:'argumentCount'}`, `{k:'invalid', index}` — never a
-string. That is the point: `src/profile.js`'s `decodeRegister` returned
+string. That is the point: `legacy/src/profile.js`'s `decodeRegister` returned
 `'feedback_vector'` / `'r3'` / `'this'`, and those strings leaked all the way
 into the emitted JavaScript as undeclared variable names. With a tagged object
 the leak is type-impossible.
@@ -462,7 +462,7 @@ real reader declines.
 | function `name`, `kind`, `startPosition`, `scope`, `uncompiled` | adapter only: it returns `null`/`''`, because the name usually lives in the `ScopeInfo` that `name_or_scope_info` points at and it has no ScopeInfo decoder. Reported per unit as `adapterGap`. `src/heap` recovers all of them. | adapter |
 | constant classification | adapter only: it classifies strings, Smis, HeapNumbers, roots, RO refs and SFIs, and 12.15% of corpus pool entries come back `{t:'unresolved'}` (boilerplate descriptors, BigInts, symbols, scope infos). Jump deltas and jump tables are unaffected either way — they are Smis, which **are** classified: 0 of 23 242 table entries and 0 of 560 890 jump deltas failed to resolve. | adapter |
 | BigInt constants | neither input side produces `{t:'bigint'}`; both report `{t:'unresolved'}`, which §8.1 requires rather than a guess. | `src/heap/` (T4) |
-| no 14.6 `.jsc` path | both profiles describe a **sandboxed** V8 build (`layouts.json`: `ExposedTrustedObject` has `self_indirect_pointer`), which is what Chromium/Electron ship and what the corpus is. The `node` on this machine is V8 14.6.202.34 built **without** the sandbox, so its code cache has no `kIndirectPointerPrefix` / `kInitializeSelfIndirectPointer` tags. Both readers reject it — `src/deserializer.js` on an unexpected tag, `src/cache` on "object size 0 tagged slots is below the one-slot map word" — so this is a profile-vs-binary mismatch, not a reader bug. The 14.6 oracle therefore runs in `listing` mode (§10). Closing it needs either a sandboxed V8 14.6 binary or a non-sandboxed 14.6 profile. | — |
+| no 14.6 `.jsc` path | both profiles describe a **sandboxed** V8 build (`layouts.json`: `ExposedTrustedObject` has `self_indirect_pointer`), which is what Chromium/Electron ship and what the corpus is. The `node` on this machine is V8 14.6.202.34 built **without** the sandbox, so its code cache has no `kIndirectPointerPrefix` / `kInitializeSelfIndirectPointer` tags. Both readers reject it — `legacy/src/deserializer.js` on an unexpected tag, `src/cache` on "object size 0 tagged slots is below the one-slot map word" — so this is a profile-vs-binary mismatch, not a reader bug. The 14.6 oracle therefore runs in `listing` mode (§10). Closing it needs either a sandboxed V8 14.6 binary or a non-sandboxed 14.6 profile. | — |
 
 ---
 

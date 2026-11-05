@@ -1,13 +1,21 @@
 // src/disasm/adapter_legacy.mjs
 //
-// A THIN, TEMPORARY bridge: the existing src/deserializer.js object graph ->
-// the FunctionUnit of ARCHITECTURE.md 8.1.
+// A bridge: the legacy/src/deserializer.js object graph -> the FunctionUnit of
+// ARCHITECTURE.md 8.1.
 //
 // Why it exists: src/disasm/ is specified against 8.1, which src/cache/ +
 // src/heap/ (T4) will produce. This adapter lets the disassembler be developed
 // and, more importantly, VALIDATED against V8's own --print-bytecode today.
-// It is expected to be deleted the moment T4 lands; nothing else in src/disasm/
-// imports it, and src/cli/disasm.mjs picks it only as a fallback.
+// src/cli/disasm.mjs picks it only as a fallback, and nothing else in
+// src/disasm/ imports it.
+//
+// It outlived its "delete the moment T4 lands" note on purpose. T4 landed, and
+// `tools/disasm/oracle_agreement.mjs` now runs BOTH input paths against the
+// same V8 listing -- `cache` through this adapter, `cache-t4` through
+// src/cache + src/heap -- and both come back 102/102 instruction-exact. Two
+// independently written readers agreeing is the evidence, so this one is
+// retained as the second reader. legacy/README.md states which parts of the
+// prototype that does and does not keep alive.
 //
 // It is deliberately conservative:
 //   * it never invents a constant -- anything it cannot classify becomes
@@ -22,8 +30,8 @@
 //   uncompiled, bigint/symbol/boilerplate constant classification.
 
 import fs from 'node:fs';
-import { JSCDeserializer, StrictV8Deserializer } from '../deserializer.js';
-import { V8Profile } from '../profile.js';
+import { JSCDeserializer, StrictV8Deserializer } from '../../legacy/src/deserializer.js';
+import { V8Profile } from '../../legacy/src/profile.js';
 
 /** Field offset -> index in the legacy `obj.slots` array (slot 0 is the map). */
 function slotIndexOf(profile, className, field) {

@@ -10,7 +10,7 @@
     },
     "opcodeCaseCoverage": {
       "value": "212/212 = 100%",
-      "why": "counts `case` labels in src/dataflow.js, not correct reconstruction: JumpLoop is handled and every loop is still lost. BASELINE_AUDIT.md 4.6",
+      "why": "counts `case` labels in legacy/src/dataflow.js, not correct reconstruction: JumpLoop is handled and every loop is still lost. BASELINE_AUDIT.md 4.6",
       "doNotReportAsProgress": true
     }
   },

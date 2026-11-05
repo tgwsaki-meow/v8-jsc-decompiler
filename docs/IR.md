@@ -25,9 +25,9 @@ What this replaces:
 
 | was | problem | now |
 |---|---|---|
-| `src/decompiler.js:70-76` | "first predecessor wins" (`if (!blockStates.has(succ.id))`), no phis, no fixpoint, layout-order traversal | `ssa.mjs` |
-| `src/lifter.js:buildCFG` | handler offsets are leaders but **zero** exception edges; no jump-table successors | `cfg.mjs` |
-| `src/relooper.js:_findMergeBlock` | "the lowest-numbered block reachable from both branches", which is not an immediate post-dominator | `dominators.mjs`'s `ipdom` |
+| `legacy/src/decompiler.js:70-76` | "first predecessor wins" (`if (!blockStates.has(succ.id))`), no phis, no fixpoint, layout-order traversal | `ssa.mjs` |
+| `legacy/src/lifter.js:buildCFG` | handler offsets are leaders but **zero** exception edges; no jump-table successors | `cfg.mjs` |
+| `legacy/src/relooper.js:_findMergeBlock` | "the lowest-numbered block reachable from both branches", which is not an immediate post-dominator | `dominators.mjs`'s `ipdom` |
 
 Nothing version-specific is written down. Opcode values, operand types and
 widths, prefixes, the jump family, the switch family and the register encoding
@@ -225,7 +225,7 @@ Every reverse-postorder walk is an iterative DFS with an explicit successor
 cursor, so a function with thousands of blocks cannot overflow the JS stack.
 
 **Post-dominators** are the same algorithm on the reverse graph rooted at a
-virtual exit. This is what replaces `src/relooper.js:_findMergeBlock`.
+virtual exit. This is what replaces `legacy/src/relooper.js:_findMergeBlock`.
 
 The virtual exit needs two rules, not one:
 

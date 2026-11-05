@@ -30,7 +30,8 @@ import os from 'node:os';
 import { spawnSync } from 'node:child_process';
 // The pipeline label is asked for, never written down here: a second copy of
 // the default's name is how the report came to claim it had measured
-// `src/decompiler.js` long after that stopped being the pipeline.
+// the prototype (now legacy/src/decompiler.js) long after that stopped being
+// the pipeline.
 import { pipelineChoice } from '../../src/verify/pipeline.mjs';
 
 const argv = process.argv.slice(2);
@@ -245,7 +246,7 @@ say('| retired metric | value | why it is not progress |');
 say('|---|---|---|');
 for (const [k, v] of Object.entries(baseline.retiredMetrics)) say(`| ${k} | ${v.value} | ${v.why} |`);
 say('');
-say('`BASELINE_AUDIT.md` §2.5 and §4.6 are the long form. In one line each: `@babel/generator` cannot print invalid JavaScript from a valid `@babel/types` AST, so parseability is a property of the printer; and opcode coverage counts `case` labels in `src/dataflow.js`, so `JumpLoop` counts as "handled" in a run where every loop is lost. The replacements are metrics 1-4 and 12, which compare the output against the input instead of inspecting the output alone.');
+say('`BASELINE_AUDIT.md` §2.5 and §4.6 are the long form. In one line each: `@babel/generator` cannot print invalid JavaScript from a valid `@babel/types` AST, so parseability is a property of the printer; and opcode coverage counts `case` labels in `legacy/src/dataflow.js`, so `JumpLoop` counts as "handled" in a run where every loop is lost. The replacements are metrics 1-4 and 12, which compare the output against the input instead of inspecting the output alone.');
 say('');
 
 if (disc.length) {
@@ -283,7 +284,7 @@ if (ft && !ft._failed) {
 if (cf && !cf._failed) {
   say('## 1-3, 10: control flow, bytecode side vs emitted side');
   say('');
-  say(`Same files on both sides: ${cf.sample.description}. Bytecode counts come from \`src/deserializer.js\` + \`src/lifter.js\`; emitted counts come from an AST walk, not a regex (a lexical \`while\` also matches inside a string literal).`);
+  say(`Same files on both sides: ${cf.sample.description}. Bytecode counts come from \`legacy/src/deserializer.js\` + \`legacy/src/lifter.js\`; emitted counts come from an AST walk, not a regex (a lexical \`while\` also matches inside a string literal).`);
   say('');
   say('| in the bytecode | count | emitted in the output | count |');
   say('|---|---:|---|---:|');
@@ -370,7 +371,7 @@ if (ro && !ro._failed) {
   say(`| \`rules/v8-ro-heap.json\` (legacy, strings only) | ${ro.legacy.distinctHits} / ${ro.distinctRefs} | ${ro.legacy.occurrenceHits} / ${ro.refOccurrences} |`);
   say('');
   const gap = ro.authority.distinctHits - ro.legacy.distinctHits;
-  say(`The legacy table is what \`src/dataflow.js\` consults today; the T2 table is the one \`ARCHITECTURE.md\` §3.6 says to use. ${gap === 0
+  say(`The legacy table is what \`legacy/src/dataflow.js\` consults; the T2 table is the one \`ARCHITECTURE.md\` §3.6 says to use. ${gap === 0
     ? 'On this sample both resolve everything, so metric 9 is not currently a source of unresolved references — the legacy table is unreproducible and strings-only, but it is not the bottleneck for the refs these constant pools actually reach.'
     : `The T2 table resolves ${gap} distinct refs the legacy table misses, which is how much of metric 9 is already solved and merely not wired up.`}`);
   say('');

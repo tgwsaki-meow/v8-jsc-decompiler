@@ -38,9 +38,9 @@ Two numbers were at 100% before any of this work started, and neither one measur
 | retired metric | value | why it is not progress |
 |---|---|---|
 | outputParseability | 1039/1039 = 100% | a property of @babel/generator, not of the decompiler: a valid @babel/types AST cannot print as invalid JavaScript. BASELINE_AUDIT.md 2.5 |
-| opcodeCaseCoverage | 212/212 = 100% | counts `case` labels in src/dataflow.js, not correct reconstruction: JumpLoop is handled and every loop is still lost. BASELINE_AUDIT.md 4.6 |
+| opcodeCaseCoverage | 212/212 = 100% | counts `case` labels in legacy/src/dataflow.js, not correct reconstruction: JumpLoop is handled and every loop is still lost. BASELINE_AUDIT.md 4.6 |
 
-`BASELINE_AUDIT.md` §2.5 and §4.6 are the long form. In one line each: `@babel/generator` cannot print invalid JavaScript from a valid `@babel/types` AST, so parseability is a property of the printer; and opcode coverage counts `case` labels in `src/dataflow.js`, so `JumpLoop` counts as "handled" in a run where every loop is lost. The replacements are metrics 1-4 and 12, which compare the output against the input instead of inspecting the output alone.
+`BASELINE_AUDIT.md` §2.5 and §4.6 are the long form. In one line each: `@babel/generator` cannot print invalid JavaScript from a valid `@babel/types` AST, so parseability is a property of the printer; and opcode coverage counts `case` labels in `legacy/src/dataflow.js`, so `JumpLoop` counts as "handled" in a run where every loop is lost. The replacements are metrics 1-4 and 12, which compare the output against the input instead of inspecting the output alone.
 
 ## Discrepancies with the baseline
 
@@ -66,7 +66,7 @@ Self-check entries: accessor-defineproperty, async-function, class-methods, decl
 
 ## 1-3, 10: control flow, bytecode side vs emitted side
 
-Same files on both sides: 20 size-stratified .jsc from extracted_jsc/ (identical to BASELINE_AUDIT.md 5.4), each paired with its own decompiled_js/*.js. Bytecode counts come from `src/deserializer.js` + `src/lifter.js`; emitted counts come from an AST walk, not a regex (a lexical `while` also matches inside a string literal).
+Same files on both sides: 20 size-stratified .jsc from extracted_jsc/ (identical to BASELINE_AUDIT.md 5.4), each paired with its own decompiled_js/*.js. Bytecode counts come from `legacy/src/deserializer.js` + `legacy/src/lifter.js`; emitted counts come from an AST walk, not a regex (a lexical `while` also matches inside a string literal).
 
 | in the bytecode | count | emitted in the output | count |
 |---|---:|---|---:|
@@ -152,7 +152,7 @@ Metric 11 is the one metric in this table that this host cannot measure to bette
 | `profiles/14.4.258.16/ro-heap.json` (T2, 10299 objects) | 577 / 577 | 2560 / 2560 |
 | `rules/v8-ro-heap.json` (legacy, strings only) | 577 / 577 | 2560 / 2560 |
 
-The legacy table is what `src/dataflow.js` consults today; the T2 table is the one `ARCHITECTURE.md` §3.6 says to use. On this sample both resolve everything, so metric 9 is not currently a source of unresolved references — the legacy table is unreproducible and strings-only, but it is not the bottleneck for the refs these constant pools actually reach.
+The legacy table is what `legacy/src/dataflow.js` consults; the T2 table is the one `ARCHITECTURE.md` §3.6 says to use. On this sample both resolve everything, so metric 9 is not currently a source of unresolved references — the legacy table is unreproducible and strings-only, but it is not the bottleneck for the refs these constant pools actually reach.
 
 ## 4, 12: the oracles over `corpus/features/`
 

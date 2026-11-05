@@ -53,7 +53,7 @@ tools/layoutpatch/         the overlay generator
 `src/cache/` knows nothing about what a BytecodeArray is; it knows the container
 format. `src/heap/` reaches every field through
 `layout.walk(className, view).fields.get(name)` — never by slot index. The old
-`src/deserializer.js` read the constant pool as `slots[5]` and the handler table
+`legacy/src/deserializer.js` read the constant pool as `slots[5]` and the handler table
 as `slots[4]`; here those are `constant_pool` and `handler_table`, so a field
 moving between V8 versions is a data change rather than a code change.
 
@@ -218,7 +218,7 @@ listed are gone:
 | the 32-byte header | `constants.codeCacheHeader.kHeaderSize` |
 | `BytecodeArray` field offsets, pool in `slots[5]`, handlers in `slots[4]` | `layoutOf('BytecodeArray')` |
 
-Added relative to `src/deserializer.js`:
+Added relative to `legacy/src/deserializer.js`:
 `kNewContextlessMetaMap` / `kNewContextfulMetaMap`,
 `kExternalReference` / `kSandboxedExternalReference` /
 `kSandboxedRawExternalReference`, `kApiReference` / `kSandboxedApiReference`,
@@ -817,6 +817,8 @@ would be wrong about 13 713 of them.
 | `tests/t4/selftest.mjs` | §7 |
 | `tests/t4/corpus-run.mjs` | the 1039-file regression |
 
-The old pipeline (`src/deserializer.js`, `src/lifter.js`, `src/dataflow.js`,
-`src/relooper.js`, `src/decompiler.js`, `src/profile.js`, `rules/`) is untouched
-and still runs.
+The old pipeline (`legacy/src/deserializer.js`, `legacy/src/lifter.js`,
+`legacy/src/dataflow.js`, `legacy/src/relooper.js`, `legacy/src/decompiler.js`,
+`legacy/src/profile.js`, `rules/`) still runs, unchanged except for the move
+itself; `legacy/README.md` says which two of those modules current code imports
+and why the other four must not be.

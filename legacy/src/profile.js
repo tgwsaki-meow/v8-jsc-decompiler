@@ -5,10 +5,18 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// `rules/` stayed at the repository root when this file moved to legacy/src/,
+// so the three tables below are two levels up, not one. The move preserved
+// relative IMPORTS but not module-relative DATA paths, and two of these three
+// reads are guarded by existsSync: a wrong path there does not throw, it
+// silently yields an empty roots map and an empty read-only-heap table, which
+// is the "before" column of metric 9 in docs/METRICS.md.
+const RULES = path.resolve(__dirname, '../../rules');
+
 export class V8Profile {
   constructor(profilePath) {
     if (!profilePath) {
-      profilePath = path.resolve(__dirname, '../rules/v8-14.4.258.16.json');
+      profilePath = path.join(RULES, 'v8-14.4.258.16.json');
     }
     const data = JSON.parse(fs.readFileSync(profilePath, 'utf8'));
     this.version = data.v8_version;
@@ -29,7 +37,7 @@ export class V8Profile {
 
     // Load official V8 roots
     this.roots = new Map();
-    const rootsPath = path.resolve(__dirname, '../rules/v8-roots-14.4.258.16.json');
+    const rootsPath = path.join(RULES, 'v8-roots-14.4.258.16.json');
     if (fs.existsSync(rootsPath)) {
       const rootsData = JSON.parse(fs.readFileSync(rootsPath, 'utf8'));
       const entries = rootsData.roots || rootsData.roots_by_index || {};
@@ -40,7 +48,7 @@ export class V8Profile {
 
     // Load official V8 ReadOnlyHeap strings table
     this.roHeap = new Map();
-    const roHeapPath = path.resolve(__dirname, '../rules/v8-ro-heap.json');
+    const roHeapPath = path.join(RULES, 'v8-ro-heap.json');
     if (fs.existsSync(roHeapPath)) {
       const roHeapData = JSON.parse(fs.readFileSync(roHeapPath, 'utf8'));
       for (const [k, v] of Object.entries(roHeapData)) {

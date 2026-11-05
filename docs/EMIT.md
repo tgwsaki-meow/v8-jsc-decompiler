@@ -629,8 +629,9 @@ layer's own `functionsEmitted / compiledUnits` — are reported in §8.4 instead
 `<base>.result.json` and `<base>.out.js` and does not delete them before
 spawning, so a child that dies leaves the *previous* run's row and text in
 place and the collector reads them as current. Measured: a liveness run came
-back with rows tagged `pipeline: src/decompiler.js` and output containing
-`function func_1`. Clear `scratch/t3/work/metrics-*` before measuring.
+back with rows tagged `pipeline: src/decompiler.js` (the string the harness
+printed then; that module is now `legacy/src/decompiler.js`) and output
+containing `function func_1`. Clear `scratch/t3/work/metrics-*` before measuring.
 
 Measured on 20 size-stratified `.jsc` with `--outputs fresh`, 16 of which
 paired (4 exceeded the 90 s per-file budget):
