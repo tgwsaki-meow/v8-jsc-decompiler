@@ -564,6 +564,7 @@ Reported, not fixed.
   `SwitchOnGeneratorState` the resume block has no predecessor, gets no SSA
   value, and no `await` can match. A test that omits the prologue tests
   nothing.
+
 ---
 
 ## 9. Every function must enter the output
@@ -634,10 +635,14 @@ emitted**, and the reference went
 | where | count | share |
 |---|---:|---:|
 | `inUnusedExprOnly` — the `{e:'fn'}` is in `exprs` and in no statement | 502 | 92.28% |
-| `parentFailed` — the parent's body is a stub, so its statements were never visited | 41 | 7.54% |
+| `parentFailed` — the parent emitted no body, so no statement of it was visited | 41 | 7.54% |
 | `t7Missing` — no statement and no `exprs` entry mentions it | 1 | 0.18% |
 
-By the child's own kind: 384 methods, 101 getters, 58 arrows. The dominant row
+All 23 of the sample's `parentFailed` parents are the refusals of docs/O1.md
+§6.8 — an unplaceable context binding, body replaced by a `throw` — and not
+units that failed to recover; the sample contains none of those.
+
+By the child's own kind: 384 methods, 101 getters, 59 arrows. The dominant row
 is one shape — the closure's user is a `Star` that the `%DefineClass` idiom
 claimed, so it emits no statement and §8.1's undecoded `ClassBoilerplate`
 leaves `{e:'class'}.members` empty. That `t7Missing` count of 1 is this layer's
@@ -779,7 +784,48 @@ On the 25-file sample: 543 unreferenced children, **485 rebound**, 58 already
 bound (the arrows), 0 at the top level, 0 absent from the input. 485 of 2 531
 functions emitted, **19.2%**, go from a form V8 discards to one it keeps.
 
-### 9.5 What this does not fix
+### 9.5 Measured on the corpus
+
+Both runs are the sharded O1 scan over all 1039 files
+(`gh workflow run scan.yml -f layer=o1 -f shards=12`), one on `main` and one on
+this branch, nothing executed either time.
+
+| | `main` | this branch |
+|---|---:|---:|
+| functions in stream A that reached a comparison | 184 672 | 184 672 |
+| functions in stream B (our text, recompiled) | 119 659 | **184 672** |
+| **paired** | 119 659 | **184 672** |
+| **A-side unpaired** (V8 makes it, our text does not) | 65 013 = 35.2046% | **0 = 0.0000%** |
+| **B-side unpaired** (we emit one V8 does not) | 0 | **0** |
+| **exactly equal** | 18 006 | **33 516** |
+| exactly equal, share of paired | 15.0478% | **18.1489%** |
+| exactly equal, share of all of V8's functions | 9.7502% | **18.1489%** |
+| mean opcode similarity | 0.770205 | 0.780057 |
+| mean whole-instruction similarity | 0.502109 | 0.519185 |
+| holes our emitter marked | 105 319 | 105 319 |
+
+The A-side count goes to **zero**: stream B now contains exactly the 184 672
+functions stream A does, and both unpaired counts are 0, so the correspondence
+is total in both directions. The exact count rose by 15 510 and the exact
+*rate* rose with it, which is the unusual direction — 65 013 functions arrived
+as new pairs and, rather than diluting the rate, lifted it. How the +15 510
+splits between a newly paired function that is equivalent and a parent that
+became equivalent by regaining the `CreateClosure` it was missing is not
+measured: the scan reports neither, and both are the same fix. Read on the
+identity-by-construction mode alone, where the pairing needs no caveat
+(docs/O1.md §4), `sfi` pairs go 114 950 → 179 961 and `sfi` exacts
+17 961 → 33 207, 15.6251% → 18.4523%: the headline is not carried by the weak
+pairing modes. Holes are unchanged, as they should be — this changes the form
+of a binding, not what the emitter is willing to guess.
+
+§9.4's 19.2% counts the bindings this layer rewrote; 35.20% is the share of
+V8's functions that came back. The two are not the same number because of the
+cascade: a function V8 does not create cannot create its own children either,
+so one unreferenced declaration costs its whole subtree, and rewriting the
+binding at every level at once recovers more functions than it rewrites
+bindings.
+
+### 9.6 What this does not fix
 
 The 648-strong `claimedByAPatternThroughItsUser:class` row is the largest
 remaining block and it is not a closure-scoping problem at all: it is §8.1's
