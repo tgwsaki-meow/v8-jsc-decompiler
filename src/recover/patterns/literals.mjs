@@ -168,9 +168,14 @@ export const ORDER_REFUSALS = Object.freeze({
   staticKeyNotDecoded: 'a placeholder entry\'s key is neither a string nor a number, so it '
     + 'cannot be matched against a store',
   fewerStoresThanPlaceholders: 'the boilerplate has more placeholder entries than there are '
-    + 'folded stores to fill them. The usual cause is an accessor: it gets a static entry, but '
-    + 'VisitObjectLiteral:4323 defines it with a runtime call that is not a Define* store, and '
-    + 'collectStores stops at it',
+    + 'folded stores to fill them, so `collectStores` stopped before the end of the static '
+    + 'part and which placeholder the stores it DID find belong to is no longer forced. Two '
+    + 'causes, both measured on the corpus: an accessor, which gets a static entry but is '
+    + 'defined by VisitObjectLiteral:4323\'s runtime call rather than a Define* store; and an '
+    + 'effect-chain member between two stores that is neither a store nor part of computing '
+    + 'one, e.g. the `ThrowReferenceErrorIfHole` of a TDZ read. In the second case the '
+    + 'emitted literal is already SHORT a property, which the oracle sees as a length '
+    + 'difference, so the order is moot until that is fixed',
   storeKeyMismatch: 'the k-th store\'s key is not the k-th placeholder entry\'s key, which '
     + 'contradicts VisitObjectLiteral:4247 walking the properties once in source order',
   keyedStoreKeyNotALiteral: 'a keyed store in the static part has a non-literal key, which '

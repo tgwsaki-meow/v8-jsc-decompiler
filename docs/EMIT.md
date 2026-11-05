@@ -1213,23 +1213,88 @@ code names is declared.
 | `entriesNotDecoded` | the boilerplate decoded to no entries |
 | `duplicateBoilerplateKey` | two static entries carry the same key. A later duplicate assigns into the property the earlier one created, so the key keeps its **first** position and its **last** value — and `ObjectLiteral::CalculateEmitStore` drops the store for the shadowed one, so which placeholder the surviving store belongs to is not in the bytecode |
 | `staticKeyNotDecoded` | a placeholder's key is neither a string nor a number, so no store can be matched to it |
-| `fewerStoresThanPlaceholders` | more placeholders than folded stores. The corpus shape behind this is an **accessor**: it gets a static entry, but `VisitObjectLiteral:4323` defines it with a runtime call that is not a `Define*` store, and `collectStores` stops there |
+| `fewerStoresThanPlaceholders` | more placeholders than folded stores, so `collectStores` stopped before the end of the static part. Two causes, both on the corpus: an **accessor**, which gets a static entry but is defined by `VisitObjectLiteral:4323`'s runtime call rather than a `Define*` store; and an effect-chain member between two stores that is neither a store nor part of computing one, e.g. a TDZ read's `ThrowReferenceErrorIfHole` |
 | `storeKeyMismatch` | the k-th store's key is not the k-th placeholder's, contradicting §10.3 |
 | `keyedStoreKeyNotALiteral` | a keyed store in the static part has a non-literal key, which `VisitObjectLiteral:4247` cannot emit — a computed name breaks out of that loop |
 
-`fewerStoresThanPlaceholders` is the one with a real residual behind it. An
-object literal containing an accessor keeps the old order, because the
-accessor's property is contributed by a different pattern
-(`src/recover/patterns/accessor.mjs`) that `literals.mjs` cannot see, so the
-placeholder its static entry occupies cannot be paired. Closing it means giving
-the two patterns a shared view of one literal's static block; until then it is
-counted, not approximated.
+**Measured, on a 40-file stride sample of the corpus** (`scratch/order/
+refusals.mjs`, recover only): 1 203 object literals got an exact plan and
+**2 583 properties were placed at the boilerplate's position**; 155 literals
+refused, **all 155 under `fewerStoresThanPlaceholders`**. The other six reasons
+never fired — in particular `storeKeyMismatch` fired zero times over 1 203
+literals, which is the evidence that §10.3's placeholder-to-store
+correspondence is a fact about the generator and not a hopeful assumption.
 
-### 10.6 Pinned
+`fewerStoresThanPlaceholders` is therefore the only residual with volume
+behind it, and it splits two ways. Where the missing store is an **accessor**,
+the property exists in the output but is contributed by a different pattern
+(`src/recover/patterns/accessor.mjs`) that `literals.mjs` cannot see, so the
+placeholder its static entry occupies cannot be paired; closing that means
+giving the two patterns a shared view of one literal's static block. Where
+`collectStores` stopped at an unrelated effect — a TDZ read's
+`ThrowReferenceErrorIfHole` is the corpus case, `r_63362.jsc` sfi 364 — the
+emitted literal is already **missing** that property, which the oracle sees as
+a length difference (`ObjectBoilerplateDescription[2]` against `[1]`), so its
+order is moot until the fold reaches past the check. Both are counted, not
+approximated.
+
+### 10.6 The corpus, before and after
+
+Both runs are the full corpus on CI (`scan.yml`, `layer=o1`, `shards=12`, 1039
+files, 12 shards merged): `main` is run `41996862891`, after is run
+`42002710278` on `literal-order`.
+
+| | before (`main`) | after |
+|---|---:|---:|
+| **exactly equal** | 33 463 | **33 516** |
+| **share of paired, and of all of V8's functions** | 18.1202% | **18.1489%** |
+| paired functions | 184 672 | 184 672 |
+| A-side unpaired | 0 | **0** |
+| B-side unpaired | 0 | **0** |
+| mean opcode similarity | 0.780057 | 0.780057 |
+| holes | 105 319 | 105 319 |
+| files / status | 1039 (1035 `ok`, 3 `decompile-timeout`, 1 `output-does-not-compile`) | identical |
+| **`literal-element-value`** | **521** functions, 532 hunks, 264 files | **182** functions, 191 hunks, 120 files |
+
+**+53 functions became `exact`** and **339 left `literal-element-value`**. Those
+are different numbers for a good reason: closing a literal's order removes one
+hunk, and a function only reaches `exact` when it has no *other* divergence —
+the vast majority of these functions still differ somewhere else.
+
+Mean opcode similarity is unchanged to six decimal places, as it must be: the
+change moves properties inside one constant-pool entry and emits not one
+different opcode.
+
+The order shape is gone, not reduced. Per shape, within the family:
+
+| shape | before | after |
+|---|---:|---:|
+| `ObjectBoilerplateDescription[6] contents differ` | 127 | **0** |
+| `ObjectBoilerplateDescription[4] contents differ` | 125 | **0** |
+| `ObjectBoilerplateDescription[2] contents differ` | 62 | **10** |
+| `ObjectBoilerplateDescription[3] contents differ` | 31 | **0** |
+| `ObjectBoilerplateDescription[5] contents differ` | 5 | **0** |
+| `ObjectBoilerplateDescription[1] contents differ` | 12 | 12 |
+
+§10.1's own repro is the direct check: the line
+
+```
+- CreateObjectLiteral K(<ObjectBoilerplateDescription[2] {"fn": <the_hole>, "await": <false>}>)
++ CreateObjectLiteral K(<ObjectBoilerplateDescription[2] {"await": <false>, "fn": <the_hole>}>)
+```
+
+appears in the `main` report and **does not appear anywhere** in the after
+report. The 12 remaining `[1] contents differ` are a one-property literal,
+which has no order to get wrong, so they were never this defect. Every shape
+still in the family after the fix is a **length** or a **contents/elements-kind**
+difference; none is an order.
+
+### 10.7 Pinned
 
 `tools/emit/selftest.mjs` group F, nine checks, no engine needed: §10.1's
 repro, the interleaved case, the no-static-part case the fix must not disturb,
 one check per refusal with its reason asserted by name, the `ORDER_REFUSALS`
 totality check, and a unit check that `staticOrder` throws on each
 contradictory plan instead of reordering and returns an unmarked list
-untouched.
+untouched. `node tools/ci/run_selftests.mjs disasm emit recover` — 3 suites,
+0 failures, 84 checks in `emit`.
