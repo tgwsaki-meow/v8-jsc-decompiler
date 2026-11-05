@@ -213,6 +213,7 @@ export class HeapContext {
     if (name === 'ArrayBoilerplateDescription') return O.decodeArrayBoilerplate(record, this);
     if (name === 'RegExpBoilerplateDescription') return O.decodeRegExpBoilerplate(record, this);
     if (name === 'TemplateObjectDescription') return O.decodeTemplateObjectDescription(record, this);
+    if (name === 'ClassBoilerplate') return O.decodeClassBoilerplate(record, this);
 
     if (FIXED_ARRAY_CLASSES.has(name)) {
       const r = O.fixedArrayElements(record, name, this);
